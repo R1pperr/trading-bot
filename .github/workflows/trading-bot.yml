@@ -1,0 +1,51 @@
+name: Trading bot (paper)
+
+on:
+  schedule:
+    # Every hour at :45, Monday-Friday, 13:45-20:45 UTC.
+    # That covers US market hours all year; the bot itself checks if the market is open.
+    - cron: "45 13-20 * * 1-5"
+  workflow_dispatch:   # adds a "Run workflow" button so you can start it by hand
+
+permissions:
+  contents: write      # lets the job save logs/trade_log.csv back into the repository
+
+concurrency:
+  group: trading-bot   # never run two copies at the same time
+  cancel-in-progress: false
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install packages
+        run: pip install -r requirements.txt
+
+      - name: Run the bot (paper account)
+        env:
+          ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python bot.py
+
+      - name: Save the trade log
+        if: always()
+        run: |
+          if [ -f logs/trade_log.csv ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add -f logs/trade_log.csv
+            if ! git diff --cached --quiet; then
+              git commit -m "Update trade log"
+              git pull --rebase
+              git push
+            fi
+          fi
