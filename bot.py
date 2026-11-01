@@ -416,8 +416,9 @@ def finish_run(args, exit_code):
     if not args.dry_run:
         notifier.notify(alerts_for(RUN_EVENTS))
     errors = [row["details"] for row in RUN_EVENTS if row["event"] == "ERROR"]
+    orders = sum(row["event"] == "ORDER" for row in RUN_EVENTS)
     dashboard.update(LOG_FILE, start_of_today_utc(), exit_code,
-                     errors[-1] if errors else "", args.dry_run)
+                     errors[-1] if errors else "", args.dry_run, orders)
     send_daily_summary(args)
 
 

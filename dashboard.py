@@ -14,7 +14,7 @@ Nothing here can stop the bot: update() catches every error and prints a note.
 import csv
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from alpaca.trading.client import TradingClient
 
@@ -22,11 +22,14 @@ import ai_analyst
 import config
 import notifier
 import risk
+from data import NEW_YORK, get_daily_bars
+from strategy import latest_signal
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "docs", "data")
 MAX_EQUITY_POINTS = 5000    # about 8 months of 15-minute runs
 MAX_TRADES = 100            # newest rows kept in trades.json
+MAX_RUNS = 120              # newest runs kept in runs.json, about 4 trading days
 
 
 # ---------------------------------------------------------------------------
@@ -107,6 +110,7 @@ def position_rows(positions):
             "market_value": _number(position.market_value),
             "unrealized_pl": _number(position.unrealized_pl),
             "unrealized_pl_pct": _number(position.unrealized_plpc),
+            "change_today_pct": _number(getattr(position, "change_today", None)),
             "stop_price": round(risk.stop_price(entry), 2),
         })
     return sorted(rows, key=lambda row: row["symbol"])
@@ -119,6 +123,44 @@ def add_equity_point(history, now, equity):
         if last["equity"] == equity and last["time_utc"][:10] == now[:10]:
             return history
     return (history + [{"time_utc": now, "equity": equity}])[-MAX_EQUITY_POINTS:]
+
+
+def add_run(history, now, state, orders):
+    """Remember this run, so the dashboard can show that the bot keeps running."""
+    return (history + [{"time_utc": now, "status": state, "orders": orders}])[-MAX_RUNS:]
+
+
+def account_figures(account, positions):
+    """Extra numbers from your own account. Empty if Alpaca couldn't be reached."""
+    if account is None:
+        return {}
+    return {
+        "cash": _number(getattr(account, "cash", None)),
+        "buying_power": _number(getattr(account, "buying_power", None)),
+        "invested": round(sum(_number(p.market_value) or 0.0 for p in positions), 2),
+        "open_pl": round(sum(_number(p.unrealized_pl) or 0.0 for p in positions), 2),
+    }
+
+
+def refresh_watchlist(today):
+    """
+    Once a New York day: the bot's current view of each stock, in words only.
+    Alpaca doesn't allow republishing its price data, so no prices or averages
+    go into this public file. The website shows price charts from TradingView.
+    """
+    if _read_json("watchlist.json", {}).get("updated_for") == today:
+        return
+    start = datetime.now(timezone.utc) - timedelta(days=int(config.SLOW_SMA_DAYS * 1.6) + 60)
+    bars = get_daily_bars(config.SYMBOLS, start)
+    stocks = []
+    for symbol in config.SYMBOLS:
+        prices = bars.get(symbol)
+        view = {"trend": "", "signal": "", "date": ""}
+        if prices is not None and len(prices) >= config.SLOW_SMA_DAYS + 1:
+            view = latest_signal(prices)
+        stocks.append({"symbol": symbol, "trend": view["trend"], "signal": view["signal"],
+                       "signal_date": view["date"]})
+    _write_json("watchlist.json", {"updated_for": today, "stocks": stocks})
 
 
 def build_status(now, exit_code, error_text, dry_run, market_open, equity, start_equity,
@@ -146,6 +188,13 @@ def build_status(now, exit_code, error_text, dry_run, market_open, equity, start
         },
         "ai_analyst_on": config.USE_AI_ANALYST,
         "paper": True,
+        "trades_today": sum(row.get("event") == "ORDER" for row in todays_rows),
+        "limits": {
+            "max_trades_per_day": config.MAX_TRADES_PER_DAY,
+            "max_position_pct": config.MAX_POSITION_PCT,
+            "stop_loss_pct": config.STOP_LOSS_PCT,
+            "kill_switch_pct": config.KILL_SWITCH_PCT,
+        },
     }
 
 
@@ -175,11 +224,12 @@ def fetch_account():
     return trading.get_account(), trading.get_all_positions(), trading.get_clock().is_open
 
 
-def _update(log_file, day_start, exit_code, error_text, dry_run):
+def _update(log_file, day_start, exit_code, error_text, dry_run, orders):
     now = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     log_rows = read_log(log_file)
     day_start_text = day_start.strftime("%Y-%m-%d %H:%M:%S")
     todays_rows = [row for row in log_rows if row.get("time_utc", "") >= day_start_text]
+    previous = _read_json("status.json", {})
 
     try:
         account, positions, market_open = fetch_account()
@@ -187,22 +237,33 @@ def _update(log_file, day_start, exit_code, error_text, dry_run):
     except (Exception, SystemExit) as error:
         # Alpaca can't be reached: keep the last good numbers and still show this run's status.
         print("⚠️  Could not refresh account data for the dashboard:", notifier.redact(error))
-        positions, market_open, start_equity = None, None, None
-        equity = _read_json("status.json", {}).get("equity")
+        account, positions, market_open, start_equity = None, None, None, None
+        equity = previous.get("equity")
 
-    _write_json("status.json", build_status(now, exit_code, error_text, dry_run, market_open,
-                                            equity, start_equity, todays_rows))
+    status = build_status(now, exit_code, error_text, dry_run, market_open,
+                          equity, start_equity, todays_rows)
+    figures = account_figures(account, positions)
+    for name in ("cash", "buying_power", "invested", "open_pl"):
+        status[name] = figures.get(name, previous.get(name))
+    _write_json("status.json", status)
     _write_json("trades.json", trade_rows(log_rows))
+    _write_json("runs.json", add_run(_read_json("runs.json", []), now,
+                                     status["last_run"]["status"], orders))
     if positions is not None:
         _write_json("positions.json", position_rows(positions))
         _write_json("equity_history.json",
                     add_equity_point(_read_json("equity_history.json", []), now, equity))
+
+    try:
+        refresh_watchlist(datetime.now(NEW_YORK).date().isoformat())
+    except (Exception, SystemExit) as error:
+        print("⚠️  Could not refresh the stock list for the dashboard:", notifier.redact(error))
     print("Dashboard data written to docs/data/")
 
 
-def update(log_file, day_start, exit_code=0, error_text="", dry_run=False):
+def update(log_file, day_start, exit_code=0, error_text="", dry_run=False, orders=0):
     """Refresh every file in docs/data/. Never raises an error."""
     try:
-        _update(log_file, day_start, exit_code, error_text, dry_run)
+        _update(log_file, day_start, exit_code, error_text, dry_run, orders)
     except (Exception, SystemExit) as error:
         print("⚠️  Dashboard data not updated:", notifier.redact(error))
