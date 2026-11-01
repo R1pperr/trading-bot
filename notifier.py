@@ -25,6 +25,7 @@ SEND_URL = "https://api.telegram.org/bot{token}/sendMessage"
 TIMEOUT_SECONDS = 10
 MAX_MESSAGE_LENGTH = 4000   # Telegram allows 4096 characters
 SECRET_NAMES = ("ALPACA_API_KEY", "ALPACA_SECRET_KEY", "GEMINI_API_KEY", "TELEGRAM_BOT_TOKEN")
+BOTH_LABEL = "[STOCK] [CRYPTO]"
 
 
 def redact(text):
@@ -54,8 +55,19 @@ def send(message):
         return False
 
 
+def is_crypto_row(row):
+    return "/" in row.get("symbol", "") or row.get("details", "").startswith("crypto:")
+
+
+def label_for(row):
+    """Every message says which side it's about. The kill switch covers both."""
+    if row.get("event") == "KILL_SWITCH":
+        return BOTH_LABEL
+    return "[CRYPTO]" if is_crypto_row(row) else "[STOCK]"
+
+
 def _order_message(row):
-    qty = f"{float(row['qty']):g}"
+    qty = f"{float(row['qty']):.8f}".rstrip("0").rstrip(".") if is_crypto_row(row) else f"{float(row['qty']):g}"
     price = f"${float(row['price']):,.2f}"
     status = row.get("order_status", "")
     outcome = "filled" if status == "filled" else f"placed ({status})"
@@ -76,7 +88,12 @@ def _order_message(row):
 
 
 def message_for(row):
-    """Turn one trade-log row into a phone message, or None if it isn't worth one."""
+    """Turn one trade-log row into a labeled phone message, or None if it isn't worth one."""
+    message = _message_text(row)
+    return f"{label_for(row)} {message}" if message else None
+
+
+def _message_text(row):
     event = row.get("event")
     if event == "ORDER":
         return _order_message(row)

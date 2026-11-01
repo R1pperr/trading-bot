@@ -18,6 +18,12 @@ from dotenv import load_dotenv
 # Nasdaq-100 indexes; the rest are single large companies. Edit freely.
 SYMBOLS = ["SPY", "QQQ", "AAPL", "MSFT", "JPM"]
 
+# Crypto pairs, written the way Alpaca orders them. See the crypto backtest with
+# python backtest.py --crypto. Crypto needs the every-day schedule in the workflow
+# file, because it never closes. Set this to False to stop all crypto activity.
+CRYPTO_ENABLED = True
+CRYPTO_SYMBOLS = ["BTC/USD", "ETH/USD"]
+
 
 # ---------------------------------------------------------------------------
 # Strategy: moving-average crossover (see strategy.py)
@@ -36,6 +42,9 @@ FEE_PCT = 0.0005
 # Slippage: you rarely get exactly the price you saw. Every simulated buy is
 # filled 0.05% higher and every sell 0.05% lower than the market price.
 SLIPPAGE_PCT = 0.0005
+# Crypto backtest only. Alpaca's crypto fees start at 0.25% for orders that fill
+# straight away, which is much more than stocks, so using FEE_PCT would flatter it.
+CRYPTO_FEE_PCT = 0.0025
 
 
 # ---------------------------------------------------------------------------

@@ -39,6 +39,7 @@ from alpaca.trading.requests import GetOrdersRequest, MarketOrderRequest
 
 import ai_analyst
 import config
+import crypto
 import dashboard
 import notifier
 import risk
@@ -103,6 +104,15 @@ def read_todays_log():
         return [row for row in csv.DictReader(handle) if row.get("time_utc", "") >= start]
 
 
+def read_crypto_days_log():
+    """Rows written since midnight UTC, because crypto's day runs on UTC."""
+    if not os.path.exists(LOG_FILE):
+        return []
+    start = crypto.utc_midnight().strftime("%Y-%m-%d %H:%M:%S")
+    with open(LOG_FILE, newline="") as handle:
+        return [row for row in csv.DictReader(handle) if row.get("time_utc", "") >= start]
+
+
 def already_logged(todays_log, event, symbol, signal_date, decision=None):
     for row in todays_log:
         if row["event"] == event and row["symbol"] == symbol and row["signal_date"] == signal_date:
@@ -115,8 +125,10 @@ def already_logged(todays_log, event, symbol, signal_date, decision=None):
 # Talking to Alpaca
 # ---------------------------------------------------------------------------
 def orders_placed_today(trading):
+    """Stock orders only: crypto keeps its own count, so it can't use up the stocks' trades."""
     request = GetOrdersRequest(status=QueryOrderStatus.ALL, after=start_of_today_utc(), limit=500)
-    return [o for o in trading.get_orders(filter=request) if text(o.status) not in NOT_A_TRADE]
+    return [o for o in trading.get_orders(filter=request)
+            if text(o.status) not in NOT_A_TRADE and not crypto.is_crypto(o)]
 
 
 def latest_price(data_client, symbol, fallback):
@@ -181,7 +193,7 @@ def run(args):
     todays_orders = orders_placed_today(trading)
     trades_today = len(todays_orders)
     traded_today = {o.symbol for o in todays_orders}
-    positions = {p.symbol: p for p in trading.get_all_positions()}
+    positions = {p.symbol: p for p in trading.get_all_positions() if not crypto.is_crypto(p)}
 
     # --- Rule 4: kill switch -------------------------------------------------
     killed_earlier = any(row["event"] == "KILL_SWITCH" for row in todays_log)
@@ -365,6 +377,50 @@ def run_test_order(trading, data_client, symbol, equity, positions, trades_today
     return 0
 
 
+def open_crypto_session(args):
+    """Log in for the crypto side and work out the shared kill switch."""
+    api_key, secret_key = config.get_alpaca_keys()
+    trading = TradingClient(api_key, secret_key, paper=True)   # PAPER ONLY
+    account = trading.get_account()
+    equity = float(account.equity)
+    start_equity = float(account.last_equity)
+    killed_earlier = any(row["event"] == "KILL_SWITCH" for row in read_todays_log())
+    killed = killed_earlier or risk.kill_switch_triggered(equity, start_equity)
+    if killed and not killed_earlier and not args.dry_run:
+        change = risk.daily_change(equity, start_equity)
+        log_event(event="KILL_SWITCH", equity=equity,
+                  details=f"equity {change:+.2%} since yesterday's close (limit "
+                          f"-{config.KILL_SWITCH_PCT:.0%}); no new trades today")
+    return trading, account, equity, killed
+
+
+def run_crypto_side(args):
+    """
+    The crypto run. It comes after the stocks with its own error handling, so a
+    crypto problem can't touch the stock run. Crypto never closes, so it doesn't
+    check the market clock.
+    """
+    if not config.CRYPTO_ENABLED or args.test_order:
+        return 0
+    try:
+        trading, account, equity, killed = open_crypto_session(args)
+        if account.trading_blocked or account.account_blocked:
+            print("❌ Crypto skipped: Alpaca says this account is blocked from trading.")
+            return 1
+        crypto.run(trading, equity, float(account.non_marginable_buying_power), killed,
+                   args.dry_run, read_crypto_days_log(), log_event)
+        return 0
+    except (Exception, SystemExit) as error:
+        print("❌ The crypto run stopped because of an error:", error)
+        record_crash("crypto: " + " ".join(str(error).split())[:290])
+        return 1
+
+
+def run_crypto_test_order(args):
+    trading, _, equity, killed = open_crypto_session(args)
+    return crypto.run_test_order(trading, args.test_order, equity, killed, log_event)
+
+
 def record_crash(details):
     try:
         log_event(event="ERROR", details=details)
@@ -426,17 +482,22 @@ def main():
     parser = argparse.ArgumentParser(description="Run the paper-trading bot once.")
     parser.add_argument("--dry-run", action="store_true", help="show decisions without placing orders")
     parser.add_argument("--test-order", nargs="?", const="SPY", default=None, metavar="SYMBOL",
-                        help="buy 1 share (default SPY) to check orders reach your dashboard")
+                        help="buy 1 share (default SPY), or about $10 of a crypto pair such as "
+                             "BTC/USD, to check orders reach your dashboard")
     args = parser.parse_args()
     os.chdir(BASE_DIR)
     exit_code = 1
     try:
-        exit_code = run(args)
+        if args.test_order and "/" in args.test_order:
+            exit_code = run_crypto_test_order(args)
+        else:
+            exit_code = run(args)
     except SystemExit:   # config.py stops the run this way when the keys are missing
         record_crash("Alpaca keys are missing or unreadable")
     except Exception as error:
         print("❌ The run stopped because of an error:", error)
         record_crash(" ".join(str(error).split())[:300])
+    exit_code = max(exit_code, run_crypto_side(args))
     finish_run(args, exit_code)
     sys.exit(exit_code)
 

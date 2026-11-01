@@ -7,6 +7,8 @@ Run with the settings from config.py:
 Or choose your own period / symbols:
     python backtest.py --start 2023-01-01
     python backtest.py --start 2018-01-01 --end 2021-12-31 --symbols SPY AAPL
+Or test the crypto pairs with the same strategy, charging CRYPTO_FEE_PCT:
+    python backtest.py --crypto
 
 What is simulated, for each symbol separately, starting with BACKTEST_CASH:
   * A signal from a day's close is traded at the NEXT day's open.
@@ -30,7 +32,8 @@ from datetime import datetime, timedelta
 import pandas as pd
 
 import config
-from data import get_daily_bars, last_complete_day_end
+from data import (get_crypto_daily_bars, get_daily_bars, last_complete_day_end,
+                  last_complete_utc_day_end)
 from strategy import BUY, HOLD, SELL, generate_signals
 
 RESULTS_DIR = "results"
@@ -232,16 +235,16 @@ def print_summary(measurements):
 # ---------------------------------------------------------------------------
 # Saving
 # ---------------------------------------------------------------------------
-def save_files(results, measurements):
+def save_files(results, measurements, prefix=""):
     os.makedirs(RESULTS_DIR, exist_ok=True)
 
-    pd.DataFrame(measurements).to_csv(os.path.join(RESULTS_DIR, "backtest_summary.csv"), index=False)
+    pd.DataFrame(measurements).to_csv(os.path.join(RESULTS_DIR, f"{prefix}backtest_summary.csv"), index=False)
 
     all_trades = [t for r in results for t in r["trades"]]
     columns = ["symbol", "entry_date", "entry_price", "exit_date", "exit_price",
                "exit_reason", "days_held", "pnl_dollars", "pnl_pct"]
     pd.DataFrame(all_trades, columns=columns).to_csv(
-        os.path.join(RESULTS_DIR, "backtest_trades.csv"), index=False)
+        os.path.join(RESULTS_DIR, f"{prefix}backtest_trades.csv"), index=False)
 
     curves = []
     for r in results:
@@ -251,7 +254,7 @@ def save_files(results, measurements):
             "strategy_equity": r["strategy_equity"].round(2).values,
             "buy_and_hold_equity": r["hold_equity"].round(2).values,
         }))
-    pd.concat(curves).to_csv(os.path.join(RESULTS_DIR, "backtest_equity.csv"), index=False)
+    pd.concat(curves).to_csv(os.path.join(RESULTS_DIR, f"{prefix}backtest_equity.csv"), index=False)
 
     try:
         import matplotlib
@@ -271,7 +274,7 @@ def save_files(results, measurements):
         ax.grid(alpha=0.3)
         ax.legend(loc="best", fontsize=9)
     fig.tight_layout()
-    fig.savefig(os.path.join(RESULTS_DIR, "backtest_chart.png"), dpi=110)
+    fig.savefig(os.path.join(RESULTS_DIR, f"{prefix}backtest_chart.png"), dpi=110)
     plt.close(fig)
 
 
@@ -282,12 +285,16 @@ def main():
     parser = argparse.ArgumentParser(description="Backtest the moving-average strategy.")
     parser.add_argument("--start", default=config.BACKTEST_START, help="first test day, e.g. 2020-01-01")
     parser.add_argument("--end", default=None, help="last test day (default: last finished trading day)")
-    parser.add_argument("--symbols", nargs="+", default=config.SYMBOLS, help="e.g. --symbols SPY AAPL")
+    parser.add_argument("--symbols", nargs="+", default=None, help="e.g. --symbols SPY AAPL")
+    parser.add_argument("--crypto", action="store_true", help="test the crypto pairs in config.py")
     args = parser.parse_args()
 
-    symbols = [s.upper() for s in args.symbols]
+    symbols = [s.upper() for s in (args.symbols or (config.CRYPTO_SYMBOLS if args.crypto else config.SYMBOLS))]
+    fee_pct = config.CRYPTO_FEE_PCT if args.crypto else config.FEE_PCT
+    download = get_crypto_daily_bars if args.crypto else get_daily_bars
+    prefix = "crypto_" if args.crypto else ""
     start = datetime.fromisoformat(args.start)
-    latest_end = last_complete_day_end().replace(tzinfo=None)
+    latest_end = (last_complete_utc_day_end() if args.crypto else last_complete_day_end()).replace(tzinfo=None)
     end = min(datetime.fromisoformat(args.end) + timedelta(days=1), latest_end) if args.end else latest_end
 
     if (end - start).days < 365:
@@ -300,14 +307,14 @@ def main():
     warm_up = timedelta(days=int(config.SLOW_SMA_DAYS * 1.6) + 30)
     print(f"Downloading daily prices for {', '.join(symbols)} ...")
     try:
-        prices = get_daily_bars(symbols, start - warm_up, end)
+        prices = download(symbols, start - warm_up, end)
     except Exception as error:
         print("❌ Could not download prices from Alpaca:", error)
         sys.exit(1)
 
     print(f"Strategy: {config.FAST_SMA_DAYS}/{config.SLOW_SMA_DAYS}-day moving-average crossover, "
           f"{config.STOP_LOSS_PCT:.0%} stop-loss")
-    print(f"Costs: {config.FEE_PCT:.2%} fee + {config.SLIPPAGE_PCT:.2%} slippage on every trade")
+    print(f"Costs: {fee_pct:.2%} fee + {config.SLIPPAGE_PCT:.2%} slippage on every trade")
 
     results, measurements = [], []
     for symbol in symbols:
@@ -315,7 +322,7 @@ def main():
             print(f"\n⚠️  {symbol}: no price data found (check the ticker). Skipped.")
             continue
         result = simulate(symbol, prices[symbol], start, config.BACKTEST_CASH,
-                          config.FEE_PCT, config.SLIPPAGE_PCT, config.STOP_LOSS_PCT)
+                          fee_pct, config.SLIPPAGE_PCT, config.STOP_LOSS_PCT)
         if result is None or (result["last_day"] - result["first_day"]).days < 365:
             print(f"\n⚠️  {symbol}: less than 1 year of prices in this period. Skipped.")
             continue
@@ -329,8 +336,9 @@ def main():
         sys.exit(1)
 
     print_summary(measurements)
-    save_files(results, measurements)
-    print(f"\nSaved: {RESULTS_DIR}/backtest_summary.csv, backtest_trades.csv, backtest_equity.csv, backtest_chart.png")
+    save_files(results, measurements, prefix)
+    print(f"\nSaved: {RESULTS_DIR}/{prefix}backtest_summary.csv, {prefix}backtest_trades.csv, "
+          f"{prefix}backtest_equity.csv, {prefix}backtest_chart.png")
 
 
 if __name__ == "__main__":

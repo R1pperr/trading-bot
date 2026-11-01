@@ -35,6 +35,18 @@ def max_shares_to_buy(equity, price, already_held_value=0.0, max_pct=None):
     return max(0, math.floor(room / price))
 
 
+def max_crypto_qty(equity, price, max_pct=None):
+    """
+    The same position cap as max_shares_to_buy, for crypto, where parts of a coin
+    can be bought. Rounded down to 8 decimal places, so it stays within the cap.
+    Example: equity $100,000, cap 5% -> $5,000; at $78,000 a coin -> 0.06410256.
+    """
+    max_pct = config.MAX_POSITION_PCT if max_pct is None else max_pct
+    if price <= 0 or equity <= 0:
+        return 0.0
+    return math.floor(equity * max_pct / price * 100_000_000) / 100_000_000
+
+
 def stop_price(entry_price, stop_pct=None):
     stop_pct = config.STOP_LOSS_PCT if stop_pct is None else stop_pct
     return entry_price * (1 - stop_pct)

@@ -17,8 +17,8 @@ from zoneinfo import ZoneInfo
 
 import pandas as pd
 from alpaca.data.enums import Adjustment, DataFeed
-from alpaca.data.historical import StockHistoricalDataClient
-from alpaca.data.requests import StockBarsRequest
+from alpaca.data.historical import CryptoHistoricalDataClient, StockHistoricalDataClient
+from alpaca.data.requests import CryptoBarsRequest, CryptoLatestTradeRequest, StockBarsRequest
 from alpaca.data.timeframe import TimeFrame
 
 import config
@@ -106,3 +106,53 @@ def get_daily_bars(symbols, start, end=None):
         tables[symbol] = table.sort_index()
 
     return tables
+
+
+def last_complete_utc_day_end():
+    """Midnight UTC today. Alpaca's daily crypto bars run from one UTC midnight to the next."""
+    return datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+
+
+def get_crypto_daily_bars(symbols, start, end=None):
+    """
+    Download daily bars for crypto pairs, in the same tables as get_daily_bars.
+    Crypto never closes, so Alpaca also returns today's unfinished bar. Only days
+    that have fully finished are kept.
+    """
+    if isinstance(symbols, str):
+        symbols = [symbols]
+    start = _to_utc(start)
+    end = min(_to_utc(end), last_complete_utc_day_end()) if end else last_complete_utc_day_end()
+
+    api_key, secret_key = config.get_alpaca_keys()
+    client = CryptoHistoricalDataClient(api_key, secret_key)
+    request = CryptoBarsRequest(symbol_or_symbols=symbols, timeframe=TimeFrame.Day, start=start, end=end)
+    raw = client.get_crypto_bars(request).df
+
+    tables = {}
+    if raw is None or raw.empty:
+        return tables
+
+    for symbol in symbols:
+        if symbol not in raw.index.get_level_values("symbol"):
+            continue
+        table = raw.xs(symbol, level="symbol").copy()
+        stamps = pd.DatetimeIndex(table.index).tz_convert("UTC")
+        finished = stamps < pd.Timestamp(end)      # a bar stamped at `end` has only just begun
+        table = table[finished]
+        table.index = stamps[finished].tz_localize(None).normalize()
+        table.index.name = "date"
+        tables[symbol] = table[["open", "high", "low", "close", "volume"]].astype(float).sort_index()
+
+    return tables
+
+
+def get_crypto_latest_price(symbol, fallback):
+    """Most recent crypto trade price (falls back to the last close)."""
+    try:
+        api_key, secret_key = config.get_alpaca_keys()
+        client = CryptoHistoricalDataClient(api_key, secret_key)
+        request = CryptoLatestTradeRequest(symbol_or_symbols=symbol)
+        return float(client.get_crypto_latest_trade(request)[symbol].price)
+    except Exception:
+        return fallback

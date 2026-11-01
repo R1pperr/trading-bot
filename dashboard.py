@@ -20,9 +20,10 @@ from alpaca.trading.client import TradingClient
 
 import ai_analyst
 import config
+import crypto
 import notifier
 import risk
-from data import NEW_YORK, get_daily_bars
+from data import NEW_YORK, get_crypto_daily_bars, get_daily_bars
 from strategy import latest_signal
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -79,6 +80,11 @@ def _number(value):
         return None
 
 
+def asset_class_of(symbol):
+    """Crypto pairs are written with a slash in the trade log, stocks never are."""
+    return "crypto" if "/" in symbol else "stock"
+
+
 def trade_rows(log_rows):
     """Orders and AI vetoes, newest first."""
     wanted = [row for row in log_rows if row.get("event") == "ORDER"
@@ -87,6 +93,7 @@ def trade_rows(log_rows):
         "time_utc": row.get("time_utc", ""),
         "event": row.get("event", ""),
         "symbol": row.get("symbol", ""),
+        "asset_class": asset_class_of(row.get("symbol", "")),
         "side": row.get("side", "") or row.get("signal", "").lower(),
         "qty": _number(row.get("qty")),
         "price": _number(row.get("price")),
@@ -102,8 +109,10 @@ def position_rows(positions):
     rows = []
     for position in positions:
         entry = float(position.avg_entry_price)
+        is_crypto = crypto.is_crypto(position)
         rows.append({
-            "symbol": position.symbol,
+            "symbol": crypto.normalize(position.symbol) if is_crypto else position.symbol,
+            "asset_class": "crypto" if is_crypto else "stock",
             "qty": float(position.qty),
             "avg_entry_price": entry,
             "current_price": _number(position.current_price),
@@ -134,33 +143,50 @@ def account_figures(account, positions):
     """Extra numbers from your own account. Empty if Alpaca couldn't be reached."""
     if account is None:
         return {}
+
+    def value_of(wanted):
+        return round(sum(_number(p.market_value) or 0.0 for p in positions
+                         if crypto.is_crypto(p) == wanted), 2)
+
     return {
         "cash": _number(getattr(account, "cash", None)),
         "buying_power": _number(getattr(account, "buying_power", None)),
         "invested": round(sum(_number(p.market_value) or 0.0 for p in positions), 2),
         "open_pl": round(sum(_number(p.unrealized_pl) or 0.0 for p in positions), 2),
+        "stock_value": value_of(False),
+        "crypto_value": value_of(True),
     }
 
 
-def refresh_watchlist(today):
-    """
-    Once a New York day: the bot's current view of each stock, in words only.
-    Alpaca doesn't allow republishing its price data, so no prices or averages
-    go into this public file. The website shows price charts from TradingView.
-    """
-    if _read_json("watchlist.json", {}).get("updated_for") == today:
-        return
-    start = datetime.now(timezone.utc) - timedelta(days=int(config.SLOW_SMA_DAYS * 1.6) + 60)
-    bars = get_daily_bars(config.SYMBOLS, start)
-    stocks = []
-    for symbol in config.SYMBOLS:
+def views_of(symbols, bars):
+    """The bot's view of each symbol, in words only."""
+    views = []
+    for symbol in symbols:
         prices = bars.get(symbol)
         view = {"trend": "", "signal": "", "date": ""}
         if prices is not None and len(prices) >= config.SLOW_SMA_DAYS + 1:
             view = latest_signal(prices)
-        stocks.append({"symbol": symbol, "trend": view["trend"], "signal": view["signal"],
-                       "signal_date": view["date"]})
-    _write_json("watchlist.json", {"updated_for": today, "stocks": stocks})
+        views.append({"symbol": symbol, "trend": view["trend"], "signal": view["signal"],
+                      "signal_date": view["date"]})
+    return views
+
+
+def refresh_watchlist(today):
+    """
+    Once a New York day: the bot's current view of each stock and crypto pair, in
+    words only. Alpaca doesn't allow republishing its price data, so no prices or
+    averages go into this public file. The website shows price charts from TradingView.
+    Crypto is left out while config.CRYPTO_ENABLED is False.
+    """
+    current = _read_json("watchlist.json", {})
+    if current.get("updated_for") == today and bool(current.get("crypto")) == config.CRYPTO_ENABLED:
+        return
+    start = datetime.now(timezone.utc) - timedelta(days=int(config.SLOW_SMA_DAYS * 1.6) + 60)
+    stocks = views_of(config.SYMBOLS, get_daily_bars(config.SYMBOLS, start))
+    pairs = []
+    if config.CRYPTO_ENABLED:
+        pairs = views_of(config.CRYPTO_SYMBOLS, get_crypto_daily_bars(config.CRYPTO_SYMBOLS, start))
+    _write_json("watchlist.json", {"updated_for": today, "stocks": stocks, "crypto": pairs})
 
 
 def build_status(now, exit_code, error_text, dry_run, market_open, equity, start_equity,
@@ -188,7 +214,10 @@ def build_status(now, exit_code, error_text, dry_run, market_open, equity, start
         },
         "ai_analyst_on": config.USE_AI_ANALYST,
         "paper": True,
-        "trades_today": sum(row.get("event") == "ORDER" for row in todays_rows),
+        "crypto_enabled": config.CRYPTO_ENABLED,
+        "crypto_symbols": config.CRYPTO_SYMBOLS,
+        "trades_today": sum(row.get("event") == "ORDER" and "/" not in row.get("symbol", "")
+                            for row in todays_rows),
         "limits": {
             "max_trades_per_day": config.MAX_TRADES_PER_DAY,
             "max_position_pct": config.MAX_POSITION_PCT,
@@ -208,7 +237,7 @@ def summary_text(orders_today):
         value += f" ({change:+.2%} today)"
     run_status = status.get("last_run", {}).get("status", "unknown")
     kill_on = status.get("kill_switch", {}).get("on")
-    return (f"📊 Daily summary\nAccount value: {value}\nOrders today: {orders_today}\n"
+    return (f"{notifier.BOTH_LABEL} 📊 Daily summary\nAccount value: {value}\nOrders today: {orders_today}\n"
             f"Open positions: {len(_read_json('positions.json', []))}\n"
             f"Kill switch: {'ON' if kill_on else 'off'}\n"
             f"Last run: {run_status.replace('_', ' ')}")
@@ -243,8 +272,12 @@ def _update(log_file, day_start, exit_code, error_text, dry_run, orders):
     status = build_status(now, exit_code, error_text, dry_run, market_open,
                           equity, start_equity, todays_rows)
     figures = account_figures(account, positions)
-    for name in ("cash", "buying_power", "invested", "open_pl"):
+    for name in ("cash", "buying_power", "invested", "open_pl", "stock_value", "crypto_value"):
         status[name] = figures.get(name, previous.get(name))
+    crypto_day = crypto.utc_midnight().strftime("%Y-%m-%d %H:%M:%S")
+    status["crypto_trades_today"] = sum(
+        row.get("event") == "ORDER" and "/" in row.get("symbol", "")
+        and row.get("time_utc", "") >= crypto_day for row in log_rows)
     _write_json("status.json", status)
     _write_json("trades.json", trade_rows(log_rows))
     _write_json("runs.json", add_run(_read_json("runs.json", []), now,
