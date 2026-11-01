@@ -31,5 +31,19 @@
       "signal": "HOLD",
       "signal_date": "2026-10-30"
     }
+  ],
+  "crypto": [
+    {
+      "symbol": "BTC/USD",
+      "trend": "DOWN",
+      "signal": "HOLD",
+      "signal_date": "2026-10-31"
+    },
+    {
+      "symbol": "ETH/USD",
+      "trend": "DOWN",
+      "signal": "HOLD",
+      "signal_date": "2026-10-31"
+    }
   ]
 }
