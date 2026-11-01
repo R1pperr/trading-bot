@@ -1,0 +1,14 @@
+[
+  {
+    "time_utc": "2026-10-30 21:10:29",
+    "event": "ORDER",
+    "symbol": "SPY",
+    "side": "buy",
+    "qty": 1.0,
+    "price": 756.0,
+    "order_status": "accepted",
+    "reason": "manual test order (not a strategy signal)",
+    "ai_decision": "",
+    "ai_reason": ""
+  }
+]

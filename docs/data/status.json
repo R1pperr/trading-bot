@@ -1,0 +1,16 @@
+{
+  "last_run": {
+    "time_utc": "2026-11-01T16:35:07Z",
+    "status": "dry_run",
+    "message": "Dry run: no orders placed."
+  },
+  "market_open": false,
+  "equity": 100000.0,
+  "day_change_pct": 0.0,
+  "kill_switch": {
+    "on": false,
+    "reason": ""
+  },
+  "ai_analyst_on": false,
+  "paper": true
+}
