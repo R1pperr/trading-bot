@@ -2,11 +2,10 @@ name: Trading bot (paper)
 
 on:
   schedule:
-    # Every 15 minutes, Monday-Friday, 13:30-21:00 UTC. That covers US market hours
-    # all year, summer and winter; the bot itself checks if the market is open.
+    # Every 15 minutes, every day, because crypto never closes. Stocks still trade only
+    # while the market is open: the bot itself checks that.
     # Off-the-hour minutes, because GitHub delays jobs scheduled at the top of the hour.
-    - cron: "37,52 13 * * 1-5"
-    - cron: "7,22,37,52 14-20 * * 1-5"
+    - cron: "7,22,37,52 * * * *"
   workflow_dispatch:   # adds a "Run workflow" button so you can start it by hand
     inputs:
       telegram_test:
