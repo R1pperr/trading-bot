@@ -38,6 +38,8 @@ from alpaca.trading.requests import GetOrdersRequest, MarketOrderRequest
 
 import ai_analyst
 import config
+import dashboard
+import notifier
 import risk
 from data import NEW_YORK, get_daily_bars
 from strategy import BUY, SELL, latest_signal
@@ -48,6 +50,7 @@ LOG_COLUMNS = ["time_utc", "event", "symbol", "signal", "signal_date", "details"
                "ai_decision", "ai_reason", "side", "qty", "price", "order_id",
                "order_status", "equity"]
 NOT_A_TRADE = {"canceled", "rejected", "expired"}
+RUN_EVENTS = []   # rows logged during this run, for the phone alerts at the end
 
 
 # ---------------------------------------------------------------------------
@@ -82,6 +85,7 @@ def log_event(**fields):
     for key, value in fields.items():
         if key in row and value is not None:
             row[key] = round(value, 4) if isinstance(value, float) else value
+    RUN_EVENTS.append(row)
     with open(LOG_FILE, "a", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=LOG_COLUMNS)
         if is_new:
@@ -322,8 +326,8 @@ def handle_candidate(trading, data_client, symbol, action, signal, prices, posit
     order_id, status, fill = place_order(trading, symbol, side, qty, market_open)
     log_event(event="ORDER", symbol=symbol, signal=action, signal_date=date, side=side_word,
               qty=float(qty), price=fill or price, order_id=order_id, order_status=status,
-              ai_decision=decision, ai_reason=ai_reason, details=f"strategy {action}: {size_note}",
-              equity=equity)
+              ai_decision=decision, ai_reason=ai_reason,
+              details=f"strategy {action}: {size_note} · {signal['reason']}", equity=equity)
     fill_text = f" at {money(fill)}" if fill else ""
     print(f"  {symbol}: {side_word.upper()} {size_note} → order {status}{fill_text}")
     traded_today.add(symbol)
@@ -360,6 +364,25 @@ def run_test_order(trading, data_client, symbol, equity, positions, trades_today
     return 0
 
 
+def record_crash(details):
+    try:
+        log_event(event="ERROR", details=details)
+    except Exception:
+        pass
+
+
+def finish_run(args, exit_code):
+    """
+    After a run: tell your phone what happened, then refresh the dashboard data.
+    Every order has already gone through by now, and neither step can stop the bot.
+    """
+    if not args.dry_run:
+        notifier.notify(RUN_EVENTS)
+    errors = [row["details"] for row in RUN_EVENTS if row["event"] == "ERROR"]
+    dashboard.update(LOG_FILE, start_of_today_utc(), exit_code,
+                     errors[-1] if errors else "", args.dry_run)
+
+
 def main():
     parser = argparse.ArgumentParser(description="Run the paper-trading bot once.")
     parser.add_argument("--dry-run", action="store_true", help="show decisions without placing orders")
@@ -367,15 +390,16 @@ def main():
                         help="buy 1 share (default SPY) to check orders reach your dashboard")
     args = parser.parse_args()
     os.chdir(BASE_DIR)
+    exit_code = 1
     try:
-        sys.exit(run(args))
+        exit_code = run(args)
+    except SystemExit:   # config.py stops the run this way when the keys are missing
+        record_crash("Alpaca keys are missing or unreadable")
     except Exception as error:
         print("❌ The run stopped because of an error:", error)
-        try:
-            log_event(event="ERROR", details=" ".join(str(error).split())[:300])
-        except Exception:
-            pass
-        sys.exit(1)
+        record_crash(" ".join(str(error).split())[:300])
+    finish_run(args, exit_code)
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":
