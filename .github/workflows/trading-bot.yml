@@ -2,13 +2,20 @@ name: Trading bot (paper)
 
 on:
   schedule:
-    # Every hour at :45, Monday-Friday, 13:45-20:45 UTC.
-    # That covers US market hours all year; the bot itself checks if the market is open.
-    - cron: "45 13-20 * * 1-5"
+    # Every 15 minutes, Monday-Friday, 13:30-21:00 UTC. That covers US market hours
+    # all year, summer and winter; the bot itself checks if the market is open.
+    # Off-the-hour minutes, because GitHub delays jobs scheduled at the top of the hour.
+    - cron: "37,52 13 * * 1-5"
+    - cron: "7,22,37,52 14-20 * * 1-5"
   workflow_dispatch:   # adds a "Run workflow" button so you can start it by hand
+    inputs:
+      telegram_test:
+        description: "Also send one Telegram test message (places no order)"
+        type: boolean
+        default: false
 
 permissions:
-  contents: write      # lets the job save logs/trade_log.csv back into the repository
+  contents: write      # lets the job save the trade log and dashboard data back into the repository
 
 concurrency:
   group: trading-bot   # never run two copies at the same time
@@ -20,6 +27,8 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: main    # a run that waited in line must still start from the newest saved log
 
       - uses: actions/setup-python@v6
         with:
@@ -29,23 +38,36 @@ jobs:
       - name: Install packages
         run: pip install -r requirements.txt
 
+      - name: Send a Telegram test message
+        if: inputs.telegram_test
+        continue-on-error: true   # a Telegram problem must never stop the bot
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python notifier.py
+
       - name: Run the bot (paper account)
         env:
           ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
           ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python bot.py
 
-      - name: Save the trade log
+      - name: Save the trade log and dashboard data
         if: always()
         run: |
-          if [ -f logs/trade_log.csv ]; then
-            git config user.name "github-actions[bot]"
-            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-            git add -f logs/trade_log.csv
-            if ! git diff --cached --quiet; then
-              git commit -m "Update trade log"
-              git pull --rebase
-              git push
-            fi
-          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -f logs/trade_log.csv ]; then git add -f logs/trade_log.csv; fi
+          if [ -d docs/data ]; then git add docs/data; fi
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Update trade log and dashboard data"
+          for attempt in 1 2 3; do
+            if git pull --rebase && git push; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep 5
+          done
+          echo "Could not save the trade log and dashboard data after 3 tries."
+          exit 1
