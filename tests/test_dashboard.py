@@ -15,8 +15,6 @@ from datetime import datetime, timezone
 from types import SimpleNamespace
 from unittest import mock
 
-import pandas as pd
-
 import config
 import dashboard
 
@@ -25,8 +23,6 @@ ACCOUNT = SimpleNamespace(equity="100500.5", last_equity="100000", cash="95530.5
 POSITION = SimpleNamespace(symbol="SPY", qty="7", avg_entry_price="700", current_price="710",
                            market_value="4970", unrealized_pl="70", unrealized_plpc="0.0142857",
                            change_today="0.0123")
-DAYS = pd.bdate_range(end="2026-10-30", periods=config.SLOW_SMA_DAYS + 5)
-BARS = {"SPY": pd.DataFrame({"close": [123.45] * len(DAYS)}, index=DAYS)}
 LOG_COLUMNS = ["time_utc", "event", "symbol", "signal", "signal_date", "details", "ai_decision",
                "ai_reason", "side", "qty", "price", "order_id", "order_status", "equity"]
 DAY_START = datetime(2026, 11, 2, 5, 0, tzinfo=timezone.utc)
@@ -44,9 +40,6 @@ class DashboardTests(unittest.TestCase):
                         mock.patch.object(config, "CRYPTO_ENABLED", False)):
             patcher.start()
             self.addCleanup(patcher.stop)
-        bars_patcher = mock.patch.object(dashboard, "get_daily_bars", return_value=BARS)
-        self.get_bars = bars_patcher.start()
-        self.addCleanup(bars_patcher.stop)
 
     def write_log(self, *rows):
         with open(self.log_file, "w", newline="", encoding="utf-8") as handle:
@@ -108,6 +101,7 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(status["trades_today"], 1)
         self.assertEqual(status["limits"], {
             "max_trades_per_day": config.MAX_TRADES_PER_DAY,
+            "max_open_positions": config.MAX_OPEN_POSITIONS,
             "max_position_pct": config.MAX_POSITION_PCT,
             "stop_loss_pct": config.STOP_LOSS_PCT,
             "kill_switch_pct": config.KILL_SWITCH_PCT})
@@ -124,42 +118,6 @@ class DashboardTests(unittest.TestCase):
             for orders in (1, 2, 3):
                 self.update(orders=orders)
         self.assertEqual([run["orders"] for run in self.load("runs.json")], [2, 3])
-
-    def test_watchlist_has_views_in_words_and_never_any_prices(self):
-        self.update()
-        watchlist = self.load("watchlist.json")
-        self.assertRegex(watchlist["updated_for"], r"^\d{4}-\d\d-\d\d$")
-        spy, new = watchlist["stocks"]
-        self.assertEqual(set(spy), {"symbol", "trend", "signal", "signal_date"})
-        self.assertEqual((spy["symbol"], spy["signal"], spy["signal_date"]), ("SPY", "HOLD", "2026-10-30"))
-        self.assertEqual((new["symbol"], new["trend"], new["signal"]), ("NEW", "", ""))
-        with open(os.path.join(dashboard.DATA_DIR, "watchlist.json"), encoding="utf-8") as handle:
-            self.assertNotIn("123.45", handle.read())
-
-    def test_no_public_file_holds_price_history(self):
-        self.update()
-        for name in os.listdir(dashboard.DATA_DIR):
-            with open(os.path.join(dashboard.DATA_DIR, name), encoding="utf-8") as handle:
-                self.assertNotIn("123.45", handle.read(), name)
-
-    def test_watchlist_downloads_prices_once_a_day(self):
-        for _ in range(4):
-            self.update()
-        self.get_bars.assert_called_once()
-
-    def test_failed_price_download_keeps_everything_else(self):
-        self.update()
-        path = os.path.join(dashboard.DATA_DIR, "watchlist.json")
-        os.remove(path)
-        for failure in (RuntimeError("no prices"), SystemExit(1)):
-            self.get_bars.side_effect = failure
-            output = io.StringIO()
-            with contextlib.redirect_stdout(output):
-                dashboard.update(self.log_file, DAY_START, orders=1)
-            self.assertIn("Could not refresh the stock list", output.getvalue())
-            self.assertIn("Dashboard data written", output.getvalue())
-            self.assertEqual(self.load("status.json")["last_run"]["status"], "ok")
-            self.assertFalse(os.path.exists(path))
 
     def test_keys_and_order_ids_never_reach_the_public_files(self):
         self.write_log({"time_utc": "2026-11-02 15:00:00", "event": "ORDER", "symbol": "SPY",
@@ -226,6 +184,19 @@ class DashboardTests(unittest.TestCase):
         with mock.patch.object(dashboard, "fetch_account", side_effect=SystemExit(1)):
             self.update(exit_code=1)
         self.assertEqual(self.load("status.json")["last_run"]["status"], "error")
+
+    def test_status_shows_each_universe(self):
+        self.update()
+        status = self.load("status.json")
+        self.assertEqual(set(status["universe"]), {"stock", "crypto"})
+        self.assertEqual(set(status["universe"]["stock"]), {"size", "refreshed", "feed"})
+
+    def test_summary_counts_candidates(self):
+        self.update()
+        dashboard.save_candidates("stock", {"found": 11, "candidates": [
+            {"ai_decision": "APPROVE"}, {"ai_decision": "VETO"}, {"ai_decision": "VETO"}]})
+        self.assertIn("Stock candidates: 11 found, 1 approved, 2 vetoed", dashboard.summary_text(0))
+        self.assertIn("Crypto candidates: 0 found, 0 approved, 0 vetoed", dashboard.summary_text(0))
 
     def test_summary_text_reads_the_files_just_written(self):
         self.update()

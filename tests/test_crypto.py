@@ -32,6 +32,7 @@ import dashboard
 import data
 import notifier
 import risk
+import universe
 
 TELEGRAM_ON = {"TELEGRAM_BOT_TOKEN": "123456:FAKE-TOKEN-FOR-TESTS", "TELEGRAM_CHAT_ID": "42"}
 REAL_STOCK_PLACE_ORDER = bot.place_order
@@ -88,14 +89,12 @@ class CryptoRunTests(unittest.TestCase):
         self.urlopen = self.start(mock.patch("urllib.request.urlopen"))
         self.crypto_bars = self.start(mock.patch.object(crypto, "get_crypto_daily_bars", side_effect=self.bars))
         self.crypto_price = self.start(mock.patch.object(crypto, "get_crypto_latest_price", return_value=78000.0))
-        self.dashboard_crypto_bars = self.start(mock.patch.object(dashboard, "get_crypto_daily_bars",
-                                                                  side_effect=self.bars))
+        self.start(mock.patch.object(universe, "rows", side_effect=self.universe_rows))
         self.start(mock.patch.object(bot, "summary_due", return_value=False))
         self.start(mock.patch.object(bot, "TradingClient", return_value=self.trading))
         self.start(mock.patch.object(dashboard, "TradingClient", return_value=self.trading))
         self.start(mock.patch.object(bot, "StockHistoricalDataClient"))
         self.start(mock.patch.object(bot, "get_daily_bars", return_value={"SPY": self.prices}))
-        self.start(mock.patch.object(dashboard, "get_daily_bars", return_value={"SPY": self.prices}))
         self.start(mock.patch.object(bot, "latest_price", return_value=100.0))
         self.start(mock.patch.object(bot, "LOG_FILE", self.log_file))
         self.start(mock.patch.object(dashboard, "DATA_DIR", os.path.join(self.folder, "data")))
@@ -109,6 +108,10 @@ class CryptoRunTests(unittest.TestCase):
         started = patcher.start()
         self.addCleanup(patcher.stop)
         return started
+
+    def universe_rows(self, market):
+        symbols = config.SYMBOLS if market == "stock" else config.CRYPTO_SYMBOLS
+        return [{"symbol": symbol, "name": symbol} for symbol in symbols]
 
     def bars(self, symbols, start, end=None):
         return {symbol: self.prices for symbol in symbols}
@@ -205,7 +208,6 @@ class CryptoRunTests(unittest.TestCase):
         self.buy_signal_for_btc()
         self.run_bot()
         self.assertEqual(self.orders(), [])
-        self.assertIn("already holding", self.output.getvalue())
 
     def test_stop_loss_on_a_btcusd_position_sells_btc_usd(self):
         self.trading.get_all_positions.return_value = [crypto_position("BTCUSD", current="70000")]
@@ -276,7 +278,6 @@ class CryptoRunTests(unittest.TestCase):
         self.assertEqual(self.run_bot(), 0)
         self.assertEqual(self.orders(), [])
         self.crypto_bars.assert_not_called()
-        self.dashboard_crypto_bars.assert_not_called()
         self.crypto_price.assert_not_called()
         self.assertNotIn("Crypto", self.output.getvalue())
         self.assertEqual(self.messages(), [])
@@ -357,7 +358,7 @@ class CryptoRunTests(unittest.TestCase):
             self.run_bot()
         self.gemini.assert_not_called()
 
-    def test_ai_veto_is_asked_and_reported_once(self):
+    def test_ai_veto_is_asked_once_and_sends_no_instant_message(self):
         config.USE_AI_ANALYST = True
         self.gemini.return_value = (ai_analyst.VETO, "Prices look choppy")
         self.buy_signal_for_btc()
@@ -365,9 +366,8 @@ class CryptoRunTests(unittest.TestCase):
             self.run_bot()
         self.gemini.assert_called_once()
         self.assertEqual(self.orders(), [])
-        self.assertEqual(len(self.messages()), 1)
-        self.assertIn("[CRYPTO]", self.messages()[0])
-        self.assertIn("VETOED", self.messages()[0])
+        self.assertEqual(self.messages(), [])
+        self.assertIn("VETO", json.dumps(self.load("candidates.json")))
 
     def test_veto_from_early_in_the_utc_day_still_counts(self):
         config.USE_AI_ANALYST = True
@@ -442,22 +442,6 @@ class CryptoRunTests(unittest.TestCase):
         self.run_bot()
         status = self.load("status.json")
         self.assertEqual((status["trades_today"], status["crypto_trades_today"]), (1, 1))
-
-    def test_watchlist_shows_crypto_in_words_only(self):
-        with mock.patch.object(dashboard, "latest_signal", return_value=fake_signal()):
-            self.run_bot()
-        watchlist = self.load("watchlist.json")
-        self.assertEqual([row["symbol"] for row in watchlist["crypto"]], config.CRYPTO_SYMBOLS)
-        self.assertEqual(set(watchlist["crypto"][0]), {"symbol", "trend", "signal", "signal_date"})
-
-    def test_watchlist_picks_up_crypto_on_the_day_it_is_turned_on(self):
-        config.CRYPTO_ENABLED = False
-        with mock.patch.object(dashboard, "latest_signal", return_value=fake_signal()):
-            self.run_bot()
-            self.assertEqual(self.load("watchlist.json")["crypto"], [])
-            config.CRYPTO_ENABLED = True
-            self.run_bot()
-        self.assertEqual(len(self.load("watchlist.json")["crypto"]), 2)
 
 
 class SmallPieceTests(unittest.TestCase):

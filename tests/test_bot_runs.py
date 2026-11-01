@@ -25,6 +25,7 @@ import ai_analyst
 import bot
 import config
 import dashboard
+import universe
 
 TELEGRAM_ON = {"TELEGRAM_BOT_TOKEN": "123456:FAKE-TOKEN-FOR-TESTS", "TELEGRAM_CHAT_ID": "42"}
 REAL_SUMMARY_DUE = bot.summary_due
@@ -69,7 +70,7 @@ class BotRunTests(unittest.TestCase):
         self.start(mock.patch.object(dashboard, "TradingClient", return_value=self.trading))
         self.start(mock.patch.object(bot, "StockHistoricalDataClient"))
         self.start(mock.patch.object(bot, "get_daily_bars", return_value={"SPY": self.prices}))
-        self.start(mock.patch.object(dashboard, "get_daily_bars", return_value={"SPY": self.prices}))
+        self.start(mock.patch.object(universe, "rows", return_value=[{"symbol": "SPY", "name": "SPDR"}]))
         self.start(mock.patch.object(bot, "latest_price", return_value=100.0))
         self.start(mock.patch.object(bot, "LOG_FILE", self.log_file))
         self.start(mock.patch.object(dashboard, "DATA_DIR", os.path.join(self.folder, "data")))
@@ -135,6 +136,7 @@ class BotRunTests(unittest.TestCase):
             self.urlopen.side_effect = failure
             self.trading.get_orders.return_value = []
             self.place_order.reset_mock()
+            shutil.rmtree(dashboard.DATA_DIR, ignore_errors=True)   # a fresh day
             self.assertEqual(self.run_bot(), 0)
             self.place_order.assert_called_once()
             self.assertIn("Telegram message not sent", self.output.getvalue())
@@ -197,7 +199,7 @@ class BotRunTests(unittest.TestCase):
         self.gemini.assert_called_once()
         self.assertEqual(len(self.messages()), 1)
 
-    def test_ai_veto_is_asked_and_reported_once_a_day(self):
+    def test_ai_veto_is_asked_once_and_sends_no_instant_message(self):
         config.USE_AI_ANALYST = True
         self.signal.return_value = fake_signal("BUY")
         self.gemini.return_value = (ai_analyst.VETO, "Prices look choppy")
@@ -205,8 +207,7 @@ class BotRunTests(unittest.TestCase):
             self.assertEqual(self.run_bot(), 0)
         self.gemini.assert_called_once()
         self.place_order.assert_not_called()
-        self.assertEqual(len(self.messages()), 1)
-        self.assertIn("VETOED", self.messages()[0])
+        self.assertEqual(self.messages(), [])
 
     # --- Repeated crashes ---------------------------------------------------------
     def test_the_same_crash_alerts_once_a_day(self):

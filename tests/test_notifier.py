@@ -78,17 +78,14 @@ class MessageTests(unittest.TestCase):
         for expected in ("STOP-LOSS", "SELL", "AAPL", "$90.00", "-10.0%", "not asked"):
             self.assertIn(expected, message)
 
-    def test_kill_switch_veto_and_crash_messages(self):
+    def test_kill_switch_and_crash_messages(self):
         self.assertIn("KILL SWITCH", notifier.message_for({"event": "KILL_SWITCH", "details": "equity -3.2%"}))
-        veto = notifier.message_for({"event": "AI_DECISION", "ai_decision": "VETO", "signal": "BUY",
-                                     "symbol": "JPM", "ai_reason": "Prices look choppy"})
-        for expected in ("VETOED", "BUY", "JPM", "Prices look choppy"):
-            self.assertIn(expected, veto)
         self.assertIn("boom", notifier.message_for({"event": "ERROR", "details": "boom"}))
 
     def test_quiet_events_send_nothing(self):
         quiet = [{"event": "SIGNAL"}, {"event": "BLOCKED"},
-                 {"event": "AI_DECISION", "ai_decision": "APPROVE"}]
+                 {"event": "AI_DECISION", "ai_decision": "APPROVE"},
+                 {"event": "AI_DECISION", "ai_decision": "VETO", "symbol": "JPM"}]
         for row in quiet:
             self.assertIsNone(notifier.message_for(row))
 
