@@ -277,7 +277,8 @@
     }));
     const errors = runs.filter((run) => run.status === "error").length;
     const orders = runs.reduce((total, run) => total + run.orders, 0);
-    setText("run-summary", `Last ${runs.length} runs: ${errors} with errors, ${orders} order(s) placed. Tall green ticks placed orders and red ones had errors.`);
+    const count = (number, word) => `${number} ${word}${number === 1 ? "" : "s"}`;
+    setText("run-summary", `Last ${count(runs.length, "run")}: ${count(errors, "error")}, ${count(orders, "order")} placed. Tall green ticks placed orders and red ones had errors.`);
   }
 
   function drawEquityChart(days) {
