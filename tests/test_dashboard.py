@@ -40,7 +40,8 @@ class DashboardTests(unittest.TestCase):
         for patcher in (mock.patch.object(dashboard, "DATA_DIR", os.path.join(self.folder, "data")),
                         mock.patch.object(dashboard, "fetch_account",
                                           return_value=(ACCOUNT, [POSITION], True)),
-                        mock.patch.object(config, "SYMBOLS", ["SPY", "NEW"])):
+                        mock.patch.object(config, "SYMBOLS", ["SPY", "NEW"]),
+                        mock.patch.object(config, "CRYPTO_ENABLED", False)):
             patcher.start()
             self.addCleanup(patcher.stop)
         bars_patcher = mock.patch.object(dashboard, "get_daily_bars", return_value=BARS)
@@ -83,15 +84,17 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(set(history[0]), {"time_utc", "equity"})
 
         position = self.load("positions.json")[0]
-        self.assertEqual(set(position), {"symbol", "qty", "avg_entry_price", "current_price",
-                                         "market_value", "unrealized_pl", "unrealized_pl_pct",
-                                         "change_today_pct", "stop_price"})
+        self.assertEqual(set(position), {"symbol", "asset_class", "qty", "avg_entry_price",
+                                         "current_price", "market_value", "unrealized_pl",
+                                         "unrealized_pl_pct", "change_today_pct", "stop_price"})
+        self.assertEqual(position["asset_class"], "stock")
         self.assertEqual(position["unrealized_pl"], 70.0)
         self.assertEqual(position["stop_price"], 651.0)
 
         trade = self.load("trades.json")[0]
-        self.assertEqual(set(trade), {"time_utc", "event", "symbol", "side", "qty", "price",
-                                      "order_status", "reason", "ai_decision", "ai_reason"})
+        self.assertEqual(set(trade), {"time_utc", "event", "symbol", "asset_class", "side", "qty",
+                                      "price", "order_status", "reason", "ai_decision", "ai_reason"})
+        self.assertEqual(trade["asset_class"], "stock")
         self.assertEqual((trade["side"], trade["reason"], trade["ai_decision"]),
                          ("buy", "strategy BUY: 7 shares", "APPROVE"))
 
