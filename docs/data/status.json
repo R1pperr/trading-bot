@@ -1,8 +1,8 @@
 {
   "last_run": {
-    "time_utc": "2026-11-01T16:35:07Z",
-    "status": "dry_run",
-    "message": "Dry run: no orders placed."
+    "time_utc": "2026-11-01T16:50:52Z",
+    "status": "market_closed",
+    "message": "The US market is closed, so there was nothing to do."
   },
   "market_open": false,
   "equity": 100000.0,
