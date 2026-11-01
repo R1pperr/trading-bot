@@ -103,9 +103,36 @@
     }
   }
 
+  // The bot runs on weekdays from 13:37 to 20:52 UTC, even on market holidays. This finds the
+  // newest moment it should have updated by. A day's first hour is skipped, so a late first
+  // run raises no alarm.
+  function latestExpectedUpdate(now) {
+    const MINUTE = 60000;
+    const DAY = 1440 * MINUTE;
+    const FIRST_RUN = (13 * 60 + 37) * MINUTE;
+    const LAST_RUN = (20 * 60 + 52) * MINUTE;
+    const midnight = now - (now % DAY);
+    for (let back = 0; back < 7; back += 1) {
+      const day = midnight - back * DAY;
+      const weekday = new Date(day).getUTCDay();
+      if (weekday === 0 || weekday === 6 || now < day + FIRST_RUN + 60 * MINUTE) continue;
+      return Math.min(now, day + LAST_RUN);
+    }
+    return 0;
+  }
+
+  function showStaleWarning(lastUpdate) {
+    const ALLOWED_GAP = 90 * 60000;   // GitHub can start scheduled runs late
+    if (latestExpectedUpdate(Date.now()) - toDate(lastUpdate).getTime() <= ALLOWED_GAP) return;
+    byId("stale-text").textContent =
+      `⚠ The last update was ${agoText(lastUpdate)}, but the bot should have run since then. It may have stopped.`;
+    byId("stale-warning").hidden = false;
+  }
+
   function renderStatus(status) {
     const run = status.last_run;
     byId("updated").textContent = `Last update ${timeText(run.time_utc)} (${agoText(run.time_utc)})`;
+    showStaleWarning(run.time_utc);
     byId("equity").textContent = money(status.equity);
     const change = byId("day-change");
     if (hasNumber(status.day_change_pct)) {
