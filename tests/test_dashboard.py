@@ -150,6 +150,18 @@ class DashboardTests(unittest.TestCase):
             self.update(exit_code=1)
         self.assertEqual(self.load("status.json")["last_run"]["status"], "error")
 
+    def test_summary_text_reads_the_files_just_written(self):
+        self.update()
+        text = dashboard.summary_text(2)
+        for expected in ("Daily summary", "$100,500.50", "+0.50%", "Orders today: 2",
+                         "Open positions: 1", "Kill switch: off", "Last run: ok"):
+            self.assertIn(expected, text)
+
+    def test_summary_text_copes_with_missing_files(self):
+        text = dashboard.summary_text(0)
+        self.assertIn("Account value: unknown", text)
+        self.assertIn("Last run: unknown", text)
+
     def test_equity_history_rules(self):
         first = dashboard.add_equity_point([], "2026-11-02T15:00:00Z", 100.0)
         self.assertEqual(len(first), 1)

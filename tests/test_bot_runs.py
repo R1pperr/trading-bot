@@ -15,6 +15,7 @@ import tempfile
 import unittest
 import urllib.error
 import urllib.parse
+from datetime import datetime, timezone
 from types import SimpleNamespace
 from unittest import mock
 
@@ -26,6 +27,7 @@ import config
 import dashboard
 
 TELEGRAM_ON = {"TELEGRAM_BOT_TOKEN": "123456:FAKE-TOKEN-FOR-TESTS", "TELEGRAM_CHAT_ID": "42"}
+REAL_SUMMARY_DUE = bot.summary_due
 
 
 def fake_signal(signal="HOLD"):
@@ -62,6 +64,7 @@ class BotRunTests(unittest.TestCase):
         self.gemini = self.start(mock.patch.object(ai_analyst, "_ask_gemini",
                                                    return_value=(ai_analyst.APPROVE, "Looks steady")))
         self.urlopen = self.start(mock.patch("urllib.request.urlopen"))
+        self.summary_due = self.start(mock.patch.object(bot, "summary_due", return_value=False))
         self.start(mock.patch.object(bot, "TradingClient", return_value=self.trading))
         self.start(mock.patch.object(dashboard, "TradingClient", return_value=self.trading))
         self.start(mock.patch.object(bot, "StockHistoricalDataClient"))
@@ -203,7 +206,90 @@ class BotRunTests(unittest.TestCase):
         self.assertEqual(len(self.messages()), 1)
         self.assertIn("VETOED", self.messages()[0])
 
+    # --- Repeated crashes ---------------------------------------------------------
+    def test_the_same_crash_alerts_once_a_day(self):
+        self.trading.get_orders.side_effect = RuntimeError("Alpaca fell over")
+        for _ in range(5):
+            self.assertEqual(self.run_bot(), 1)
+        self.assertEqual(len(self.messages()), 1)
+        self.assertEqual(self.status()["last_run"]["status"], "error")
+
+    def test_numbers_inside_an_error_do_not_make_it_a_new_problem(self):
+        for request_id in (123, 456, 789):
+            self.trading.get_orders.side_effect = RuntimeError(f"request {request_id} failed")
+            self.run_bot()
+        self.assertEqual(len(self.messages()), 1)
+
+    def test_a_different_crash_still_alerts(self):
+        for problem in ("Alpaca fell over", "Prices did not load"):
+            self.trading.get_orders.side_effect = RuntimeError(problem)
+            self.run_bot()
+        self.assertEqual(len(self.messages()), 2)
+
+    def test_repeat_crash_filter_cannot_hide_other_alerts(self):
+        self.signal.return_value = fake_signal("BUY")
+        self.trading.get_orders.side_effect = RuntimeError("Alpaca fell over")
+        self.run_bot()
+        self.run_bot()
+        self.trading.get_orders.side_effect = None
+        self.run_bot()
+        self.assertEqual(len(self.messages()), 2)
+        self.assertIn("BUY", self.messages()[1])
+
+    # --- Daily summary ---------------------------------------------------------
+    def test_summary_is_sent_once_a_day(self):
+        self.summary_due.return_value = True
+        self.set_account(market_open=False, equity="100500")
+        for _ in range(3):
+            self.assertEqual(self.run_bot(), 0)
+        self.assertEqual(len(self.messages()), 1)
+        for expected in ("Daily summary", "$100,500.00", "+0.50%", "Orders today: 0",
+                         "Open positions: 0", "Kill switch: off", "market closed"):
+            self.assertIn(expected, self.messages()[0])
+
+    def test_summary_counts_todays_orders(self):
+        self.signal.return_value = fake_signal("BUY")
+        self.run_bot()
+        self.summary_due.return_value = True
+        self.trading.get_orders.return_value = [filled_order("SPY")]
+        self.run_bot()
+        self.assertIn("Orders today: 1", self.messages()[-1])
+
+    def test_failed_summary_tries_again_on_the_next_run(self):
+        self.summary_due.return_value = True
+        self.urlopen.side_effect = TimeoutError("too slow")
+        self.assertEqual(self.run_bot(), 0)
+        self.urlopen.side_effect = None
+        self.urlopen.reset_mock()
+        self.assertEqual(self.run_bot(), 0)
+        self.assertEqual(len(self.messages()), 1)
+
+    def test_summary_without_telegram_settings_changes_nothing(self):
+        self.summary_due.return_value = True
+        with mock.patch.dict(os.environ, {"TELEGRAM_BOT_TOKEN": ""}):
+            self.assertEqual(self.run_bot(), 0)
+        self.urlopen.assert_not_called()
+
+    def test_summary_problem_cannot_change_a_runs_result(self):
+        self.summary_due.return_value = True
+        with mock.patch.object(dashboard, "summary_text", side_effect=RuntimeError("bad file")):
+            self.assertEqual(self.run_bot(), 0)
+        self.assertIn("Daily summary not sent", self.output.getvalue())
+
+    def test_summary_is_due_only_on_weekdays_from_the_set_time(self):
+        self.start(mock.patch.object(bot, "summary_due", wraps=REAL_SUMMARY_DUE))
+        at = lambda *when: datetime(*when, tzinfo=timezone.utc)
+        self.assertFalse(bot.summary_due(at(2026, 11, 2, 20, 37)))   # Monday, too early
+        self.assertTrue(bot.summary_due(at(2026, 11, 2, 20, 52)))    # Monday, last run
+        self.assertTrue(bot.summary_due(at(2026, 11, 2, 21, 10)))    # Monday, last run was late
+        self.assertFalse(bot.summary_due(at(2026, 11, 7, 20, 52)))   # Saturday
+
     # --- Dry run -----------------------------------------------------------------
+    def test_dry_run_sends_no_summary(self):
+        self.summary_due.return_value = True
+        self.assertEqual(self.run_bot("--dry-run"), 0)
+        self.urlopen.assert_not_called()
+
     def test_dry_run_orders_nothing_logs_nothing_sends_nothing(self):
         config.USE_AI_ANALYST = True
         self.signal.return_value = fake_signal("BUY")
