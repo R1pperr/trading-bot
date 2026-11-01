@@ -43,6 +43,8 @@ import crypto
 import dashboard
 import notifier
 import risk
+import signals
+import universe
 from data import NEW_YORK, get_daily_bars
 from strategy import BUY, SELL, latest_signal
 
@@ -237,70 +239,83 @@ def run(args):
         traded_today.add(symbol)
         sold_now.add(symbol)
 
-    # --- Signals --------------------------------------------------------------
+    # --- Signals: worked out once a day, then read from the saved list ---------
+    today = new_york_now().date().isoformat()
     history_start = datetime.now(timezone.utc) - timedelta(days=int(config.SLOW_SMA_DAYS * 1.6) + 60)
-    bars = get_daily_bars(config.SYMBOLS, history_start)
-    candidates = []
-    print("\nSignals:")
-    for symbol in config.SYMBOLS:
-        prices = bars.get(symbol)
-        if prices is None or len(prices) < config.SLOW_SMA_DAYS + 1:
-            print(f"  {symbol}: not enough price history, skipped")
-            continue
-        signal = latest_signal(prices)
-        holding = symbol in positions and symbol not in sold_now
-        action, note = None, ""
-        if signal["signal"] == BUY:
-            action, note = (None, "already holding") if holding else (BUY, "")
-        elif signal["signal"] == SELL:
-            action, note = (SELL, "") if holding else (None, "no position, nothing to sell")
-        elif holding and signal["trend"] == "DOWN":
-            action, note = SELL, "holding while the trend is down (sell signal was missed)"
+    plan = dashboard.load_candidates().get("stock", {})
+    bars = {}
+    if dry_run or plan.get("day") != today:
+        rows = universe.rows("stock")
+        bars = get_daily_bars(sorted({row["symbol"] for row in rows} | set(positions)), history_start)
+        found = signals.scan(bars, set(positions) - sold_now, latest_signal)
+        plan = signals.start_day("stock", today, found, rows, len(bars))
+    signals.describe(plan, "Signals")
 
-        print(f"  {symbol:5} {signal['signal']:4} {signal['reason']}"
-              f" [close of {signal['date']}]" + (f" · {note}" if note else ""))
+    def prices_for(symbol):
+        """Closing prices for the AI. A later run downloads them for just this symbol."""
+        if symbol not in bars:
+            bars.update(get_daily_bars([symbol], history_start))
+        return bars.get(symbol)
 
-        logged_signal = signal["signal"] if signal["signal"] != "HOLD" else (SELL if action else None)
-        if logged_signal and not dry_run and not already_logged(todays_log, "SIGNAL", symbol, signal["date"]):
-            log_event(event="SIGNAL", symbol=symbol, signal=logged_signal, signal_date=signal["date"],
-                      details=f"{signal['reason']}" + (f"; {note}" if note else ""), equity=equity)
-        if action:
-            candidates.append((symbol, action, signal, prices))
-
-    # Sells first (they free up cash and reduce risk), then buys.
-    candidates.sort(key=lambda c: 0 if c[1] == SELL else 1)
-    if candidates:
+    waiting = signals.waiting(plan)
+    if waiting:
         print("\nOrders:")
-    for symbol, action, signal, prices in candidates:
-        placed = handle_candidate(trading, data_client, symbol, action, signal, prices, positions,
-                                  equity, todays_log, dry_run, killed, market_open,
-                                  trades_today, traded_today)
-        if placed:
-            trades_today += 1
+    open_count = len(positions) - len(sold_now)
+    try:
+        for candidate in waiting:
+            if not dry_run and not already_logged(todays_log, "SIGNAL", candidate["symbol"], candidate["signal_date"]):
+                log_event(event="SIGNAL", symbol=candidate["symbol"], signal=candidate["action"],
+                          signal_date=candidate["signal_date"], details=candidate["reason"], equity=equity)
+            placed = handle_candidate(trading, data_client, candidate, prices_for, positions, open_count,
+                                      equity, todays_log, dry_run, killed, market_open,
+                                      trades_today, traded_today)
+            if placed:
+                trades_today += 1
+                open_count += 1 if candidate["action"] == BUY else -1
+    finally:
+        if not dry_run:
+            dashboard.save_candidates("stock", plan)
 
     print("\nDone." + ("" if dry_run else f" Log: {os.path.relpath(LOG_FILE, BASE_DIR)}"))
     return 0
 
 
-def handle_candidate(trading, data_client, symbol, action, signal, prices, positions,
+def handle_candidate(trading, data_client, candidate, prices_for, positions, open_count,
                      equity, todays_log, dry_run, killed, market_open, trades_today, traded_today):
     """Run one BUY/SELL through the risk rules and the AI. Returns True if an order was placed."""
-    date = signal["date"]
+    symbol, action, date = candidate["symbol"], candidate["action"], candidate["signal_date"]
+    reason = candidate["reason"]
     side_word = "buy" if action == BUY else "sell"
 
-    def block(reason):
-        print(f"  {symbol}: {side_word} BLOCKED · {reason}")
+    def block(why):
+        print(f"  {symbol}: {side_word} BLOCKED · {why}")
+        candidate["note"] = why
         if not dry_run and not already_logged(todays_log, "BLOCKED", symbol, date):
             log_event(event="BLOCKED", symbol=symbol, signal=action, signal_date=date,
-                      side=side_word, details=reason, equity=equity)
+                      side=side_word, details=why, equity=equity)
 
     if symbol in traded_today:
         print(f"  {symbol}: already traded today, skipping")
+        candidate["status"] = "already traded"
         return
+    if action == SELL and symbol not in positions:
+        candidate["status"] = "no longer held"
+        return
+
+    # --- Rule 4, Rule 3 and the position limit, before any more calls are made ---
+    if not dry_run:
+        if killed:
+            return block(f"kill switch is on (equity fell {config.KILL_SWITCH_PCT:.0%}+ today)")
+        if risk.trades_left(trades_today) == 0:
+            return block(f"daily trade limit reached ({config.MAX_TRADES_PER_DAY})")
+        if action == BUY and open_count >= config.MAX_OPEN_POSITIONS["stock"]:
+            return block(f"position limit reached ({config.MAX_OPEN_POSITIONS['stock']} stocks)")
 
     # --- Rule 1: size (and what we would sell) ---------------------------------
     if action == BUY:
-        price = latest_price(data_client, symbol, fallback=signal["close"])
+        price = latest_price(data_client, symbol, fallback=0.0)
+        if price <= 0:
+            return block("could not get a price")
         qty = risk.max_shares_to_buy(equity, price)
         if qty < 1:
             return block(f"{config.MAX_POSITION_PCT:.0%} of equity ({money(equity * config.MAX_POSITION_PCT)})"
@@ -309,38 +324,38 @@ def handle_candidate(trading, data_client, symbol, action, signal, prices, posit
     else:
         position = positions[symbol]
         qty = float(position.qty)
-        price = float(position.current_price or signal["close"])
+        price = float(position.current_price or 0)
         size_note = f"all {qty:g} shares ≈ {money(qty * price)}"
 
     if dry_run:
         print(f"  {symbol}: would {side_word} {size_note}" +
               (" (but the kill switch is ON)" if killed else ""))
         return
-    # --- Rule 4 and Rule 3 -------------------------------------------------------
-    if killed:
-        return block(f"kill switch is on (equity fell {config.KILL_SWITCH_PCT:.0%}+ today)")
-    if risk.trades_left(trades_today) == 0:
-        return block(f"daily trade limit reached ({config.MAX_TRADES_PER_DAY})")
 
     # --- Optional AI analyst: approve or veto only -----------------------------
     if already_logged(todays_log, "AI_DECISION", symbol, date, decision=ai_analyst.VETO):
         print(f"  {symbol}: AI already vetoed this signal today, skipping")
+        candidate.update(status="vetoed", ai_decision=ai_analyst.VETO)
         return
-    decision, ai_reason = ai_analyst.review(symbol, action, signal["reason"], prices)
+    prices = prices_for(symbol) if config.USE_AI_ANALYST else None
+    decision, ai_reason = ai_analyst.review(symbol, action, reason, prices)
+    candidate.update(ai_decision=decision, ai_reason=ai_reason if decision != ai_analyst.OFF else "")
     if decision != ai_analyst.OFF:
         log_event(event="AI_DECISION", symbol=symbol, signal=action, signal_date=date,
                   ai_decision=decision, ai_reason=ai_reason, equity=equity)
         print(f"  {symbol}: AI analyst says {decision} · {ai_reason}")
     if decision == ai_analyst.VETO:
+        candidate["status"] = "vetoed"
         return
 
     # --- Place the PAPER order ------------------------------------------------
     side = OrderSide.BUY if action == BUY else OrderSide.SELL
     order_id, status, fill = place_order(trading, symbol, side, qty, market_open)
+    candidate["status"] = "ordered"
     log_event(event="ORDER", symbol=symbol, signal=action, signal_date=date, side=side_word,
               qty=float(qty), price=fill or price, order_id=order_id, order_status=status,
               ai_decision=decision, ai_reason=ai_reason,
-              details=f"strategy {action}: {size_note} · {signal['reason']}", equity=equity)
+              details=f"strategy {action}: {size_note} · {reason}", equity=equity)
     fill_text = f" at {money(fill)}" if fill else ""
     print(f"  {symbol}: {side_word.upper()} {size_note} → order {status}{fill_text}")
     traded_today.add(symbol)
@@ -408,7 +423,9 @@ def run_crypto_side(args):
             print("❌ Crypto skipped: Alpaca says this account is blocked from trading.")
             return 1
         crypto.run(trading, equity, float(account.non_marginable_buying_power), killed,
-                   args.dry_run, read_crypto_days_log(), log_event)
+                   args.dry_run, read_crypto_days_log(), log_event,
+                   dashboard.load_candidates().get("crypto", {}),
+                   lambda plan: dashboard.save_candidates("crypto", plan))
         return 0
     except (Exception, SystemExit) as error:
         print("❌ The crypto run stopped because of an error:", error)
@@ -445,8 +462,12 @@ def alerts_for(rows):
 
 
 def summary_due(now):
-    """True on a weekday from config.DAILY_SUMMARY_UTC onwards, around the day's last run."""
-    return now.weekday() < 5 and now.astimezone(timezone.utc).strftime("%H:%M") >= config.DAILY_SUMMARY_UTC
+    """
+    True from config.DAILY_SUMMARY_UTC onwards. With crypto on that's every day,
+    because AI vetoes are only reported here and crypto never stops.
+    """
+    trading_day = config.CRYPTO_ENABLED or now.weekday() < 5
+    return trading_day and now.astimezone(timezone.utc).strftime("%H:%M") >= config.DAILY_SUMMARY_UTC
 
 
 def send_daily_summary(args):

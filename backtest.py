@@ -9,6 +9,8 @@ Or choose your own period / symbols:
     python backtest.py --start 2018-01-01 --end 2021-12-31 --symbols SPY AAPL
 Or test the crypto pairs with the same strategy, charging CRYPTO_FEE_PCT:
     python backtest.py --crypto
+Or compare the old short lists with today's long lists, in one small table:
+    python backtest.py --universe
 
 What is simulated, for each symbol separately, starting with BACKTEST_CASH:
   * A signal from a day's close is traded at the NEXT day's open.
@@ -32,6 +34,7 @@ from datetime import datetime, timedelta
 import pandas as pd
 
 import config
+import universe
 from data import (get_crypto_daily_bars, get_daily_bars, last_complete_day_end,
                   last_complete_utc_day_end)
 from strategy import BUY, HOLD, SELL, generate_signals
@@ -279,6 +282,61 @@ def save_files(results, measurements, prefix=""):
 
 
 # ---------------------------------------------------------------------------
+# Comparing the short lists with the long lists
+# ---------------------------------------------------------------------------
+def test_group(title, symbols, download, fee_pct, start, end):
+    """Test every symbol on its own and boil the results down to one row."""
+    print(f"Testing {title}: {len(symbols)} symbols ...")
+    warm_up = timedelta(days=int(config.SLOW_SMA_DAYS * 1.6) + 30)
+    prices = download(symbols, start - warm_up, end)
+    results = []
+    for symbol in symbols:
+        if symbol not in prices:
+            continue
+        result = simulate(symbol, prices[symbol], start, config.BACKTEST_CASH, fee_pct,
+                          config.SLIPPAGE_PCT, config.STOP_LOSS_PCT)
+        if result is not None and (result["last_day"] - result["first_day"]).days >= 365:
+            results.append(measure(result))
+    frame = pd.DataFrame(results)
+    trades = int(frame["closed_trades"].sum())
+    wins = (frame["win_rate"].fillna(0) * frame["closed_trades"]).sum()
+    return {"group": title, "tested": len(frame),
+            "strategy_median": frame["strategy_return"].median(),
+            "hold_median": frame["hold_return"].median(),
+            "beat_hold_share": frame["beat_buy_and_hold"].mean(),
+            "strategy_worst_fall_median": frame["strategy_max_drawdown"].median(),
+            "hold_worst_fall_median": frame["hold_max_drawdown"].median(),
+            "trades": trades, "win_rate": wins / trades if trades else float("nan")}
+
+
+def compare_universes(start, end):
+    groups = [
+        test_group("Old stocks", config.SYMBOLS, get_daily_bars, config.FEE_PCT, start, end),
+        test_group("New stocks", [row["symbol"] for row in universe.rows("stock")],
+                   get_daily_bars, config.FEE_PCT, start, end),
+        test_group("Old crypto", config.CRYPTO_SYMBOLS, get_crypto_daily_bars, config.CRYPTO_FEE_PCT, start, end),
+        test_group("New crypto", [row["symbol"] for row in universe.rows("crypto")],
+                   get_crypto_daily_bars, config.CRYPTO_FEE_PCT, start, end),
+    ]
+    print("\n" + "=" * 96)
+    print(f"{'':12}{'Tested':>7}{'Strategy':>10}{'Buy&hold':>10}{'Beat hold':>11}"
+          f"{'Worst fall':>12}{'Hold fall':>11}{'Trades':>8}{'Win rate':>10}")
+    for row in groups:
+        print(f"{row['group']:12}{row['tested']:>7}{pct(row['strategy_median']):>10}{pct(row['hold_median']):>10}"
+              f"{row['beat_hold_share'] * 100:>10.0f}%{pct(row['strategy_worst_fall_median']):>12}"
+              f"{pct(row['hold_worst_fall_median']):>11}{row['trades']:>8}{row['win_rate'] * 100:>9.0f}%")
+    print("=" * 96)
+    print("Returns and falls are medians: half the symbols did better, half did worse.")
+    print("Each symbol is tested alone with its own money, all in, so these aren't portfolio results.")
+    print("\nWARNING, survivorship bias: the long lists are today's most traded names. Companies that")
+    print("shrank or vanished aren't in them, and many got there by rising. That makes the past look")
+    print("better than anyone could have known at the time. Past results do not predict future results.")
+    os.makedirs(RESULTS_DIR, exist_ok=True)
+    pd.DataFrame(groups).to_csv(os.path.join(RESULTS_DIR, "universe_backtest_summary.csv"), index=False)
+    print(f"\nSaved: {RESULTS_DIR}/universe_backtest_summary.csv")
+
+
+# ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
 def main():
@@ -287,7 +345,13 @@ def main():
     parser.add_argument("--end", default=None, help="last test day (default: last finished trading day)")
     parser.add_argument("--symbols", nargs="+", default=None, help="e.g. --symbols SPY AAPL")
     parser.add_argument("--crypto", action="store_true", help="test the crypto pairs in config.py")
+    parser.add_argument("--universe", action="store_true", help="compare the old short lists with the long lists")
     args = parser.parse_args()
+
+    if args.universe:
+        start = datetime.fromisoformat(args.start)
+        compare_universes(start, last_complete_utc_day_end().replace(tzinfo=None))
+        return
 
     symbols = [s.upper() for s in (args.symbols or (config.CRYPTO_SYMBOLS if args.crypto else config.SYMBOLS))]
     fee_pct = config.CRYPTO_FEE_PCT if args.crypto else config.FEE_PCT

@@ -99,9 +99,7 @@ def _message_text(row):
         return _order_message(row)
     if event == "KILL_SWITCH":
         return f"⛔ KILL SWITCH ON\n{row.get('details', '')}"
-    if event == "AI_DECISION" and row.get("ai_decision") == ai_analyst.VETO:
-        return f"🤖 AI VETOED {row.get('signal', '')} {row.get('symbol', '')}\nReason: {row.get('ai_reason', '')}"
-    if event == "ERROR":
+    if event == "ERROR":     # AI vetoes are counted in the daily summary instead
         return f"❌ Bot run crashed\n{row.get('details', '')}"
     return None
 

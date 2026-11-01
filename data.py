@@ -12,6 +12,7 @@ Prices are adjusted for stock splits and dividends, so a 4-for-1 split does
 not look like a 75% crash.
 """
 
+import time
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
@@ -24,6 +25,7 @@ from alpaca.data.timeframe import TimeFrame
 import config
 
 NEW_YORK = ZoneInfo("America/New_York")
+LAST_STOCK_FEED = "sip"     # which feed answered the latest stock request
 
 
 def last_complete_day_end():
@@ -45,6 +47,29 @@ def _to_utc(when):
     if when.tzinfo is None:
         when = when.replace(tzinfo=timezone.utc)
     return when.astimezone(timezone.utc)
+
+
+def in_batches(symbols, download):
+    """
+    Download many symbols in batches, never one call per symbol. It paces the
+    batches to stay well under Alpaca's limit, and after an error it waits and
+    tries again, waiting longer each time.
+    """
+    tables = {}
+    pause = 60 / config.ALPACA_CALLS_PER_MINUTE
+    for first in range(0, len(symbols), config.ALPACA_BATCH_SIZE):
+        if first:
+            time.sleep(pause)
+        batch = symbols[first:first + config.ALPACA_BATCH_SIZE]
+        for attempt in range(config.ALPACA_RETRIES):
+            try:
+                tables.update(download(batch))
+                break
+            except Exception:
+                if attempt == config.ALPACA_RETRIES - 1:
+                    raise
+                time.sleep(2 ** (attempt + 1))
+    return tables
 
 
 def _download(client, symbols, start, end, feed):
@@ -71,17 +96,27 @@ def get_daily_bars(symbols, start, end=None):
         symbols = [symbols]
     start = _to_utc(start)
     end = min(_to_utc(end), last_complete_day_end()) if end else last_complete_day_end()
+    # Alpaca includes a bar stamped exactly at `end`, and today's unfinished bar is
+    # stamped at midnight, so stop one second before it. Signals use finished days only.
+    end -= timedelta(seconds=1)
 
     api_key, secret_key = config.get_alpaca_keys()
     client = StockHistoricalDataClient(api_key, secret_key)
+    return in_batches(symbols, lambda batch: _stock_tables(client, batch, start, end))
 
+
+def _stock_tables(client, symbols, start, end):
+    """One batch of stock bars, as a dictionary of tables."""
+    global LAST_STOCK_FEED
     try:
         raw = _download(client, symbols, start, end, DataFeed.SIP)
+        LAST_STOCK_FEED = "sip"
     except Exception as error:
         if "subscription" not in str(error).lower():
             raise
         print("⚠️  Alpaca refused full-market (SIP) data on your plan; using the free IEX feed.")
         raw = _download(client, symbols, start, end, DataFeed.IEX)
+        LAST_STOCK_FEED = "iex"
 
     tables = {}
     if raw is None or raw.empty:
@@ -126,6 +161,11 @@ def get_crypto_daily_bars(symbols, start, end=None):
 
     api_key, secret_key = config.get_alpaca_keys()
     client = CryptoHistoricalDataClient(api_key, secret_key)
+    return in_batches(symbols, lambda batch: _crypto_tables(client, batch, start, end))
+
+
+def _crypto_tables(client, symbols, start, end):
+    """One batch of crypto bars, as a dictionary of tables."""
     request = CryptoBarsRequest(symbol_or_symbols=symbols, timeframe=TimeFrame.Day, start=start, end=end)
     raw = client.get_crypto_bars(request).df
 

@@ -14,7 +14,7 @@ Nothing here can stop the bot: update() catches every error and prints a note.
 import csv
 import json
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 
 from alpaca.trading.client import TradingClient
 
@@ -23,8 +23,8 @@ import config
 import crypto
 import notifier
 import risk
-from data import NEW_YORK, get_crypto_daily_bars, get_daily_bars
-from strategy import latest_signal
+import signals
+import universe
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(BASE_DIR, "docs", "data")
@@ -158,35 +158,16 @@ def account_figures(account, positions):
     }
 
 
-def views_of(symbols, bars):
-    """The bot's view of each symbol, in words only."""
-    views = []
-    for symbol in symbols:
-        prices = bars.get(symbol)
-        view = {"trend": "", "signal": "", "date": ""}
-        if prices is not None and len(prices) >= config.SLOW_SMA_DAYS + 1:
-            view = latest_signal(prices)
-        views.append({"symbol": symbol, "trend": view["trend"], "signal": view["signal"],
-                      "signal_date": view["date"]})
-    return views
+def load_candidates():
+    """Today's short lists. This file is the cache that later runs act on, so it holds
+    no prices: Alpaca doesn't allow republishing its data, and the file is public."""
+    return _read_json("candidates.json", {})
 
 
-def refresh_watchlist(today):
-    """
-    Once a New York day: the bot's current view of each stock and crypto pair, in
-    words only. Alpaca doesn't allow republishing its price data, so no prices or
-    averages go into this public file. The website shows price charts from TradingView.
-    Crypto is left out while config.CRYPTO_ENABLED is False.
-    """
-    current = _read_json("watchlist.json", {})
-    if current.get("updated_for") == today and bool(current.get("crypto")) == config.CRYPTO_ENABLED:
-        return
-    start = datetime.now(timezone.utc) - timedelta(days=int(config.SLOW_SMA_DAYS * 1.6) + 60)
-    stocks = views_of(config.SYMBOLS, get_daily_bars(config.SYMBOLS, start))
-    pairs = []
-    if config.CRYPTO_ENABLED:
-        pairs = views_of(config.CRYPTO_SYMBOLS, get_crypto_daily_bars(config.CRYPTO_SYMBOLS, start))
-    _write_json("watchlist.json", {"updated_for": today, "stocks": stocks, "crypto": pairs})
+def save_candidates(market, plan):
+    saved = load_candidates()
+    saved[market] = plan
+    _write_json("candidates.json", saved)
 
 
 def build_status(now, exit_code, error_text, dry_run, market_open, equity, start_equity,
@@ -215,11 +196,12 @@ def build_status(now, exit_code, error_text, dry_run, market_open, equity, start
         "ai_analyst_on": config.USE_AI_ANALYST,
         "paper": True,
         "crypto_enabled": config.CRYPTO_ENABLED,
-        "crypto_symbols": config.CRYPTO_SYMBOLS,
+        "universe": {market: universe.info(market) for market in universe.FILES},
         "trades_today": sum(row.get("event") == "ORDER" and "/" not in row.get("symbol", "")
                             for row in todays_rows),
         "limits": {
             "max_trades_per_day": config.MAX_TRADES_PER_DAY,
+            "max_open_positions": config.MAX_OPEN_POSITIONS,
             "max_position_pct": config.MAX_POSITION_PCT,
             "stop_loss_pct": config.STOP_LOSS_PCT,
             "kill_switch_pct": config.KILL_SWITCH_PCT,
@@ -237,8 +219,15 @@ def summary_text(orders_today):
         value += f" ({change:+.2%} today)"
     run_status = status.get("last_run", {}).get("status", "unknown")
     kill_on = status.get("kill_switch", {}).get("on")
+    saved = load_candidates()
+    lines = []
+    for market, title in (("stock", "Stock"), ("crypto", "Crypto")):
+        numbers = signals.counts(saved.get(market, {}))
+        lines.append(f"{title} candidates: {numbers['found']} found, "
+                     f"{numbers['approved']} approved, {numbers['vetoed']} vetoed")
     return (f"{notifier.BOTH_LABEL} 📊 Daily summary\nAccount value: {value}\nOrders today: {orders_today}\n"
             f"Open positions: {len(_read_json('positions.json', []))}\n"
+            + "\n".join(lines) + "\n"
             f"Kill switch: {'ON' if kill_on else 'off'}\n"
             f"Last run: {run_status.replace('_', ' ')}")
 
@@ -286,11 +275,6 @@ def _update(log_file, day_start, exit_code, error_text, dry_run, orders):
         _write_json("positions.json", position_rows(positions))
         _write_json("equity_history.json",
                     add_equity_point(_read_json("equity_history.json", []), now, equity))
-
-    try:
-        refresh_watchlist(datetime.now(NEW_YORK).date().isoformat())
-    except (Exception, SystemExit) as error:
-        print("⚠️  Could not refresh the stock list for the dashboard:", notifier.redact(error))
     print("Dashboard data written to docs/data/")
 
 
