@@ -1,0 +1,112 @@
+{
+ "refreshed": "2026-11-01",
+ "feed": "crypto",
+ "ranked_by": "average daily dollar volume, last 20 days",
+ "symbols": [
+  {
+   "symbol": "BTC/USD",
+   "name": "Bitcoin  / US Dollar",
+   "avg_dollar_volume": 230000.0
+  },
+  {
+   "symbol": "ETH/USD",
+   "name": "Ethereum / US Dollar",
+   "avg_dollar_volume": 38000.0
+  },
+  {
+   "symbol": "SOL/USD",
+   "name": "Solana / US Dollar",
+   "avg_dollar_volume": 30000.0
+  },
+  {
+   "symbol": "XRP/USD",
+   "name": "Ripple / US Dollar",
+   "avg_dollar_volume": 21000.0
+  },
+  {
+   "symbol": "AVAX/USD",
+   "name": "Avalanche / US Dollar",
+   "avg_dollar_volume": 7100.0
+  },
+  {
+   "symbol": "LTC/USD",
+   "name": "Litecoin / US Dollar",
+   "avg_dollar_volume": 6900.0
+  },
+  {
+   "symbol": "UNI/USD",
+   "name": "Uniswap / US Dollar",
+   "avg_dollar_volume": 6500.0
+  },
+  {
+   "symbol": "LINK/USD",
+   "name": "Chainlink / US Dollar",
+   "avg_dollar_volume": 5500.0
+  },
+  {
+   "symbol": "DOT/USD",
+   "name": "Polkadot / US Dollar",
+   "avg_dollar_volume": 5000.0
+  },
+  {
+   "symbol": "DOGE/USD",
+   "name": "Dogecoin / US Dollar",
+   "avg_dollar_volume": 4600.0
+  },
+  {
+   "symbol": "PEPE/USD",
+   "name": "Pepe / US Dollar",
+   "avg_dollar_volume": 3900.0
+  },
+  {
+   "symbol": "AAVE/USD",
+   "name": "Aave / US Dollar",
+   "avg_dollar_volume": 3800.0
+  },
+  {
+   "symbol": "BCH/USD",
+   "name": "Bitcoin Cash / US Dollar",
+   "avg_dollar_volume": 3600.0
+  },
+  {
+   "symbol": "RENDER/USD",
+   "name": "Render / US Dollar",
+   "avg_dollar_volume": 3300.0
+  },
+  {
+   "symbol": "HYPE/USD",
+   "name": "Hype / US Dollar",
+   "avg_dollar_volume": 3000.0
+  },
+  {
+   "symbol": "ADA/USD",
+   "name": "Cardano / US Dollar",
+   "avg_dollar_volume": 2700.0
+  },
+  {
+   "symbol": "ARB/USD",
+   "name": "Arbitrum / US Dollar",
+   "avg_dollar_volume": 2000.0
+  },
+  {
+   "symbol": "BAT/USD",
+   "name": "Basic Attention Token / US Dollar",
+   "avg_dollar_volume": 1600.0
+  },
+  {
+   "symbol": "ONDO/USD",
+   "name": "Ondo / US Dollar",
+   "avg_dollar_volume": 1200.0
+  },
+  {
+   "symbol": "LDO/USD",
+   "name": "Lido DAO / US Dollar",
+   "avg_dollar_volume": 1100.0
+  },
+  {
+   "symbol": "GRT/USD",
+   "name": "The Graph / US Dollar",
+   "avg_dollar_volume": 1100.0
+  }
+ ]
+}
