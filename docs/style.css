@@ -19,6 +19,9 @@
   --critical: #b3261e;
   --warning: #e8a317;
   --focus: #1f6fb2;
+  --stock-fill: #1f6fb2;
+  --crypto-fill: #c9531f;
+  --cash-fill: #5d6f84;
 
   /* The cluster is the same in both themes. */
   --dash: #132134;
@@ -43,6 +46,9 @@
     --good: #5fd39a;
     --critical: #ff8a84;
     --focus: #8cc4f5;
+    --stock-fill: #3987e5;
+    --crypto-fill: #d95926;
+    --cash-fill: #4a5b70;
   }
 }
 
@@ -239,6 +245,62 @@ h2 { font-size: 18px; font-weight: 600; }
 details { margin-top: 8px; }
 details summary { color: var(--ink-2); font-size: 15px; cursor: pointer; }
 
+/* Stocks, crypto and cash, one whole split into parts */
+.breakdown { display: flex; gap: 2px; height: 28px; overflow: hidden; border-radius: 4px; background: var(--rule); }
+
+.breakdown-part {
+  display: flex;
+  align-items: center;
+  min-width: 2px;
+  padding-inline: 8px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.is-stock { background: var(--stock-fill); }
+.is-crypto { background: var(--crypto-fill); }
+.is-cash { background: var(--cash-fill); }
+
+.breakdown-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 24px;
+  margin: 8px 0 0;
+  padding: 0;
+  font-size: 15px;
+  list-style: none;
+}
+
+.breakdown-legend li { display: flex; align-items: center; gap: 6px; }
+.breakdown-legend span:last-child { color: var(--ink-2); }
+.swatch { width: 12px; height: 12px; border-radius: 3px; }
+
+/* Stocks and Crypto tabs */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--rule); }
+
+.tabs button {
+  min-height: 44px;
+  margin-bottom: -1px;
+  padding: 6px 20px;
+  border: 0;
+  border-bottom: 3px solid transparent;
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-family: "Barlow Condensed", "Barlow", sans-serif;
+  font-size: 22px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.tabs button[aria-selected="true"] { border-bottom-color: currentColor; color: var(--ink); }
+
+.market-panel { padding-top: 12px; }
+.market-panel h3 { margin: 16px 0 6px; font-size: 16px; font-weight: 600; }
+.market-panel .block-head { margin-bottom: 0; }
+
 /* Recent runs */
 .run-strip { display: flex; align-items: flex-end; gap: 3px; height: 40px; list-style: none; }
 
@@ -297,7 +359,7 @@ th {
 
 td { padding: 8px; border-bottom: 1px solid var(--rule); vertical-align: top; overflow-wrap: anywhere; }
 
-td a { font-weight: 600; }
+td a { font-weight: 600; white-space: nowrap; }
 
 .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 

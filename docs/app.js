@@ -10,6 +10,24 @@
     AAPL: "Apple",
     MSFT: "Microsoft",
     JPM: "JPMorgan Chase",
+    "BTC/USD": "Bitcoin",
+    "ETH/USD": "Ether",
+  };
+  const MARKETS = {
+    stock: {
+      title: "Stocks",
+      page: "stocks",
+      list: "stocks",
+      back: "All stocks",
+      intro: "The stocks the bot follows and how it sees each one. Open a stock to see its price history and your trades.",
+    },
+    crypto: {
+      title: "Crypto",
+      page: "crypto",
+      list: "crypto",
+      back: "All crypto",
+      intro: "The crypto pairs the bot follows and how it sees each one. Open a pair to see its price history and your trades.",
+    },
   };
   const RUN_STATES = {
     ok: ["good", "✓ Ran normally"],
@@ -26,9 +44,10 @@
     watchlist: "watchlist",
   };
 
-  const data = { status: null, positions: [], trades: [], history: [], runs: [], watchlist: { stocks: [] } };
+  const data = { status: null, positions: [], trades: [], history: [], runs: [], watchlist: { stocks: [], crypto: [] } };
   const view = document.getElementById("view");
   let chart = null;
+  let activeMarket = "stock";
 
   // ------------------------------------------------------------------------
   // Small helpers
@@ -37,7 +56,9 @@
   const color = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
   const hasNumber = (value) => typeof value === "number" && Number.isFinite(value);
   const tone = (value) => (value > 0 ? "good" : value < 0 ? "critical" : "");
-  const shares = (value) => (hasNumber(value) ? value.toLocaleString("en-US") : "–");
+  const shares = (value) => (hasNumber(value) ? value.toLocaleString("en-US", { maximumFractionDigits: 8 }) : "–");
+  const marketOf = (symbol) => (symbol.includes("/") ? "crypto" : "stock");
+  const held = (position) => `${shares(position.qty)}${marketOf(position.symbol) === "crypto" ? "" : " shares"}`;
 
   function element(tag, className, text) {
     const node = document.createElement(tag);
@@ -126,13 +147,25 @@
     holder.replaceChildren(typeof content === "string" ? element("p", "note", content) : content);
   }
 
-  const stockLink = (symbol) => `#/stocks/${encodeURIComponent(symbol)}`;
+  function stockLink(symbol) {
+    if (marketOf(symbol) === "crypto") return `#/crypto/${encodeURIComponent(symbol.replace("/", "-"))}`;
+    return `#/stocks/${encodeURIComponent(symbol)}`;
+  }
 
-  // Every stock the bot follows, plus anything it holds or traded.
-  function knownSymbols() {
-    const symbols = data.watchlist.stocks.map((stock) => stock.symbol);
+  function watchlistOf(market) {
+    return data.watchlist[MARKETS[market].list] || [];
+  }
+
+  // Everything the bot follows in one market, plus anything it holds or traded there.
+  function knownSymbols(market) {
+    const symbols = watchlistOf(market).map((stock) => stock.symbol);
+    if (market === "crypto" && data.status) {
+      for (const symbol of data.status.crypto_symbols || []) {
+        if (!symbols.includes(symbol)) symbols.push(symbol);
+      }
+    }
     for (const row of [...data.positions, ...data.trades]) {
-      if (row.symbol && !symbols.includes(row.symbol)) symbols.push(row.symbol);
+      if (row.symbol && marketOf(row.symbol) === market && !symbols.includes(row.symbol)) symbols.push(row.symbol);
     }
     return symbols;
   }
@@ -160,7 +193,9 @@
 
   function showStaleWarning(lastUpdate) {
     const ALLOWED_GAP = 90 * 60000;   // GitHub can start scheduled runs late
-    if (latestExpectedUpdate(Date.now()) - toDate(lastUpdate).getTime() <= ALLOWED_GAP) return;
+    const now = Date.now();
+    const expected = data.status.crypto_enabled ? now : latestExpectedUpdate(now);   // crypto runs 24/7
+    if (expected - toDate(lastUpdate).getTime() <= ALLOWED_GAP) return;
     byId("stale-text").textContent =
       `⚠ The last update was ${agoText(lastUpdate)}, but the bot should have run since then. It may have stopped.`;
     byId("stale-warning").hidden = false;
@@ -408,9 +443,85 @@
     }
   }
 
-  function positionColumns(withSymbol) {
+  function renderBreakdown() {
+    const status = data.status;
+    if (!status) return;
+    const parts = [
+      { name: "Stocks", value: status.stock_value, className: "is-stock" },
+      { name: "Crypto", value: status.crypto_value, className: "is-crypto" },
+      { name: "Cash", value: status.cash, className: "is-cash" },
+    ].map((part) => ({ ...part, value: hasNumber(part.value) ? Math.max(0, part.value) : 0 }));
+    const total = parts.reduce((sum, part) => sum + part.value, 0);
+    const share = (part) => (total ? Math.round((part.value / total) * 100) : 0);
+
+    const bar = byId("breakdown");
+    bar.replaceChildren(...parts.filter((part) => part.value > 0).map((part) => {
+      const block = element("div", `breakdown-part ${part.className}`, share(part) >= 12 ? `${share(part)}%` : "");
+      block.style.flexGrow = part.value;
+      block.title = `${part.name}: ${money(part.value)}`;
+      return block;
+    }));
+    bar.setAttribute("aria-label", parts.map((part) => `${part.name} ${money(part.value)}, ${share(part)}%`).join("; "));
+
+    byId("breakdown-legend").replaceChildren(...parts.map((part) => {
+      const item = element("li");
+      item.append(element("span", `swatch ${part.className}`), element("span", "", part.name),
+        element("span", "", `${money(part.value)} (${share(part)}%)`));
+      return item;
+    }));
+  }
+
+  function renderMarketTab() {
+    for (const tab of document.querySelectorAll('[role="tab"]')) {
+      const selected = tab.dataset.market === activeMarket;
+      tab.setAttribute("aria-selected", String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+      if (selected) byId("market-panel").setAttribute("aria-labelledby", tab.id);
+    }
+    const status = data.status || {};
+    const limit = status.limits ? status.limits.max_trades_per_day : 3;
+    const isMarket = (row) => (row.asset_class || "stock") === activeMarket;
+    const name = activeMarket === "crypto" ? "crypto" : "stock";
+    let note = `Stock trades today: ${status.trades_today ?? "–"} of ${limit}.`;
+    if (activeMarket === "crypto") {
+      note = status.crypto_enabled
+        ? `Crypto trades today: ${status.crypto_trades_today ?? "–"} of ${limit}, counted by UTC day.`
+        : "Crypto trading is off. Trades appear here once it's turned on.";
+    }
+    setText("market-note", note);
+
+    const positions = data.positions.filter(isMarket);
+    const trades = data.trades.filter(isMarket);
+    show(byId("positions"), positions.length
+      ? buildTable(positionColumns(activeMarket), positions)
+      : `No open ${name} positions.`);
+    show(byId("latest-trades"), trades.length
+      ? tradeTable(trades.slice(0, 10), true, activeMarket)
+      : `No ${name} trades yet.`);
+  }
+
+  function renderTabs() {
+    renderMarketTab();
+    const tabs = [...document.querySelectorAll('[role="tab"]')];
+    const choose = (tab) => {
+      activeMarket = tab.dataset.market;
+      renderMarketTab();
+      tab.focus();
+    };
+    for (const tab of tabs) {
+      tab.addEventListener("click", () => choose(tab));
+      tab.addEventListener("keydown", (event) => {
+        if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+        event.preventDefault();
+        choose(tabs[(tabs.indexOf(tab) + 1) % tabs.length]);
+      });
+    }
+  }
+
+  function positionColumns(market) {
     const columns = [
-      { title: "Shares", value: (p) => shares(p.qty), numeric: true },
+      { title: "Stock", value: (p) => p.symbol, link: (p) => stockLink(p.symbol) },
+      { title: market === "crypto" ? "Amount" : "Shares", value: (p) => shares(p.qty), numeric: true },
       { title: "Bought at", value: (p) => money(p.avg_entry_price), numeric: true },
       { title: "Now", value: (p) => money(p.current_price), numeric: true },
       { title: "Value", value: (p) => money(p.market_value), numeric: true },
@@ -422,7 +533,7 @@
       },
       { title: "Stop-loss at", value: (p) => money(p.stop_price), numeric: true },
     ];
-    if (withSymbol) columns.unshift({ title: "Stock", value: (p) => p.symbol, link: (p) => stockLink(p.symbol) });
+    if (market === "crypto") columns[0].title = "Pair";
     return columns;
   }
 
@@ -437,30 +548,27 @@
     return trade.event === "AI_DECISION" ? `Vetoed ${side}` : side;
   }
 
-  function tradeTable(trades, withSymbol) {
+  function tradeTable(trades, withSymbol, market) {
     const columns = [
       { title: "Time", value: (t) => timeText(t.time_utc) },
       { title: "Action", value: actionText },
-      { title: "Shares", value: (t) => shares(t.qty), numeric: true },
+      { title: market === "stock" ? "Shares" : "Amount", value: (t) => shares(t.qty), numeric: true },
       { title: "Price", value: (t) => money(t.price), numeric: true },
       { title: "Status", value: (t) => t.order_status || "–" },
       { title: "Reason", value: (t) => t.reason || "–" },
       { title: "AI decision", value: aiText },
     ];
-    if (withSymbol) columns.splice(2, 0, { title: "Stock", value: (t) => t.symbol, link: (t) => stockLink(t.symbol) });
+    const symbolTitle = market === "crypto" ? "Pair" : market === "stock" ? "Stock" : "Symbol";
+    if (withSymbol) columns.splice(2, 0, { title: symbolTitle, value: (t) => t.symbol, link: (t) => stockLink(t.symbol) });
     return buildTable(columns, trades);
   }
 
   function showOverview() {
     renderSummary();
-    renderRuns();
     renderEquity();
-    show(byId("positions"), data.positions.length
-      ? buildTable(positionColumns(true), data.positions)
-      : "No open positions. Holdings appear here after the bot buys.");
-    show(byId("latest-trades"), data.trades.length
-      ? tradeTable(data.trades.slice(0, 5), true)
-      : "No trades yet. They appear here after the bot's first order.");
+    renderBreakdown();
+    renderTabs();
+    renderRuns();
   }
 
   // ------------------------------------------------------------------------
@@ -480,7 +588,7 @@
   }
 
   function viewOf(symbol) {
-    return data.watchlist.stocks.find((stock) => stock.symbol === symbol)
+    return watchlistOf(marketOf(symbol)).find((stock) => stock.symbol === symbol)
       || { symbol, trend: "", signal: "", signal_date: "" };
   }
 
@@ -501,7 +609,7 @@
       signal.append(element("span", "", `from the ${label} close`));
     }
 
-    const holding = element("div", "stock-cell", position ? `${shares(position.qty)} shares held` : "Not held");
+    const holding = element("div", "stock-cell", position ? `${held(position)} held` : "Not held");
     if (position) {
       holding.append(element("span", tone(position.unrealized_pl),
         `${signed(money(position.unrealized_pl), position.unrealized_pl)} (${percent(position.unrealized_pl_pct)})`));
@@ -510,10 +618,14 @@
     return row;
   }
 
-  function showStocks() {
-    const symbols = knownSymbols();
+  function showMarket(market) {
+    setText("market-title", MARKETS[market].title);
+    setText("market-intro", market === "crypto" && data.status && !data.status.crypto_enabled
+      ? `${MARKETS.crypto.intro} Crypto trading is off for now.`
+      : MARKETS[market].intro);
+    const symbols = knownSymbols(market);
     const list = byId("stock-list");
-    if (!symbols.length) return show(list, "The stock list fills in after the bot's next run.");
+    if (!symbols.length) return show(list, "This list fills in after the bot's next run.");
     list.replaceChildren(...symbols.map(stockRow));
   }
 
@@ -532,7 +644,7 @@
     script.async = true;
     script.textContent = JSON.stringify({
       autosize: true,
-      symbol,
+      symbol: marketOf(symbol) === "crypto" ? `COINBASE:${symbol.replace("/", "")}` : symbol,
       interval: "D",
       range: "12M",
       timezone: "exchange",
@@ -558,10 +670,14 @@
   }
 
   function showStock(symbol) {
-    if (!knownSymbols().includes(symbol)) {
+    const market = marketOf(symbol);
+    const back = byId("stock-back");
+    back.textContent = MARKETS[market].back;
+    back.href = `#/${MARKETS[market].page}`;
+    if (!knownSymbols(market).includes(symbol)) {
       setText("stock-symbol", symbol);
       setText("stock-name", "");
-      show(byId("stock-trades"), "The bot doesn't follow this stock.");
+      show(byId("stock-trades"), "The bot doesn't follow this.");
       byId("stock-chart").hidden = true;
       return;
     }
@@ -574,7 +690,7 @@
     const facts = byId("stock-facts");
     fact(facts, "The bot's view", trendText(stock));
     fact(facts, "Latest signal", signalText(stock));
-    fact(facts, "Your position", position ? `${shares(position.qty)} shares at ${money(position.avg_entry_price)}` : "Not held");
+    fact(facts, "Your position", position ? `${held(position)} at ${money(position.avg_entry_price)}` : "Not held");
     if (position) {
       fact(facts, "Profit or loss",
         `${signed(money(position.unrealized_pl), position.unrealized_pl)} (${percent(position.unrealized_pl_pct)})`,
@@ -584,7 +700,7 @@
 
     mountPriceChart(byId("stock-chart"), symbol);
     const trades = data.trades.filter((trade) => trade.symbol === symbol);
-    show(byId("stock-trades"), trades.length ? tradeTable(trades, false) : "The bot hasn't traded this stock yet.");
+    show(byId("stock-trades"), trades.length ? tradeTable(trades, false, market) : "The bot hasn't traded this yet.");
   }
 
   // ------------------------------------------------------------------------
@@ -593,6 +709,7 @@
   function matchesFilter(trade, filter) {
     if (filter === "veto") return trade.event === "AI_DECISION";
     if (filter === "buy" || filter === "sell") return trade.event === "ORDER" && trade.side === filter;
+    if (filter === "stock" || filter === "crypto") return (trade.asset_class || "stock") === filter;
     return true;
   }
 
@@ -600,7 +717,7 @@
     const holder = byId("all-trades");
     const render = (filter) => {
       const trades = data.trades.filter((trade) => matchesFilter(trade, filter));
-      show(holder, trades.length ? tradeTable(trades, true) : "Nothing to show here yet.");
+      show(holder, trades.length ? tradeTable(trades, true, "all") : "Nothing to show here yet.");
     };
     render("all");
     byId("trade-filters").addEventListener("click", (event) => {
@@ -629,19 +746,22 @@
 
   function route(moved) {
     const parts = location.hash.replace(/^#\/?/, "").split("/").filter(Boolean);
-    if (parts[0] === "stocks" && parts[1]) {
+    if ((parts[0] === "stocks" || parts[0] === "crypto") && parts[1]) {
       let symbol = "";
       try {
         symbol = decodeURIComponent(parts[1]).toUpperCase();
       } catch {
-        location.hash = "#/stocks";
+        location.hash = `#/${parts[0]}`;
         return;
       }
-      open("stock-page", "stocks");
-      showStock(symbol);
+      open("stock-page", parts[0]);
+      showStock(parts[0] === "crypto" ? symbol.replace("-", "/") : symbol);
     } else if (parts[0] === "stocks") {
       open("stocks-page", "stocks");
-      showStocks();
+      showMarket("stock");
+    } else if (parts[0] === "crypto") {
+      open("stocks-page", "crypto");
+      showMarket("crypto");
     } else if (parts[0] === "trades") {
       open("trades-page", "trades");
       showTrades();
