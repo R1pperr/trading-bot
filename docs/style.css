@@ -1,0 +1,153 @@
+/* Dashboard styles. Colors are named by role here, so light and dark swap in one place. */
+:root {
+  color-scheme: light;
+  --plane: #f9f9f7;
+  --surface: #fcfcfb;
+  --ink: #0b0b0b;
+  --ink-2: #52514e;
+  --axis: #898781;
+  --grid: #e1e0d9;
+  --border: rgba(11, 11, 11, 0.1);
+  --series: #2a78d6;
+  --good: #006300;
+  --critical: #b52f2f;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --plane: #0d0d0d;
+    --surface: #1a1a19;
+    --ink: #f0efec;
+    --ink-2: #c3c2b7;
+    --axis: #898781;
+    --grid: #2c2c2a;
+    --border: rgba(255, 255, 255, 0.1);
+    --series: #3987e5;
+    --good: #0ca30c;
+    --critical: #e66767;
+  }
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--plane);
+  color: var(--ink);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.45;
+}
+
+h1, h2, p { margin: 0; }
+
+.page {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+  display: grid;
+  gap: 16px;
+}
+
+.top {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 8px 24px;
+}
+
+h1 { font-size: 24px; font-weight: 600; }
+
+.sub, .updated, .note, .foot { color: var(--ink-2); font-size: 14px; }
+
+.tag {
+  display: inline-block;
+  padding: 1px 8px;
+  margin-right: 4px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--ink);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.hero, .tile, .card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.label, .tile h2 { color: var(--ink-2); font-size: 14px; font-weight: 500; }
+
+.hero-value { font-size: 48px; font-weight: 600; line-height: 1.15; overflow-wrap: anywhere; }
+
+.delta { font-size: 16px; font-weight: 500; }
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+
+.state { margin-top: 2px; font-size: 18px; font-weight: 600; }
+
+.note { margin-top: 4px; overflow-wrap: anywhere; }
+
+.good { color: var(--good); }
+.critical { color: var(--critical); }
+
+.card { display: grid; gap: 12px; min-width: 0; }
+.card h2 { font-size: 16px; font-weight: 600; }
+
+.chart-box { position: relative; height: 280px; }
+
+details summary { color: var(--ink-2); font-size: 14px; cursor: pointer; }
+details table { margin-top: 8px; }
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+
+th {
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--grid);
+  color: var(--ink-2);
+  font-weight: 500;
+  text-align: left;
+  white-space: nowrap;
+}
+
+td { padding: 8px; border-bottom: 1px solid var(--grid); vertical-align: top; overflow-wrap: anywhere; }
+
+tr:last-child td { border-bottom: 0; }
+
+.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.foot { padding: 0 4px; font-size: 13px; }
+
+@media (max-width: 720px) {
+  .tiles { grid-template-columns: repeat(2, 1fr); }
+  .hero-value { font-size: 40px; }
+
+  /* On a phone each table row becomes its own small card, so nothing scrolls sideways. */
+  table, tbody, tr, td { display: block; width: 100%; }
+  thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  tr { padding: 8px 0; border-bottom: 1px solid var(--grid); }
+  tr:last-child { border-bottom: 0; }
+  td {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 2px 0;
+    border: 0;
+    text-align: right;
+    white-space: normal;
+  }
+  td::before {
+    content: attr(data-label);
+    flex: none;
+    color: var(--ink-2);
+    text-align: left;
+  }
+}
