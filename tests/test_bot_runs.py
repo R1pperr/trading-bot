@@ -69,6 +69,7 @@ class BotRunTests(unittest.TestCase):
         self.start(mock.patch.object(dashboard, "TradingClient", return_value=self.trading))
         self.start(mock.patch.object(bot, "StockHistoricalDataClient"))
         self.start(mock.patch.object(bot, "get_daily_bars", return_value={"SPY": self.prices}))
+        self.start(mock.patch.object(dashboard, "get_daily_bars", return_value={"SPY": self.prices}))
         self.start(mock.patch.object(bot, "latest_price", return_value=100.0))
         self.start(mock.patch.object(bot, "LOG_FILE", self.log_file))
         self.start(mock.patch.object(dashboard, "DATA_DIR", os.path.join(self.folder, "data")))
