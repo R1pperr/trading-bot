@@ -63,6 +63,12 @@ GEMINI_MODEL = "gemini-3.8-flash"
 
 
 # ---------------------------------------------------------------------------
+# Phone alerts (see notifier.py)
+# ---------------------------------------------------------------------------
+DAILY_SUMMARY_UTC = "20:45"   # the first weekday run from this time on sends the day's summary
+
+
+# ---------------------------------------------------------------------------
 # Keys (read from the .env file, never written in code)
 # ---------------------------------------------------------------------------
 def get_alpaca_keys():

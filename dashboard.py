@@ -149,6 +149,22 @@ def build_status(now, exit_code, error_text, dry_run, market_open, equity, start
     }
 
 
+def summary_text(orders_today):
+    """The day's one-message summary, built from the files just written."""
+    status = _read_json("status.json", {})
+    equity = status.get("equity")
+    change = status.get("day_change_pct")
+    value = "unknown" if equity is None else f"${equity:,.2f}"
+    if change is not None:
+        value += f" ({change:+.2%} today)"
+    run_status = status.get("last_run", {}).get("status", "unknown")
+    kill_on = status.get("kill_switch", {}).get("on")
+    return (f"📊 Daily summary\nAccount value: {value}\nOrders today: {orders_today}\n"
+            f"Open positions: {len(_read_json('positions.json', []))}\n"
+            f"Kill switch: {'ON' if kill_on else 'off'}\n"
+            f"Last run: {run_status.replace('_', ' ')}")
+
+
 # ---------------------------------------------------------------------------
 # Called by bot.py at the end of every run
 # ---------------------------------------------------------------------------

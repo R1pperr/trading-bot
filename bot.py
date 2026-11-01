@@ -25,6 +25,7 @@ stop-losses.
 import argparse
 import csv
 import os
+import re
 import sys
 import time
 from datetime import datetime, timedelta, timezone
@@ -371,16 +372,53 @@ def record_crash(details):
         pass
 
 
+def crash_key(row):
+    """The error text with numbers removed, so the same problem matches itself."""
+    return re.sub(r"\d+", "#", row["details"])
+
+
+def alerts_for(rows):
+    """This run's rows, minus a crash alert you already got today for the same problem."""
+    try:
+        todays_crashes = [crash_key(row) for row in read_todays_log() if row["event"] == "ERROR"]
+    except Exception:
+        return rows
+    # Today's log already includes this run's own crash, so a repeat shows up twice.
+    return [row for row in rows
+            if row["event"] != "ERROR" or todays_crashes.count(crash_key(row)) < 2]
+
+
+def summary_due(now):
+    """True on a weekday from config.DAILY_SUMMARY_UTC onwards, around the day's last run."""
+    return now.weekday() < 5 and now.astimezone(timezone.utc).strftime("%H:%M") >= config.DAILY_SUMMARY_UTC
+
+
+def send_daily_summary(args):
+    """One message a day, so a quiet phone can't hide a bot that stopped running."""
+    try:
+        if args.dry_run or not summary_due(new_york_now()):
+            return
+        todays_log = read_todays_log()
+        if any(row["event"] == "DAILY_SUMMARY" for row in todays_log):
+            return
+        orders_today = sum(row["event"] == "ORDER" for row in todays_log)
+        if notifier.send(dashboard.summary_text(orders_today)):
+            log_event(event="DAILY_SUMMARY")
+    except Exception as error:
+        print("⚠️  Daily summary not sent:", notifier.redact(error))
+
+
 def finish_run(args, exit_code):
     """
     After a run: tell your phone what happened, then refresh the dashboard data.
-    Every order has already gone through by now, and neither step can stop the bot.
+    Every order has already gone through by now, and none of this can stop the bot.
     """
     if not args.dry_run:
-        notifier.notify(RUN_EVENTS)
+        notifier.notify(alerts_for(RUN_EVENTS))
     errors = [row["details"] for row in RUN_EVENTS if row["event"] == "ERROR"]
     dashboard.update(LOG_FILE, start_of_today_utc(), exit_code,
                      errors[-1] if errors else "", args.dry_run)
+    send_daily_summary(args)
 
 
 def main():
