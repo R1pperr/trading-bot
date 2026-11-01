@@ -1,32 +1,48 @@
-/* Dashboard styles. Colors are named by role here, so light and dark swap in one place. */
+/* Tach Trading Bot. The dark instrument cluster stays dark in both themes, like a car's
+   dashboard. Everything around it stays quiet. Colors are named by role. */
+@font-face { font-family: "Barlow"; font-weight: 400; font-display: swap; src: url("https://cdn.jsdelivr.net/npm/@fontsource/barlow@5.2.8/files/barlow-latin-400-normal.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-weight: 500; font-display: swap; src: url("https://cdn.jsdelivr.net/npm/@fontsource/barlow@5.2.8/files/barlow-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Barlow"; font-weight: 600; font-display: swap; src: url("https://cdn.jsdelivr.net/npm/@fontsource/barlow@5.2.8/files/barlow-latin-600-normal.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Condensed"; font-weight: 500; font-display: swap; src: url("https://cdn.jsdelivr.net/npm/@fontsource/barlow-condensed@5.2.8/files/barlow-condensed-latin-500-normal.woff2") format("woff2"); }
+@font-face { font-family: "Barlow Condensed"; font-weight: 600; font-display: swap; src: url("https://cdn.jsdelivr.net/npm/@fontsource/barlow-condensed@5.2.8/files/barlow-condensed-latin-600-normal.woff2") format("woff2"); }
+
 :root {
   color-scheme: light;
-  --plane: #f9f9f7;
-  --surface: #fcfcfb;
-  --ink: #0b0b0b;
-  --ink-2: #52514e;
-  --axis: #898781;
-  --grid: #e1e0d9;
-  --border: rgba(11, 11, 11, 0.1);
-  --series: #2a78d6;
-  --good: #006300;
-  --critical: #b52f2f;
-  --warning: #fab219;
+  --plane: #e9eef2;
+  --ink: #13233a;
+  --ink-2: #4a5b70;
+  --axis: #64758a;
+  --rule: #c9d3dc;
+  --surface: #f7f9fb;
+  --series: #1f6fb2;
+  --good: #16693a;
+  --critical: #b3261e;
+  --warning: #e8a317;
+  --focus: #1f6fb2;
+
+  /* The cluster is the same in both themes. */
+  --dash: #132134;
+  --dash-edge: #26384d;
+  --dash-ink: #e8eef4;
+  --dash-ink-2: #a5b4c4;
+  --dash-needle: #ff9f45;
+  --dash-red: #ff6b6b;
+  --dash-good: #5fd39a;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --plane: #0d0d0d;
-    --surface: #1a1a19;
-    --ink: #f0efec;
-    --ink-2: #c3c2b7;
-    --axis: #898781;
-    --grid: #2c2c2a;
-    --border: rgba(255, 255, 255, 0.1);
+    --plane: #0c1624;
+    --ink: #e8eef4;
+    --ink-2: #a5b4c4;
+    --axis: #8496a9;
+    --rule: #26384d;
+    --surface: #0c1624;
     --series: #3987e5;
-    --good: #0ca30c;
-    --critical: #e66767;
+    --good: #5fd39a;
+    --critical: #ff8a84;
+    --focus: #8cc4f5;
   }
 }
 
@@ -36,130 +52,277 @@ body {
   margin: 0;
   background: var(--plane);
   color: var(--ink);
-  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-family: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 16px;
-  line-height: 1.45;
+  line-height: 1.5;
 }
 
-h1, h2, p { margin: 0; }
+h1, h2, p, dl, dd, ol { margin: 0; padding: 0; }
 
-.page {
-  max-width: 960px;
-  margin: 0 auto;
-  padding: 24px 16px 40px;
-  display: grid;
-  gap: 16px;
+a { color: inherit; }
+
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.view:focus { outline: none; }
+
+.masthead, .warning, .view, .foot {
+  width: 100%;
+  max-width: 1040px;
+  margin-inline: auto;
+  padding-inline: 16px;
 }
 
-.top {
+/* Top of page */
+.masthead {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 8px 24px;
+  gap: 8px 32px;
+  padding-block: 20px 16px;
 }
 
-h1 { font-size: 24px; font-weight: 600; }
-
-.sub, .updated, .note, .foot { color: var(--ink-2); font-size: 14px; }
-
-.tag {
-  display: inline-block;
-  padding: 1px 8px;
-  margin-right: 4px;
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  color: var(--ink);
-  font-size: 12px;
+.brand {
+  font-family: "Barlow Condensed", "Barlow", sans-serif;
+  font-size: 30px;
   font-weight: 600;
+  line-height: 1.1;
+  text-decoration: none;
 }
+
+.paper { color: var(--ink-2); font-size: 14px; }
+
+.pages { display: flex; gap: 20px; }
+
+.pages a {
+  padding-block: 4px;
+  border-bottom: 2px solid transparent;
+  color: var(--ink-2);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.pages a[aria-current="page"] { border-bottom-color: currentColor; color: var(--ink); }
 
 .warning {
+  max-width: 1008px;
+  margin-bottom: 16px;
   padding: 12px 16px;
-  border: 1px solid var(--border);
   border-left: 4px solid var(--warning);
-  border-radius: 12px;
   background: var(--surface);
-  font-size: 14px;
+  font-size: 15px;
 }
 
-.warning a { color: inherit; white-space: nowrap; }
+.warning a { white-space: nowrap; }
 
-.hero, .tile, .card {
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-}
+.view { padding-bottom: 32px; }
 
-.label, .tile h2 { color: var(--ink-2); font-size: 14px; font-weight: 500; }
-
-.hero-value { font-size: 48px; font-weight: 600; line-height: 1.15; overflow-wrap: anywhere; }
-
-.delta { font-size: 16px; font-weight: 500; }
-
-.tiles {
+/* The instrument cluster */
+.cluster {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
+  grid-template-columns: minmax(280px, 400px) 1fr;
+  gap: 16px 40px;
+  align-items: center;
+  padding: 20px 32px;
+  border-radius: 20px 20px 4px 4px;
+  background: var(--dash);
+  color: var(--dash-ink);
 }
 
-.state { margin-top: 2px; font-size: 18px; font-weight: 600; }
+.dial { display: block; width: 100%; height: auto; }
 
-.note { margin-top: 4px; overflow-wrap: anywhere; }
+.dial-track { fill: none; stroke: var(--dash-edge); stroke-width: 8; }
+.dial-red { fill: none; stroke: var(--dash-red); stroke-width: 8; }
+.dial-tick { stroke: var(--dash-ink-2); stroke-width: 1.5; }
+.dial-tick-major { stroke: var(--dash-ink); stroke-width: 2.5; }
+.dial-tick-red { stroke: var(--dash-red); }
+.dial-number { fill: var(--dash-ink-2); font-family: "Barlow Condensed", sans-serif; font-size: 17px; font-weight: 500; text-anchor: middle; dominant-baseline: central; }
+.dial-caption { fill: var(--dash-red); font-size: 12px; font-weight: 500; text-anchor: middle; }
+.dial-needle { stroke: var(--dash-needle); stroke-width: 4; stroke-linecap: round; transform-origin: 160px 150px; transition: transform 900ms cubic-bezier(.2, .9, .3, 1.08); }
+.dial-hub { fill: var(--dash-edge); stroke: var(--dash-needle); stroke-width: 3; }
+.dial-value { fill: var(--dash-ink); font-family: "Barlow Condensed", sans-serif; font-size: 40px; font-weight: 600; text-anchor: middle; }
+.dial-unit { fill: var(--dash-ink-2); font-size: 13px; text-anchor: middle; }
 
-.good { color: var(--good); }
-.critical { color: var(--critical); }
+.readout-label { color: var(--dash-ink-2); font-size: 15px; font-weight: 500; }
 
-.card { display: grid; gap: 12px; min-width: 0; }
-.card h2 { font-size: 16px; font-weight: 600; }
+.readout-value {
+  font-family: "Barlow Condensed", "Barlow", sans-serif;
+  font-size: clamp(52px, 8vw, 76px);
+  font-weight: 600;
+  line-height: 1;
+}
+
+.readout-note { margin-top: 6px; color: var(--dash-ink-2); font-size: 14px; }
+
+.figures {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 24px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--dash-edge);
+}
+
+.figures dt { color: var(--dash-ink-2); font-size: 14px; }
+.figures dd { font-family: "Barlow Condensed", "Barlow", sans-serif; font-size: 24px; font-weight: 500; line-height: 1.2; }
+.figures .good { color: var(--dash-good); }
+.figures .critical { color: var(--dash-red); }
+
+/* Warning lights under the cluster */
+.lamps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 2px;
+  margin-top: 2px;
+  margin-bottom: 32px;
+  border-radius: 4px 4px 12px 12px;
+  overflow: hidden;
+}
+
+.lamp { padding: 12px 16px; background: var(--dash); color: var(--dash-ink); }
+.lamp h2 { color: var(--dash-ink-2); font-size: 14px; font-weight: 500; }
+.lamp-state { font-family: "Barlow Condensed", "Barlow", sans-serif; font-size: 22px; font-weight: 600; line-height: 1.25; }
+.lamp .note { color: var(--dash-ink-2); }
+.lamp .good { color: var(--dash-good); }
+.lamp .critical { color: var(--dash-red); }
+
+.note { margin-top: 2px; color: var(--ink-2); font-size: 14px; overflow-wrap: anywhere; }
+
+/* Sections below the cluster */
+.block { margin-top: 32px; }
+
+.block-head {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px 16px;
+}
+
+h2 { font-size: 18px; font-weight: 600; }
+
+.block > h2, .block-head { margin-bottom: 10px; }
+
+.more { font-size: 15px; }
+
+.page-title {
+  font-family: "Barlow Condensed", "Barlow", sans-serif;
+  font-size: 40px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.page-title-name { color: var(--ink-2); font-weight: 500; }
+.page-intro { max-width: 62ch; margin-bottom: 20px; color: var(--ink-2); }
+.back { display: inline-block; margin-bottom: 8px; font-size: 15px; }
+
+.choices { display: flex; flex-wrap: wrap; gap: 4px; }
+
+.choices button {
+  min-height: 36px;
+  padding: 4px 12px;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.choices button[aria-pressed="true"] { border-color: var(--ink); background: var(--ink); color: var(--plane); }
+
+#trade-filters { margin-block: 12px 16px; }
 
 .chart-box { position: relative; height: 280px; }
 
-details summary { color: var(--ink-2); font-size: 14px; cursor: pointer; }
-details table { margin-top: 8px; }
+details { margin-top: 8px; }
+details summary { color: var(--ink-2); font-size: 15px; cursor: pointer; }
 
-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+/* Recent runs */
+.run-strip { display: flex; align-items: flex-end; gap: 3px; height: 40px; list-style: none; }
+
+.run-strip li { flex: 1 1 0; min-width: 2px; max-width: 12px; height: 60%; border-radius: 2px; background: var(--axis); }
+.run-strip .is-ok { background: var(--series); }
+.run-strip .is-error { height: 80%; background: var(--critical); }
+.run-strip .has-orders { height: 100%; background: var(--good); }
+
+/* Stocks */
+.stock-list { border-top: 1px solid var(--rule); }
+
+.stock-row {
+  display: grid;
+  grid-template-columns: minmax(180px, 2fr) 1fr 1fr minmax(150px, 1.4fr);
+  gap: 4px 16px;
+  align-items: center;
+  padding: 12px 8px;
+  border-bottom: 1px solid var(--rule);
+  text-decoration: none;
+}
+
+.stock-row:hover { background: var(--surface); }
+
+.stock-symbol { font-family: "Barlow Condensed", "Barlow", sans-serif; font-size: 24px; font-weight: 600; line-height: 1.2; }
+.stock-name { color: var(--ink-2); font-size: 14px; }
+.stock-cell span { display: block; color: var(--ink-2); font-size: 13px; }
+.stock-cell span.good { color: var(--good); }
+.stock-cell span.critical { color: var(--critical); }
+
+.facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px 24px;
+  margin-block: 12px 20px;
+}
+
+.facts dt { color: var(--ink-2); font-size: 14px; }
+.facts dd { font-weight: 500; }
+
+.stock-chart { height: 520px; overflow: hidden; border-radius: 8px; background: var(--dash); }
+.stock-chart .tradingview-widget-container, .stock-chart .tradingview-widget-container__widget { height: 100%; width: 100%; }
+.stock-chart-note { padding: 16px; color: var(--dash-ink); }
+.chart-credit { margin-top: 6px; color: var(--ink-2); font-size: 13px; }
+
+/* Tables */
+table { width: 100%; border-collapse: collapse; font-size: 15px; }
 
 th {
   padding: 6px 8px;
-  border-bottom: 1px solid var(--grid);
+  border-bottom: 1px solid var(--rule);
   color: var(--ink-2);
   font-weight: 500;
   text-align: left;
   white-space: nowrap;
 }
 
-td { padding: 8px; border-bottom: 1px solid var(--grid); vertical-align: top; overflow-wrap: anywhere; }
+td { padding: 8px; border-bottom: 1px solid var(--rule); vertical-align: top; overflow-wrap: anywhere; }
 
-tr:last-child td { border-bottom: 0; }
+td a { font-weight: 600; }
 
 .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
-.foot { padding: 0 4px; font-size: 13px; }
+.good { color: var(--good); }
+.critical { color: var(--critical); }
 
-@media (max-width: 720px) {
-  .tiles { grid-template-columns: repeat(2, 1fr); }
-  .hero-value { font-size: 40px; }
+.foot { padding-block: 16px 32px; color: var(--ink-2); font-size: 14px; }
 
-  /* On a phone each table row becomes its own small card, so nothing scrolls sideways. */
+@media (max-width: 780px) {
+  .cluster { grid-template-columns: 1fr; padding: 16px 16px 20px; }
+  .dial-block { max-width: 340px; width: 100%; margin-inline: auto; }
+  .lamps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stock-chart { height: 420px; }
+
+  .stock-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .stock-title { grid-column: 1 / -1; }
+
+  /* On a phone each table row becomes its own small block, so nothing scrolls sideways. */
   table, tbody, tr, td { display: block; width: 100%; }
   thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-  tr { padding: 8px 0; border-bottom: 1px solid var(--grid); }
-  tr:last-child { border-bottom: 0; }
-  td {
-    display: flex;
-    justify-content: space-between;
-    gap: 16px;
-    padding: 2px 0;
-    border: 0;
-    text-align: right;
-    white-space: normal;
-  }
-  td::before {
-    content: attr(data-label);
-    flex: none;
-    color: var(--ink-2);
-    text-align: left;
-  }
+  tr { padding: 8px 0; border-bottom: 1px solid var(--rule); }
+  td { display: flex; justify-content: space-between; gap: 16px; padding: 2px 0; border: 0; text-align: right; white-space: normal; }
+  td::before { content: attr(data-label); flex: none; color: var(--ink-2); text-align: left; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dial-needle { transition: none; }
 }

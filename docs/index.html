@@ -3,57 +3,78 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <!-- The browser may load this site's own files and the chart library, and nothing else.
-       That means this page cannot contact Alpaca, Gemini or Telegram. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'">
+  <!-- The browser may load this site's files, the chart library and fonts from jsDelivr, and
+       TradingView's stock chart. Nothing else, so this page can't contact Alpaca or Gemini. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; font-src https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'; frame-src https://www.tradingview-widget.com https://s.tradingview.com; base-uri 'none'; form-action 'none'">
   <title>Tach Trading Bot</title>
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <main class="page">
-    <header class="top">
-      <div>
-        <h1>Tach Trading Bot</h1>
-        <p class="sub"><span class="tag">Paper account</span> Simulated money, no real trades</p>
+  <header class="masthead">
+    <div class="brand-block">
+      <a class="brand" href="#/">Tach Trading Bot</a>
+      <p class="paper">Paper account, simulated money</p>
+    </div>
+    <nav class="pages" aria-label="Pages">
+      <a href="#/" data-page="overview">Overview</a>
+      <a href="#/stocks" data-page="stocks">Stocks</a>
+      <a href="#/trades" data-page="trades">Trades</a>
+    </nav>
+  </header>
+
+  <p id="stale-warning" class="warning" role="status" hidden>
+    <span id="stale-text"></span>
+    <a href="https://github.com/R1pperr/trading-bot/actions">Check the run history</a>
+  </p>
+
+  <main id="view" class="view" tabindex="-1"></main>
+
+  <footer class="foot">
+    <p>Updated after each bot run. This page holds no keys and never contacts Alpaca or Gemini.
+    Stock charts come from TradingView.</p>
+  </footer>
+
+  <template id="overview-page">
+    <section class="cluster" aria-label="Account summary">
+      <div class="dial-block">
+        <svg id="dial" class="dial" viewBox="0 0 320 240" role="img"></svg>
       </div>
-      <p id="updated" class="updated">Loading…</p>
-    </header>
-
-    <p id="stale-warning" class="warning" role="status" hidden>
-      <span id="stale-text"></span>
-      <a href="https://github.com/R1pperr/trading-bot/actions">Check the run history</a>
-    </p>
-
-    <section class="hero" aria-label="Account value">
-      <p class="label">Account value</p>
-      <p id="equity" class="hero-value">–</p>
-      <p id="day-change" class="delta"></p>
+      <div class="readout">
+        <h1 class="readout-label">Account value</h1>
+        <p id="equity" class="readout-value">–</p>
+        <p id="updated" class="readout-note">Loading…</p>
+        <dl class="figures">
+          <div><dt>Cash</dt><dd id="cash">–</dd></div>
+          <div><dt>Invested</dt><dd id="invested">–</dd></div>
+          <div><dt>Open profit or loss</dt><dd id="open-pl">–</dd></div>
+          <div><dt>Trades today</dt><dd id="trades-today">–</dd></div>
+        </dl>
+      </div>
     </section>
 
-    <section class="tiles" aria-label="Bot status">
-      <div class="tile">
-        <h2>Last run</h2>
-        <p id="run-status" class="state">–</p>
-        <p id="run-message" class="note"></p>
-      </div>
-      <div class="tile">
-        <h2>US market</h2>
-        <p id="market" class="state">–</p>
-      </div>
-      <div class="tile">
-        <h2>Kill switch</h2>
-        <p id="kill-switch" class="state">–</p>
-        <p id="kill-reason" class="note"></p>
-      </div>
-      <div class="tile">
-        <h2>AI analyst</h2>
-        <p id="ai-analyst" class="state">–</p>
-      </div>
+    <section class="lamps" aria-label="Bot status">
+      <div class="lamp"><h2>Last run</h2><p id="run-status" class="lamp-state">–</p><p id="run-message" class="note"></p></div>
+      <div class="lamp"><h2>US market</h2><p id="market" class="lamp-state">–</p></div>
+      <div class="lamp"><h2>Kill switch</h2><p id="kill-switch" class="lamp-state">–</p><p id="kill-reason" class="note"></p></div>
+      <div class="lamp"><h2>AI analyst</h2><p id="ai-analyst" class="lamp-state">–</p></div>
     </section>
 
-    <section class="card">
-      <h2>Account value over time</h2>
+    <section class="block">
+      <h2>Recent runs</h2>
+      <ol id="run-strip" class="run-strip"></ol>
+      <p id="run-summary" class="note"></p>
+    </section>
+
+    <section class="block">
+      <div class="block-head">
+        <h2>Account value over time</h2>
+        <div id="equity-ranges" class="choices" role="group" aria-label="Time range">
+          <button type="button" data-range="7">Week</button>
+          <button type="button" data-range="31">Month</button>
+          <button type="button" data-range="all" aria-pressed="true">All</button>
+        </div>
+      </div>
       <div class="chart-box"><canvas id="equity-chart" role="img" aria-label="Line chart of account value over time. The table below has the same numbers."></canvas></div>
       <p id="chart-note" class="note" hidden></p>
       <details id="equity-details">
@@ -62,21 +83,47 @@
       </details>
     </section>
 
-    <section class="card">
+    <section class="block">
       <h2>Open positions</h2>
-      <div id="positions"><p class="note">Loading…</p></div>
+      <div id="positions"></div>
     </section>
 
-    <section class="card">
-      <h2>Trade history</h2>
-      <div id="trades"><p class="note">Loading…</p></div>
+    <section class="block">
+      <div class="block-head">
+        <h2>Latest trades</h2>
+        <a class="more" href="#/trades">See all trades</a>
+      </div>
+      <div id="latest-trades"></div>
     </section>
+  </template>
 
-    <footer class="foot">
-      Updated after each bot run. This page only reads files saved by the bot. It holds no keys
-      and never contacts Alpaca or Gemini.
-    </footer>
-  </main>
+  <template id="stocks-page">
+    <h1 class="page-title">Stocks</h1>
+    <p class="page-intro">The stocks the bot follows and how it sees each one. Open a stock to see its price history and your trades.</p>
+    <div id="stock-list" class="stock-list"></div>
+  </template>
+
+  <template id="stock-page">
+    <a class="back" href="#/stocks">All stocks</a>
+    <h1 class="page-title"><span id="stock-symbol"></span> <span id="stock-name" class="page-title-name"></span></h1>
+    <dl id="stock-facts" class="facts"></dl>
+    <div id="stock-chart" class="stock-chart"></div>
+    <section class="block">
+      <h2>Your trades in this stock</h2>
+      <div id="stock-trades"></div>
+    </section>
+  </template>
+
+  <template id="trades-page">
+    <h1 class="page-title">Trades</h1>
+    <div id="trade-filters" class="choices" role="group" aria-label="Show">
+      <button type="button" data-filter="all" aria-pressed="true">All</button>
+      <button type="button" data-filter="buy">Buys</button>
+      <button type="button" data-filter="sell">Sells</button>
+      <button type="button" data-filter="veto">AI vetoes</button>
+    </div>
+    <div id="all-trades"></div>
+  </template>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
   <script src="app.js"></script>
