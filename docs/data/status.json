@@ -1,6 +1,6 @@
 {
   "last_run": {
-    "time_utc": "2026-11-01T17:18:19Z",
+    "time_utc": "2026-11-01T18:28:31Z",
     "status": "market_closed",
     "message": "The US market is closed, so there was nothing to do."
   },
@@ -12,5 +12,16 @@
     "reason": ""
   },
   "ai_analyst_on": false,
-  "paper": true
+  "paper": true,
+  "trades_today": 0,
+  "limits": {
+    "max_trades_per_day": 3,
+    "max_position_pct": 0.05,
+    "stop_loss_pct": 0.07,
+    "kill_switch_pct": 0.03
+  },
+  "cash": 100000.0,
+  "buying_power": 399241.77,
+  "invested": 0,
+  "open_pl": 0
 }
