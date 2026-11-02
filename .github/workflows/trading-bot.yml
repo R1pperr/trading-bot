@@ -61,6 +61,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           if [ -f logs/trade_log.csv ]; then git add -f logs/trade_log.csv; fi
           if [ -d docs/data ]; then git add docs/data; fi
+          if [ -d state ]; then git add state; fi
           if git diff --cached --quiet; then exit 0; fi
           git commit -m "Update trade log and dashboard data"
           for attempt in 1 2 3; do
