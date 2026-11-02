@@ -21,7 +21,25 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  decide:
+    # Most ticks have nothing to do while the market is shut and no crypto needs watching.
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    outputs:
+      run: ${{ steps.clock.outputs.run }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - name: Decide whether this tick runs the bot
+        id: clock
+        run: python3 market_hours.py || echo "run=true" >> "$GITHUB_OUTPUT"
+
   run-bot:
+    needs: decide
+    # Only a clear "no" skips the bot, so a failed decide job can't switch off the stop-losses.
+    if: ${{ !cancelled() && needs.decide.outputs.run != 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
