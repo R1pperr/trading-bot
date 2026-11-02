@@ -904,6 +904,38 @@ class SettingsTests(unittest.TestCase):
             self.assertIn("git add state", handle.read())
 
 
+class PacemakerTests(unittest.TestCase):
+    """Each run starts the next one, after a wait that only the pacemaker environment provides."""
+
+    def setUp(self):
+        path = os.path.join(sleeves.BASE_DIR, ".github", "workflows", "trading-bot.yml")
+        with open(path, encoding="utf-8") as handle:
+            self.workflow = handle.read()
+        self.job = self.workflow.split("  next-run:\n")[1]
+
+    def test_the_next_run_waits_for_the_timer(self):
+        self.assertIn("    environment: pacemaker\n", self.job)
+
+    def test_a_failed_run_keeps_the_chain_going_and_a_cancelled_run_stops_it(self):
+        self.assertIn("    needs: run-bot\n", self.job)
+        self.assertIn("    if: ${{ !cancelled() }}\n", self.job)
+
+    def test_only_this_job_may_start_runs(self):
+        self.assertIn("    permissions:\n      actions: write\n", self.job)
+        self.assertEqual(self.workflow.count("actions: write"), 1)
+
+    def test_it_restarts_this_workflow_on_main(self):
+        self.assertIn("gh workflow run trading-bot.yml", self.job)
+        self.assertIn("--ref main", self.job)
+
+    def test_runs_never_overlap(self):
+        self.assertIn("  group: trading-bot", self.workflow)
+        self.assertIn("  cancel-in-progress: false", self.workflow)
+
+    def test_the_schedule_stays_as_a_backup(self):
+        self.assertIn('- cron: "7,22,37,52 * * * *"', self.workflow)
+
+
 class BotWiringTests(unittest.TestCase):
     """bot.py picks the strategy from config.STRATEGY_MODE."""
 
