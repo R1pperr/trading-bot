@@ -285,21 +285,21 @@ class CryptoRunTests(unittest.TestCase):
 
     # --- Keeping stocks and crypto apart ---------------------------------------------
     def test_crypto_orders_do_not_use_up_the_stocks_daily_limit(self):
-        self.trading.get_orders.return_value = [crypto_order("BTC/USD"), crypto_order("ETH/USD"), crypto_order("SOL/USD")]
+        self.trading.get_orders.return_value = [crypto_order(f"C{n}/USD") for n in range(config.MAX_TRADES_PER_DAY)]
         self.stock_signal.return_value = fake_signal("BUY")
         self.set_account(market_open=True)
         self.run_bot()
         self.stock_order.assert_called_once()
-        self.assertIn("Trades today: 0 of 3", self.output.getvalue())
+        self.assertIn(f"Trades today: 0 of {config.MAX_TRADES_PER_DAY}", self.output.getvalue())
 
     def test_stock_orders_do_not_use_up_the_crypto_daily_limit(self):
-        self.trading.get_orders.return_value = [stock_order("SPY"), stock_order("QQQ"), stock_order("AAPL")]
+        self.trading.get_orders.return_value = [stock_order(f"S{n}") for n in range(config.MAX_TRADES_PER_DAY)]
         self.buy_signal_for_btc()
         self.run_bot()
         self.assertEqual(len(self.orders()), 1)
 
     def test_crypto_has_its_own_daily_limit(self):
-        self.trading.get_orders.return_value = [crypto_order("SOL/USD"), crypto_order("AVAX/USD"), crypto_order("LTC/USD")]
+        self.trading.get_orders.return_value = [crypto_order(f"C{n}/USD") for n in range(config.MAX_TRADES_PER_DAY)]
         self.buy_signal_for_btc()
         self.run_bot()
         self.assertEqual(self.orders(), [])

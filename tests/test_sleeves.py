@@ -525,23 +525,24 @@ class EnableFlagTests(SleeveCase):
 
 
 class DailyCapTests(SleeveCase):
-    def test_at_most_three_new_entries_short_term_first(self):
+    def test_the_daily_limit_fills_short_term_sleeves_first(self):
         self.enable("ENABLE_RSI2_STOCKS", "ENABLE_MOMENTUM_STOCKS")
         tables = {"SPY": stock_bars(rising()), "MOM": stock_bars(rising(step=4))}
-        tables.update({name: stock_bars(pullback()) for name in ("AAA", "BBB", "CCC", "DDD")})
+        names = [f"RSI{number}" for number in range(config.MAX_TRADES_PER_DAY + 1)]
+        tables.update({name: stock_bars(pullback()) for name in names})
         state = self.go("stock", tables)
         self.assertEqual(len(self.trading.buys()), config.MAX_TRADES_PER_DAY)
         self.assertEqual({r["sleeve"] for r in state["positions"].values()}, {"rsi2_stocks"})
 
     def test_momentum_builds_up_on_later_days(self):
         self.enable("ENABLE_MOMENTUM_STOCKS")
-        tables = {f"S{n}": stock_bars(rising(step=0.5 + n / 5)) for n in range(5)}
+        tables = {f"S{n}": stock_bars(rising(step=0.5 + n / 5)) for n in range(config.MAX_TRADES_PER_DAY)}
         tables["SPY"] = stock_bars(rising())
         self.go("stock", tables)
-        self.assertEqual(len(self.trading.buys()), 3)
+        self.assertEqual(len(self.trading.buys()), config.MAX_TRADES_PER_DAY)
         held = [fake_position(o.symbol, entry=100, price=100) for o in self.trading.buys()]
         self.go("stock", tables, FakeTrading(held), today="2026-11-03")
-        self.assertEqual(len(self.trading.buys()), 3)
+        self.assertEqual(len(self.trading.buys()), 1)
         self.assertFalse({o.symbol for o in self.trading.buys()} & {p.symbol for p in held})
 
     def test_exits_are_not_held_back_by_the_cap(self):
@@ -550,19 +551,22 @@ class DailyCapTests(SleeveCase):
         self.own(**{name: "rsi2_stocks" for name in names})
         tables = {name: stock_bars(rising()) for name in names}
         held = [fake_position(name, entry=390, price=395) for name in names]
-        full_log = [{"event": "ORDER", "side": "buy", "symbol": f"X{n}", "ai_decision": ""} for n in range(3)]
+        full_log = [{"event": "ORDER", "side": "buy", "symbol": f"X{n}", "ai_decision": ""}
+                    for n in range(config.MAX_TRADES_PER_DAY)]
         self.go("stock", tables, FakeTrading(held), log=full_log)
         self.assertEqual(len(self.trading.sells()), 5)
 
     def test_todays_earlier_entries_use_up_the_cap(self):
         self.enable("ENABLE_RSI2_STOCKS")
-        log = [{"event": "ORDER", "side": "buy", "symbol": f"X{n}", "ai_decision": ""} for n in range(2)]
+        log = [{"event": "ORDER", "side": "buy", "symbol": f"X{n}", "ai_decision": ""}
+               for n in range(config.MAX_TRADES_PER_DAY - 1)]
         self.go("stock", {name: stock_bars(pullback()) for name in ("AAA", "BBB", "CCC")}, log=log)
         self.assertEqual(len(self.trading.buys()), 1)
 
     def test_crypto_buys_do_not_use_up_the_stock_cap(self):
         self.enable("ENABLE_RSI2_STOCKS")
-        log = [{"event": "ORDER", "side": "buy", "symbol": f"C{n}/USD", "ai_decision": ""} for n in range(3)]
+        log = [{"event": "ORDER", "side": "buy", "symbol": f"C{n}/USD", "ai_decision": ""}
+               for n in range(config.MAX_TRADES_PER_DAY)]
         self.go("stock", {"AAA": stock_bars(pullback())}, log=log)
         self.assertEqual(len(self.trading.buys()), 1)
 
