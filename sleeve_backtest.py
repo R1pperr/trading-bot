@@ -463,7 +463,7 @@ def main():
     print_rows(fee_rows)
 
     print("\nSignals skipped in the combined mix:")
-    print(f"{'':22}{'Another sleeve owned it':>26}{'Daily cap of 3':>16}")
+    print(f"{'':22}{'Another sleeve owned it':>26}{f'Daily cap of {config.MAX_TRADES_PER_DAY}':>16}")
     for sleeve in sleeves:
         print(f"{sleeve:22}{combined['skips'][sleeve]['owned']:>26}{combined['skips'][sleeve]['daily_cap']:>16}")
 

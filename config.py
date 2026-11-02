@@ -96,7 +96,7 @@ BACKTEST_CASH = 10_000          # pretend dollars per symbol tested
 # ---------------------------------------------------------------------------
 MAX_POSITION_PCT = 0.05     # never put more than 5% of equity in one position
 STOP_LOSS_PCT = 0.07        # sell if a position falls 7% below the buy price
-MAX_TRADES_PER_DAY = 3      # at most 3 orders per day
+MAX_TRADES_PER_DAY = 5      # at most 5 orders per day
 KILL_SWITCH_PCT = 0.03      # stop trading for the day if equity falls 3%
 # At 5% each, 18 positions is 90% of the account. The other 10% stays as cash,
 # because crypto can't be bought on margin.
