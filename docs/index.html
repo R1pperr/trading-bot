@@ -2,22 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#061A22">
   <!-- The browser may load this site's files, the chart library and fonts from jsDelivr, and
        TradingView's stock chart. Nothing else, so this page can't contact Alpaca or Gemini. -->
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; font-src https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'; frame-src https://www.tradingview-widget.com https://s.tradingview.com; base-uri 'none'; form-action 'none'">
   <title>Tach Trading Bot</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
+  <div class="scene" aria-hidden="true">
+    <div class="glow"></div>
+    <canvas id="road"></canvas>
+  </div>
+  <div id="shift" class="shift" aria-hidden="true"></div>
+  <a class="skip" href="#view">Skip to the page</a>
+
   <header class="masthead">
     <div class="brand-block">
       <a class="brand" href="#/">Tach Trading Bot</a>
       <p class="paper">Paper account, simulated money</p>
     </div>
-    <nav class="pages" aria-label="Pages">
+    <nav class="gear" aria-label="Pages">
+      <span id="gear-thumb" class="gear-thumb" aria-hidden="true"></span>
       <a href="#/" data-page="overview">Overview</a>
+      <a href="#/strategy" data-page="strategy">Strategy</a>
       <a href="#/stocks" data-page="stocks">Stocks</a>
       <a href="#/crypto" data-page="crypto">Crypto</a>
       <a href="#/trades" data-page="trades">Trades</a>
@@ -25,6 +35,7 @@
   </header>
 
   <p id="stale-warning" class="warning" role="status" hidden>
+    <span class="warning-lamp" aria-hidden="true"></span>
     <span id="stale-text"></span>
     <a href="https://github.com/R1pperr/trading-bot/actions">Check the run history</a>
   </p>
@@ -37,54 +48,80 @@
   </footer>
 
   <template id="overview-page">
-    <section class="cluster" aria-label="Account summary">
-      <div class="dial-block">
-        <svg id="dial" class="dial" viewBox="0 0 320 240" role="img"></svg>
-      </div>
-      <div class="readout">
-        <h1 class="readout-label">Account value</h1>
-        <p id="equity" class="readout-value">–</p>
-        <p id="updated" class="readout-note">Loading…</p>
-        <dl class="figures">
-          <div><dt>Cash</dt><dd id="cash">–</dd></div>
-          <div><dt>Invested</dt><dd id="invested">–</dd></div>
-          <div><dt>Open profit or loss</dt><dd id="open-pl">–</dd></div>
-          <div><dt>Stock trades today</dt><dd id="trades-today">–</dd></div>
-        </dl>
-      </div>
-    </section>
-
-    <section class="lamps" aria-label="Bot status">
-      <div class="lamp"><h2>Last run</h2><p id="run-status" class="lamp-state">–</p><p id="run-message" class="note"></p></div>
-      <div class="lamp"><h2>US market</h2><p id="market" class="lamp-state">–</p></div>
-      <div class="lamp"><h2>Kill switch</h2><p id="kill-switch" class="lamp-state">–</p><p id="kill-reason" class="note"></p></div>
-      <div class="lamp"><h2>AI analyst</h2><p id="ai-analyst" class="lamp-state">–</p></div>
-    </section>
-
-    <section class="block">
-      <div class="block-head">
-        <h2>Account value over time</h2>
-        <div id="equity-ranges" class="choices" role="group" aria-label="Time range">
-          <button type="button" data-range="7">Week</button>
-          <button type="button" data-range="31">Month</button>
-          <button type="button" data-range="all" aria-pressed="true">All</button>
+    <section id="cockpit" class="cockpit" aria-label="Account summary">
+      <div class="tach-block">
+        <svg id="tach" class="tach" role="img"></svg>
+        <div class="readout">
+          <h1 class="readout-label">Account value</h1>
+          <p id="equity" class="odometer" role="img"></p>
+          <p id="day-change" class="day-change"></p>
+          <p id="updated" class="readout-note">Loading</p>
         </div>
       </div>
-      <div class="chart-box"><canvas id="equity-chart" role="img" aria-label="Line chart of account value over time. The table below has the same numbers."></canvas></div>
-      <p id="chart-note" class="note" hidden></p>
-      <details id="equity-details">
-        <summary>View as table</summary>
-        <div id="equity-table"></div>
-      </details>
+
+      <dl class="pods">
+        <div class="pod"><dt>Cash</dt><dd id="cash">–</dd></div>
+        <div class="pod"><dt>Invested</dt><dd id="invested">–</dd></div>
+        <div class="pod"><dt>Open profit or loss</dt><dd id="open-pl">–</dd></div>
+        <div class="pod"><dt>New buys today</dt><dd><span id="buy-count">–</span><span id="buy-pips" class="pips" aria-hidden="true"></span></dd></div>
+      </dl>
+
+      <div class="lamps" aria-label="Bot status" role="group">
+        <div class="lamp" id="lamp-run"><span class="lamp-dot" aria-hidden="true"></span><div><h2>Last run</h2><p id="run-status" class="lamp-state">–</p><p id="run-message" class="note"></p></div></div>
+        <div class="lamp" id="lamp-market"><span class="lamp-dot" aria-hidden="true"></span><div><h2>US market</h2><p id="market" class="lamp-state">–</p></div></div>
+        <div class="lamp" id="lamp-kill"><span class="lamp-dot" aria-hidden="true"></span><div><h2>Kill switch</h2><p id="kill-switch" class="lamp-state">–</p><p id="kill-reason" class="note"></p></div></div>
+        <div class="lamp" id="lamp-ai"><span class="lamp-dot" aria-hidden="true"></span><div><h2>AI analyst</h2><p id="ai-analyst" class="lamp-state">–</p></div></div>
+      </div>
+
+      <div class="fuel">
+        <div id="breakdown" class="breakdown" role="img"></div>
+        <ul id="breakdown-legend" class="breakdown-legend"></ul>
+      </div>
     </section>
 
-    <section class="block">
-      <h2>Stocks and crypto</h2>
-      <div id="breakdown" class="breakdown" role="img"></div>
-      <ul id="breakdown-legend" class="breakdown-legend"></ul>
+    <p id="right-now" class="right-now"></p>
+
+    <div class="split">
+      <section class="panel chart-panel">
+        <div class="block-head">
+          <h2>Account value over time</h2>
+          <div id="equity-ranges" class="choices" role="group" aria-label="Time range">
+            <button type="button" data-range="7">Week</button>
+            <button type="button" data-range="31">Month</button>
+            <button type="button" data-range="all" aria-pressed="true">All</button>
+          </div>
+        </div>
+        <div class="chart-box">
+          <canvas id="equity-chart" role="img" aria-label="Line chart of account value over time. The table below has the same numbers."></canvas>
+          <span id="chart-head" class="chart-head" hidden></span>
+        </div>
+        <p id="chart-note" class="note" hidden></p>
+        <details id="equity-details">
+          <summary>View as table</summary>
+          <div id="equity-table"></div>
+        </details>
+      </section>
+
+      <section class="panel tower-panel">
+        <div class="block-head">
+          <h2>Open positions</h2>
+          <a class="more" href="#/stocks">All stocks</a>
+        </div>
+        <div id="tower" class="tower"></div>
+      </section>
+    </div>
+
+    <section class="panel">
+      <div class="block-head">
+        <h2>Strategies</h2>
+        <a class="more" href="#/strategy">How they work</a>
+      </div>
+      <p id="sleeves-note" class="note"></p>
+      <div id="bank"></div>
+      <div id="sleeves"></div>
     </section>
 
-    <section class="block">
+    <section class="panel">
       <div class="tabs" role="tablist" aria-label="Markets">
         <button type="button" role="tab" id="tab-stock" data-market="stock" aria-controls="market-panel">Stocks</button>
         <button type="button" role="tab" id="tab-crypto" data-market="crypto" aria-controls="market-panel">Crypto</button>
@@ -94,8 +131,6 @@
         <h3>Today's top candidates</h3>
         <p id="candidates-note" class="note"></p>
         <div id="candidates"></div>
-        <h3>Open positions</h3>
-        <div id="positions"></div>
         <div class="block-head">
           <h3>Trades</h3>
           <a class="more" href="#/trades">See all trades</a>
@@ -104,10 +139,24 @@
       </div>
     </section>
 
-    <section class="block">
+    <section class="panel">
       <h2>Recent runs</h2>
       <ol id="run-strip" class="run-strip"></ol>
       <p id="run-summary" class="note"></p>
+    </section>
+  </template>
+
+  <template id="strategy-page">
+    <h1 class="page-title">Strategy</h1>
+    <p id="strategy-intro" class="page-intro"></p>
+    <section class="panel">
+      <h2>How the account is shared</h2>
+      <div id="bank"></div>
+    </section>
+    <div id="sleeve-cards" class="sleeve-cards"></div>
+    <section class="panel">
+      <h2>Rules that always apply</h2>
+      <ul id="house-rules" class="house-rules"></ul>
     </section>
   </template>
 
@@ -120,9 +169,9 @@
   <template id="stock-page">
     <a id="stock-back" class="back" href="#/stocks"></a>
     <h1 class="page-title"><span id="stock-symbol"></span> <span id="stock-name" class="page-title-name"></span></h1>
-    <dl id="stock-facts" class="facts"></dl>
+    <dl id="stock-facts" class="pods facts"></dl>
     <div id="stock-chart" class="stock-chart"></div>
-    <section class="block">
+    <section class="panel">
       <h2>Your trades</h2>
       <div id="stock-trades"></div>
     </section>
@@ -138,10 +187,10 @@
       <button type="button" data-filter="sell">Sells</button>
       <button type="button" data-filter="veto">AI vetoes</button>
     </div>
-    <div id="all-trades"></div>
+    <section class="panel"><div id="all-trades"></div></section>
   </template>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
-  <script src="app.js"></script>
+  <script src="app.js?v=2"></script>
 </body>
 </html>
