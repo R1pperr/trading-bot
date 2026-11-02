@@ -1,12 +1,40 @@
 {
   "closed_pl": {},
   "days": {
-    "crypto": "2026-11-02"
+    "crypto": "2026-11-02",
+    "stock": "2026-11-02"
   },
   "momentum": {
-    "month": "",
+    "month": "2026-10",
     "stopped": [],
-    "targets": []
+    "targets": [
+      "AXTI",
+      "SNDK",
+      "MRNA",
+      "TXG",
+      "TWST",
+      "LITE",
+      "MU",
+      "STX",
+      "RVMD",
+      "DELL"
+    ]
   },
-  "positions": {}
+  "positions": {
+    "MSFT": {
+      "entry_date": "2026-11-02",
+      "sleeve": "rsi2_stocks",
+      "stop": 487.9152
+    },
+    "NVDA": {
+      "entry_date": "2026-11-02",
+      "sleeve": "rsi2_stocks",
+      "stop": 193.0401
+    },
+    "QQQ": {
+      "entry_date": "2026-11-02",
+      "sleeve": "rsi2_stocks",
+      "stop": 645.5409
+    }
+  }
 }

@@ -7,9 +7,9 @@
       "market": "stock",
       "allocation": 0.5,
       "enabled": true,
-      "positions": 0,
-      "value": 0,
-      "open_pl": 0,
+      "positions": 3,
+      "value": 10078.84,
+      "open_pl": -0.78,
       "closed_pl": 0.0
     },
     {

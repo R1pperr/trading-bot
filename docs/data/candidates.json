@@ -4,5 +4,82 @@
     "scanned": 21,
     "found": 0,
     "candidates": []
+  },
+  "stock": {
+    "day": "2026-11-02",
+    "scanned": 494,
+    "found": 54,
+    "candidates": [
+      {
+        "rank": 1,
+        "symbol": "QQQ",
+        "sleeve": "rsi2_stocks",
+        "action": "BUY",
+        "reason": "short-term entry signal",
+        "trend": "",
+        "signal_date": "2026-11-02",
+        "name": "",
+        "status": "ordered",
+        "ai_decision": "OFF",
+        "ai_reason": "",
+        "note": ""
+      },
+      {
+        "rank": 2,
+        "symbol": "NVDA",
+        "sleeve": "rsi2_stocks",
+        "action": "BUY",
+        "reason": "short-term entry signal",
+        "trend": "",
+        "signal_date": "2026-11-02",
+        "name": "",
+        "status": "ordered",
+        "ai_decision": "OFF",
+        "ai_reason": "",
+        "note": ""
+      },
+      {
+        "rank": 3,
+        "symbol": "MSFT",
+        "sleeve": "rsi2_stocks",
+        "action": "BUY",
+        "reason": "short-term entry signal",
+        "trend": "",
+        "signal_date": "2026-11-02",
+        "name": "",
+        "status": "ordered",
+        "ai_decision": "OFF",
+        "ai_reason": "",
+        "note": ""
+      },
+      {
+        "rank": 4,
+        "symbol": "MRVL",
+        "sleeve": "rsi2_stocks",
+        "action": "BUY",
+        "reason": "short-term entry signal",
+        "trend": "",
+        "signal_date": "2026-11-02",
+        "name": "",
+        "status": "skipped",
+        "ai_decision": "",
+        "ai_reason": "",
+        "note": "daily entry limit reached"
+      },
+      {
+        "rank": 5,
+        "symbol": "TSM",
+        "sleeve": "rsi2_stocks",
+        "action": "BUY",
+        "reason": "short-term entry signal",
+        "trend": "",
+        "signal_date": "2026-11-02",
+        "name": "",
+        "status": "skipped",
+        "ai_decision": "",
+        "ai_reason": "",
+        "note": "daily entry limit reached"
+      }
+    ]
   }
 }

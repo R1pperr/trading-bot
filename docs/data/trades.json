@@ -1,1 +1,44 @@
-[]
+[
+  {
+    "time_utc": "2026-11-02 14:38:52",
+    "event": "ORDER",
+    "symbol": "MSFT",
+    "asset_class": "stock",
+    "sleeve": "rsi2_stocks",
+    "side": "buy",
+    "qty": 9.0,
+    "price": 524.64,
+    "order_status": "pending_new",
+    "reason": "short-term entry signal",
+    "ai_decision": "OFF",
+    "ai_reason": "AI analyst is turned off in config.py"
+  },
+  {
+    "time_utc": "2026-11-02 14:38:52",
+    "event": "ORDER",
+    "symbol": "NVDA",
+    "asset_class": "stock",
+    "sleeve": "rsi2_stocks",
+    "side": "buy",
+    "qty": 24.0,
+    "price": 207.57,
+    "order_status": "pending_new",
+    "reason": "short-term entry signal",
+    "ai_decision": "OFF",
+    "ai_reason": "AI analyst is turned off in config.py"
+  },
+  {
+    "time_utc": "2026-11-02 14:38:51",
+    "event": "ORDER",
+    "symbol": "QQQ",
+    "asset_class": "stock",
+    "sleeve": "rsi2_stocks",
+    "side": "buy",
+    "qty": 7.0,
+    "price": 694.13,
+    "order_status": "pending_new",
+    "reason": "short-term entry signal",
+    "ai_decision": "OFF",
+    "ai_reason": "AI analyst is turned off in config.py"
+  }
+]

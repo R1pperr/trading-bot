@@ -1,2 +1,5 @@
 time_utc,event,symbol,signal,signal_date,details,ai_decision,ai_reason,side,qty,price,order_id,order_status,equity
 2026-11-01 22:17:59,DAILY_SUMMARY,,,,,,,,,,,,
+2026-11-02 14:38:51,ORDER,QQQ,BUY,2026-11-02,sleeve=rsi2_stocks; short-term entry signal,OFF,AI analyst is turned off in config.py,buy,7.0,694.13,644c2bff-9814-4bfe-97e0-c67731fd2b13,pending_new,99999.45
+2026-11-02 14:38:52,ORDER,NVDA,BUY,2026-11-02,sleeve=rsi2_stocks; short-term entry signal,OFF,AI analyst is turned off in config.py,buy,24.0,207.57,80c07080-87e5-4da9-b4f3-e91883cfc002,pending_new,99999.45
+2026-11-02 14:38:52,ORDER,MSFT,BUY,2026-11-02,sleeve=rsi2_stocks; short-term entry signal,OFF,AI analyst is turned off in config.py,buy,9.0,524.64,6da36f10-1a02-42f6-937d-280b6153c0f6,pending_new,99999.45

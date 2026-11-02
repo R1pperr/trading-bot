@@ -1,1 +1,54 @@
-[]
+[
+  {
+    "symbol": "MSFT",
+    "asset_class": "stock",
+    "sleeve": "rsi2_stocks",
+    "qty": 6.0,
+    "avg_entry_price": 524.61,
+    "current_price": 524.58,
+    "market_value": 3147.48,
+    "unrealized_pl": -0.18,
+    "unrealized_pl_pct": -6e-05,
+    "change_today_pct": 0.00512,
+    "stop_price": 487.89
+  },
+  {
+    "symbol": "NVDA",
+    "asset_class": "stock",
+    "sleeve": "rsi2_stocks",
+    "qty": 20.0,
+    "avg_entry_price": 207.72,
+    "current_price": 207.68,
+    "market_value": 4153.6,
+    "unrealized_pl": -0.8,
+    "unrealized_pl_pct": -0.00019,
+    "change_today_pct": 0.01486,
+    "stop_price": 193.18
+  },
+  {
+    "symbol": "QQQ",
+    "asset_class": "stock",
+    "sleeve": "rsi2_stocks",
+    "qty": 4.0,
+    "avg_entry_price": 694.39,
+    "current_price": 694.44,
+    "market_value": 2777.76,
+    "unrealized_pl": 0.2,
+    "unrealized_pl_pct": 7e-05,
+    "change_today_pct": 0.00572,
+    "stop_price": 645.78
+  },
+  {
+    "symbol": "SPY",
+    "asset_class": "stock",
+    "sleeve": "",
+    "qty": 1.0,
+    "avg_entry_price": 759.6,
+    "current_price": 759.24,
+    "market_value": 759.24,
+    "unrealized_pl": -0.36,
+    "unrealized_pl_pct": -0.00047,
+    "change_today_pct": 0.00466,
+    "stop_price": 706.43
+  }
+]
