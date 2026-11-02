@@ -2,8 +2,8 @@ name: Trading bot (paper)
 
 on:
   schedule:
-    # Every 15 minutes, every day, because crypto never closes. Stocks still trade only
-    # while the market is open: the bot itself checks that.
+    # A backup, because GitHub's scheduler is unreliable: on 2 Nov 2026 it ran 2 of about 46
+    # slots. The next-run job below keeps the 15-minute rhythm, and this restarts it if it stops.
     # Off-the-hour minutes, because GitHub delays jobs scheduled at the top of the hour.
     - cron: "7,22,37,52 * * * *"
   workflow_dispatch:   # adds a "Run workflow" button so you can start it by hand
@@ -70,4 +70,27 @@ jobs:
             sleep 5
           done
           echo "Could not save the trade log and dashboard data after 3 tries."
+          exit 1
+
+  next-run:
+    # Each run starts the next one, so the bot doesn't depend on GitHub's scheduler. The pacemaker
+    # environment (Settings, Environments) holds this job for 14 minutes without using a runner.
+    # If a run fails the chain carries on. Cancelling a run stops it until the schedule restarts it.
+    needs: run-bot
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: pacemaker
+    permissions:
+      actions: write
+    steps:
+      - name: Start the next run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for attempt in 1 2 3; do
+            if gh workflow run trading-bot.yml --repo "$GITHUB_REPOSITORY" --ref main; then exit 0; fi
+            sleep 10
+          done
+          echo "Could not start the next run after 3 tries. The schedule will restart the chain."
           exit 1
