@@ -182,6 +182,13 @@ def counts_toward_cap(row):
     return row.get("event") == "ORDER" and (config.STRATEGY_MODE != "sleeves" or row.get("side") == "buy")
 
 
+def crypto_trading():
+    """Whether anything trades crypto right now. If not, the bot skips nights and weekends."""
+    if not config.CRYPTO_ENABLED:
+        return False
+    return config.STRATEGY_MODE != "sleeves" or bool(sleeves.sleeves_for("crypto"))
+
+
 def build_status(now, exit_code, error_text, dry_run, market_open, equity, start_equity,
                  todays_rows):
     if exit_code or error_text:
@@ -208,6 +215,7 @@ def build_status(now, exit_code, error_text, dry_run, market_open, equity, start
         "ai_analyst_on": config.USE_AI_ANALYST,
         "paper": True,
         "crypto_enabled": config.CRYPTO_ENABLED,
+        "crypto_trading": crypto_trading(),
         "universe": {market: universe.info(market) for market in universe.FILES},
         "trades_today": sum(counts_toward_cap(row) and "/" not in row.get("symbol", "") for row in todays_rows),
         "limits": {
