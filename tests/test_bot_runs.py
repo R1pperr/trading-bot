@@ -78,6 +78,7 @@ class BotRunTests(unittest.TestCase):
         self.start(mock.patch.object(config, "SYMBOLS", ["SPY"]))
         self.start(mock.patch.object(config, "USE_AI_ANALYST", False))
         self.start(mock.patch.object(config, "CRYPTO_ENABLED", False))   # these tests are about stocks
+        self.start(mock.patch.object(config, "STRATEGY_MODE", "crossover"))
         self.start(mock.patch.dict(os.environ, TELEGRAM_ON))
 
     def start(self, patcher):

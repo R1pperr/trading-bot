@@ -259,6 +259,7 @@ class CachedRunTests(unittest.TestCase):
         self.start(mock.patch.object(config, "get_alpaca_keys", return_value=("fake", "fake")))
         self.start(mock.patch.object(config, "USE_AI_ANALYST", True))
         self.start(mock.patch.object(config, "CRYPTO_ENABLED", True))
+        self.start(mock.patch.object(config, "STRATEGY_MODE", "crossover"))
         self.start(mock.patch.dict(os.environ, {"TELEGRAM_BOT_TOKEN": "", "TELEGRAM_CHAT_ID": ""}))
 
     def start(self, patcher):

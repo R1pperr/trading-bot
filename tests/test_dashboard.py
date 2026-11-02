@@ -77,7 +77,7 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(set(history[0]), {"time_utc", "equity"})
 
         position = self.load("positions.json")[0]
-        self.assertEqual(set(position), {"symbol", "asset_class", "qty", "avg_entry_price",
+        self.assertEqual(set(position), {"symbol", "asset_class", "sleeve", "qty", "avg_entry_price",
                                          "current_price", "market_value", "unrealized_pl",
                                          "unrealized_pl_pct", "change_today_pct", "stop_price"})
         self.assertEqual(position["asset_class"], "stock")
@@ -85,13 +85,16 @@ class DashboardTests(unittest.TestCase):
         self.assertEqual(position["stop_price"], 651.0)
 
         trade = self.load("trades.json")[0]
-        self.assertEqual(set(trade), {"time_utc", "event", "symbol", "asset_class", "side", "qty",
+        self.assertEqual(set(trade), {"time_utc", "event", "symbol", "asset_class", "sleeve", "side", "qty",
                                       "price", "order_status", "reason", "ai_decision", "ai_reason"})
         self.assertEqual(trade["asset_class"], "stock")
         self.assertEqual((trade["side"], trade["reason"], trade["ai_decision"]),
                          ("buy", "strategy BUY: 7 shares", "APPROVE"))
 
     def test_status_has_the_account_figures_and_limits(self):
+        patcher = mock.patch.object(config, "STRATEGY_MODE", "crossover")
+        patcher.start()
+        self.addCleanup(patcher.stop)
         self.write_log({"time_utc": "2026-11-02 15:00:00", "event": "ORDER", "symbol": "SPY"},
                        {"time_utc": "2026-11-01 15:00:00", "event": "ORDER", "symbol": "QQQ"})
         self.update()
