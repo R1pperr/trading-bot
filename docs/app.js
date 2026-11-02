@@ -385,9 +385,9 @@
   // ------------------------------------------------------------------------
   // The warning shown on every page when the bot goes quiet
   // ------------------------------------------------------------------------
-  // The bot runs on weekdays from 13:37 to 20:52 UTC, even on market holidays. This finds the
-  // newest moment it should have updated by. A day's first hour is skipped, so a late first
-  // run raises no alarm.
+  // With no crypto trading, the bot runs on weekdays around market hours, even on holidays.
+  // This finds the newest moment it should have updated by. A day's first hour is skipped, so
+  // a late first run raises no alarm.
   function latestExpectedUpdate(now) {
     const MINUTE = 60000;
     const DAY = 1440 * MINUTE;
@@ -406,7 +406,8 @@
   function showStaleWarning(lastUpdate) {
     const ALLOWED_GAP = 90 * 60000;   // GitHub can start scheduled runs late
     const now = Date.now();
-    const expected = data.status.crypto_enabled ? now : latestExpectedUpdate(now);   // crypto runs 24/7
+    const allDay = data.status.crypto_trading ?? data.status.crypto_enabled;     // crypto never closes
+    const expected = allDay ? now : latestExpectedUpdate(now);
     const late = expected - toDate(lastUpdate).getTime() > ALLOWED_GAP;
     byId("stale-warning").hidden = !late;
     if (late) {
