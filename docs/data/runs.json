@@ -68,5 +68,10 @@
     "time_utc": "2026-11-02T13:24:52Z",
     "status": "market_closed",
     "orders": 0
+  },
+  {
+    "time_utc": "2026-11-02T13:39:33Z",
+    "status": "market_closed",
+    "orders": 0
   }
 ]
