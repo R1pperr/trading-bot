@@ -1,0 +1,49 @@
+{
+  "mode": "sleeves",
+  "sleeves": [
+    {
+      "name": "rsi2_stocks",
+      "horizon": "SHORT",
+      "market": "stock",
+      "allocation": 0.5,
+      "enabled": true,
+      "positions": 0,
+      "value": 0,
+      "open_pl": 0,
+      "closed_pl": 0.0
+    },
+    {
+      "name": "crypto_trend",
+      "horizon": "SHORT",
+      "market": "crypto",
+      "allocation": 0.3,
+      "enabled": false,
+      "positions": 0,
+      "value": 0,
+      "open_pl": 0,
+      "closed_pl": 0.0
+    },
+    {
+      "name": "momentum_stocks",
+      "horizon": "LONG",
+      "market": "stock",
+      "allocation": 0.15,
+      "enabled": true,
+      "positions": 0,
+      "value": 0,
+      "open_pl": 0,
+      "closed_pl": 0.0
+    },
+    {
+      "name": "crypto_hold",
+      "horizon": "LONG",
+      "market": "crypto",
+      "allocation": 0.05,
+      "enabled": false,
+      "positions": 0,
+      "value": 0,
+      "open_pl": 0,
+      "closed_pl": 0.0
+    }
+  ]
+}

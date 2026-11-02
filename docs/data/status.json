@@ -1,6 +1,6 @@
 {
   "last_run": {
-    "time_utc": "2026-11-01T22:17:58Z",
+    "time_utc": "2026-11-02T00:04:52Z",
     "status": "market_closed",
     "message": "The US market is closed, so there was nothing to do."
   },
@@ -30,8 +30,8 @@
   "limits": {
     "max_trades_per_day": 3,
     "max_open_positions": {
-      "stock": 12,
-      "crypto": 6
+      "stock": 20,
+      "crypto": 10
     },
     "max_position_pct": 0.05,
     "stop_loss_pct": 0.07,
