@@ -12,6 +12,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from types import SimpleNamespace
 from unittest import mock
 
@@ -24,6 +25,7 @@ import bot
 import config
 import crypto
 import dashboard
+import market_hours
 import notifier
 import risk
 import sleeve_backtest as backtest
@@ -865,6 +867,16 @@ class DashboardTests(SleeveCase):
         with mock.patch.object(config, "STRATEGY_MODE", "sleeves"):
             self.assertEqual(count(), 1)
 
+    def test_the_page_knows_when_crypto_is_really_trading(self):
+        with mock.patch.object(config, "CRYPTO_ENABLED", True), mock.patch.object(config, "STRATEGY_MODE", "sleeves"):
+            self.assertFalse(dashboard.crypto_trading())
+            self.enable("ENABLE_CRYPTO_HOLD")
+            self.assertTrue(dashboard.crypto_trading())
+        with mock.patch.object(config, "CRYPTO_ENABLED", True), mock.patch.object(config, "STRATEGY_MODE", "crossover"):
+            self.assertTrue(dashboard.crypto_trading())
+        with mock.patch.object(config, "CRYPTO_ENABLED", False):
+            self.assertFalse(dashboard.crypto_trading())
+
     def test_summary_shows_each_sleeve_on_or_off_with_its_share_and_profit(self):
         self.enable("ENABLE_MOMENTUM_STOCKS")
         state = sleeves.load_state()
@@ -908,6 +920,93 @@ class SettingsTests(unittest.TestCase):
             self.assertIn("git add state", handle.read())
 
 
+class MarketHoursTests(unittest.TestCase):
+    """Most ticks skip the bot, but never when anything could still need a stop-loss check."""
+
+    SLEEVES_ONLY = 'STRATEGY_MODE = "sleeves"\nENABLE_CRYPTO_TREND = False\nENABLE_CRYPTO_HOLD = False\n'
+    NOTHING_HELD = '{"positions": {}}'
+
+    def at(self, text):
+        return datetime.fromisoformat(text).replace(tzinfo=timezone.utc)
+
+    def decide(self, when, by_hand=False, settings=None, state=None):
+        return market_hours.should_run(self.at(when), by_hand, settings or self.SLEEVES_ONLY, state or self.NOTHING_HELD)
+
+    def test_winter_hours(self):       # New York is UTC-5 on Monday 2 November 2026
+        self.assertFalse(self.decide("2026-11-02T14:19:00"))
+        self.assertTrue(self.decide("2026-11-02T14:20:00"))
+        self.assertTrue(self.decide("2026-11-02T21:59:00"))
+        self.assertFalse(self.decide("2026-11-02T22:00:00"))
+
+    def test_summer_hours(self):       # New York is UTC-4 on Monday 15 June 2026
+        self.assertFalse(self.decide("2026-06-15T13:19:00"))
+        self.assertTrue(self.decide("2026-06-15T13:20:00"))
+        self.assertTrue(self.decide("2026-06-15T20:59:00"))
+        self.assertFalse(self.decide("2026-06-15T21:00:00"))
+
+    def test_the_market_open_and_the_daily_summary_are_inside_the_window_all_year(self):
+        summary = config.DAILY_SUMMARY_UTC
+        for day in ("2026-01-05", "2026-07-06"):
+            self.assertTrue(self.decide(f"{day}T{summary}:00"), day)
+        self.assertTrue(self.decide("2026-01-05T14:30:00"))     # 09:30 in New York, winter
+        self.assertTrue(self.decide("2026-07-06T13:30:00"))     # 09:30 in New York, summer
+
+    def test_weekends_are_skipped(self):
+        self.assertFalse(self.decide("2026-11-07T16:00:00"))    # Saturday
+        self.assertFalse(self.decide("2026-11-08T16:00:00"))    # Sunday
+
+    def test_a_run_started_by_hand_always_runs(self):
+        self.assertTrue(self.decide("2026-11-08T03:00:00", by_hand=True))
+
+    def test_any_crypto_sleeve_keeps_it_running_all_night(self):
+        for flag in ("ENABLE_CRYPTO_TREND", "ENABLE_CRYPTO_HOLD"):
+            settings = self.SLEEVES_ONLY.replace(f"{flag} = False", f"{flag} = True")
+            self.assertTrue(self.decide("2026-11-08T03:00:00", settings=settings), flag)
+
+    def test_the_old_strategy_keeps_it_running_all_night(self):
+        self.assertTrue(self.decide("2026-11-08T03:00:00", settings='STRATEGY_MODE = "crossover"\n'))
+
+    def test_settings_that_cant_be_read_keep_it_running(self):
+        self.assertTrue(self.decide("2026-11-08T03:00:00", settings="nothing useful"))
+
+    def test_crypto_still_held_keeps_it_running_after_its_sleeve_is_switched_off(self):
+        state = '{"positions": {"BTC/USD": {"sleeve": "crypto_trend"}}}'
+        self.assertTrue(self.decide("2026-11-08T03:00:00", state=state))
+
+    def test_stocks_held_overnight_can_wait_for_the_open(self):
+        state = '{"positions": {"AAPL": {"sleeve": "rsi2_stocks"}}}'
+        self.assertFalse(self.decide("2026-11-08T03:00:00", state=state))
+
+    def test_a_damaged_state_file_keeps_it_running(self):
+        self.assertTrue(self.decide("2026-11-08T03:00:00", state="not json"))
+
+    def test_todays_real_settings_skip_the_night(self):
+        with open(os.path.join(sleeves.BASE_DIR, "config.py"), encoding="utf-8") as handle:
+            self.assertFalse(market_hours.crypto_is_trading(handle.read()))
+
+    def run_main(self, event, actor):
+        folder = tempfile.mkdtemp()
+        self.addCleanup(shutil.rmtree, folder)
+        output = os.path.join(folder, "output")
+        settings = mock.patch.object(market_hours, "read", side_effect=[self.SLEEVES_ONLY, self.NOTHING_HELD])
+        clock = mock.patch.object(market_hours, "datetime", wraps=market_hours.datetime)
+        with settings, clock as fake_clock, contextlib.redirect_stdout(io.StringIO()), mock.patch.dict(
+                os.environ, {"GITHUB_EVENT_NAME": event, "GITHUB_TRIGGERING_ACTOR": actor, "GITHUB_OUTPUT": output}):
+            fake_clock.now.return_value = self.at("2026-11-08T03:00:00")
+            market_hours.main()
+        with open(output, encoding="utf-8") as handle:
+            return handle.read()
+
+    def test_a_tick_from_the_chain_is_not_a_run_by_hand(self):
+        self.assertEqual(self.run_main("workflow_dispatch", "github-actions[bot]"), "run=false\n")
+
+    def test_the_run_button_counts_as_by_hand(self):
+        self.assertEqual(self.run_main("workflow_dispatch", "R1pperr"), "run=true\n")
+
+    def test_a_scheduled_tick_at_night_skips(self):
+        self.assertEqual(self.run_main("schedule", "R1pperr"), "run=false\n")
+
+
 class PacemakerTests(unittest.TestCase):
     """Each run starts the next one, after a wait that only the pacemaker environment provides."""
 
@@ -927,6 +1026,13 @@ class PacemakerTests(unittest.TestCase):
     def test_only_this_job_may_start_runs(self):
         self.assertIn("    permissions:\n      actions: write\n", self.job)
         self.assertEqual(self.workflow.count("actions: write"), 1)
+
+    def test_a_skipped_bot_still_starts_the_next_tick(self):
+        self.assertNotIn("decide.outputs", self.job)
+
+    def test_only_a_clear_no_can_skip_the_bot(self):
+        self.assertIn("needs.decide.outputs.run != 'false'", self.workflow)
+        self.assertIn('python3 market_hours.py || echo "run=true"', self.workflow)
 
     def test_it_restarts_this_workflow_on_main(self):
         self.assertIn("gh workflow run trading-bot.yml", self.job)
