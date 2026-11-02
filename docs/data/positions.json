@@ -5,11 +5,11 @@
     "sleeve": "rsi2_stocks",
     "qty": 9.0,
     "avg_entry_price": 524.655555,
-    "current_price": 508.0,
-    "market_value": 4572.0,
-    "unrealized_pl": -149.899995,
-    "unrealized_pl_pct": -0.03175,
-    "change_today_pct": -0.02665,
+    "current_price": 507.53,
+    "market_value": 4567.77,
+    "unrealized_pl": -154.129995,
+    "unrealized_pl_pct": -0.03264,
+    "change_today_pct": -0.02755,
     "stop_price": 487.93
   },
   {
@@ -18,11 +18,11 @@
     "sleeve": "rsi2_stocks",
     "qty": 24.0,
     "avg_entry_price": 207.7175,
-    "current_price": 202.985,
-    "market_value": 4871.64,
-    "unrealized_pl": -113.58,
-    "unrealized_pl_pct": -0.02278,
-    "change_today_pct": -0.00809,
+    "current_price": 202.36,
+    "market_value": 4856.64,
+    "unrealized_pl": -128.58,
+    "unrealized_pl_pct": -0.02579,
+    "change_today_pct": -0.01114,
     "stop_price": 193.18
   },
   {
@@ -31,11 +31,11 @@
     "sleeve": "rsi2_stocks",
     "qty": 7.0,
     "avg_entry_price": 694.424286,
-    "current_price": 682.89,
-    "market_value": 4780.23,
-    "unrealized_pl": -80.740002,
-    "unrealized_pl_pct": -0.01661,
-    "change_today_pct": -0.01101,
+    "current_price": 682.5,
+    "market_value": 4777.5,
+    "unrealized_pl": -83.470002,
+    "unrealized_pl_pct": -0.01717,
+    "change_today_pct": -0.01157,
     "stop_price": 645.81
   },
   {
@@ -44,11 +44,11 @@
     "sleeve": "",
     "qty": 1.0,
     "avg_entry_price": 759.6,
-    "current_price": 753.66,
-    "market_value": 753.66,
-    "unrealized_pl": -5.94,
-    "unrealized_pl_pct": -0.00782,
-    "change_today_pct": -0.00273,
+    "current_price": 752.55,
+    "market_value": 752.55,
+    "unrealized_pl": -7.05,
+    "unrealized_pl_pct": -0.00928,
+    "change_today_pct": -0.00419,
     "stop_price": 706.43
   }
 ]
