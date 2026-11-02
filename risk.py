@@ -47,6 +47,25 @@ def max_crypto_qty(equity, price, max_pct=None):
     return math.floor(equity * max_pct / price * 100_000_000) / 100_000_000
 
 
+def atr_stop(entry_price, atr):
+    """A stop ATR_STOP_MULTIPLE times the day's typical range below the entry price."""
+    return entry_price - config.ATR_STOP_MULTIPLE * atr
+
+
+def risk_sized_dollars(equity, price, stop, room):
+    """
+    How many dollars to put in one entry. Hitting the stop must lose at most
+    RISK_PER_TRADE of equity, and the position stays within MAX_POSITION_PCT
+    and within the room left in its sleeve.
+    Example: equity $100,000, price $100, stop $95 -> a 5% fall may cost $500,
+    so $10,000 by risk, but the 5% limit makes it $5,000.
+    """
+    if equity <= 0 or price <= 0 or stop >= price:
+        return 0.0
+    by_risk = equity * config.RISK_PER_TRADE / ((price - stop) / price)
+    return max(0.0, min(by_risk, equity * config.MAX_POSITION_PCT, room))
+
+
 def stop_price(entry_price, stop_pct=None):
     stop_pct = config.STOP_LOSS_PCT if stop_pct is None else stop_pct
     return entry_price * (1 - stop_pct)

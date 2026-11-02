@@ -44,8 +44,9 @@ import dashboard
 import notifier
 import risk
 import signals
+import sleeves
 import universe
-from data import NEW_YORK, get_daily_bars
+from data import NEW_YORK, get_crypto_daily_bars, get_crypto_latest_price, get_daily_bars
 from strategy import BUY, SELL, latest_signal
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -210,6 +211,15 @@ def run(args):
     if args.test_order:
         return run_test_order(trading, data_client, args.test_order.upper(), equity,
                               positions, trades_today, killed, market_open)
+
+    if config.STRATEGY_MODE == "sleeves":
+        spendable = min(float(account.cash), float(account.non_marginable_buying_power))
+        sleeves.run("stock", trading, equity, spendable, killed, dry_run,
+                    new_york_now().date().isoformat(), todays_log, log_event, get_daily_bars,
+                    lambda symbol, fallback: latest_price(data_client, symbol, fallback),
+                    lambda plan: dashboard.save_candidates("stock", plan))
+        print("\nDone.")
+        return 0
 
     # --- Rule 2: stop-loss on every position ----------------------------------
     print("\nStop-loss check:")
@@ -422,6 +432,12 @@ def run_crypto_side(args):
         if account.trading_blocked or account.account_blocked:
             print("❌ Crypto skipped: Alpaca says this account is blocked from trading.")
             return 1
+        if config.STRATEGY_MODE == "sleeves":
+            sleeves.run("crypto", trading, equity, float(account.non_marginable_buying_power), killed,
+                        args.dry_run, crypto.utc_midnight().date().isoformat(), read_crypto_days_log(),
+                        log_event, get_crypto_daily_bars, get_crypto_latest_price,
+                        lambda plan: dashboard.save_candidates("crypto", plan))
+            return 0
         crypto.run(trading, equity, float(account.non_marginable_buying_power), killed,
                    args.dry_run, read_crypto_days_log(), log_event,
                    dashboard.load_candidates().get("crypto", {}),

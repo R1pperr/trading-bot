@@ -139,7 +139,11 @@ def rank_stocks(assets, bars):
         ranked.append((dollar_volume(table), symbol))
     ranked.sort(reverse=True)
     names = {asset["symbol"]: asset.get("name", "") for asset in assets}
-    return to_rows(ranked[:config.STOCK_UNIVERSE_SIZE], names)
+    top = ranked[:config.STOCK_UNIVERSE_SIZE]
+    kept = {symbol for _, symbol in top}
+    top += [row for row in ranked[config.STOCK_UNIVERSE_SIZE:]
+            if row[1] in config.UNIVERSE_ALWAYS_INCLUDE and row[1] not in kept]
+    return to_rows(top, names)
 
 
 def rank_crypto(assets, bars):

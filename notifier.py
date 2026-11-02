@@ -13,6 +13,7 @@ Check your Telegram setup:   python notifier.py
 """
 
 import os
+import re
 import sys
 import urllib.parse
 import urllib.request
@@ -20,6 +21,7 @@ import urllib.request
 from dotenv import load_dotenv
 
 import ai_analyst
+import config
 
 SEND_URL = "https://api.telegram.org/bot{token}/sendMessage"
 TIMEOUT_SECONDS = 10
@@ -59,11 +61,23 @@ def is_crypto_row(row):
     return "/" in row.get("symbol", "") or row.get("details", "").startswith("crypto:")
 
 
+def sleeve_of(row):
+    match = re.match(r"sleeve=(\w+);", row.get("details", ""))
+    return match.group(1) if match else ""
+
+
+def plain_details(row):
+    """The log's details without the sleeve tag."""
+    return re.sub(r"^sleeve=\w+; ", "", row.get("details", ""))
+
+
 def label_for(row):
     """Every message says which side it's about. The kill switch covers both."""
     if row.get("event") == "KILL_SWITCH":
         return BOTH_LABEL
-    return "[CRYPTO]" if is_crypto_row(row) else "[STOCK]"
+    market = "[CRYPTO]" if is_crypto_row(row) else "[STOCK]"
+    sleeve = config.SLEEVES.get(sleeve_of(row))
+    return f"[{sleeve['horizon']}] {market}" if sleeve else market
 
 
 def _order_message(row):
@@ -71,7 +85,7 @@ def _order_message(row):
     price = f"${float(row['price']):,.2f}"
     status = row.get("order_status", "")
     outcome = "filled" if status == "filled" else f"placed ({status})"
-    details = row.get("details", "")
+    details = plain_details(row)
 
     decision = row.get("ai_decision", "")
     if decision and row.get("ai_reason") and decision != ai_analyst.OFF:

@@ -24,6 +24,7 @@ import crypto
 import notifier
 import risk
 import signals
+import sleeves
 import universe
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -94,11 +95,12 @@ def trade_rows(log_rows):
         "event": row.get("event", ""),
         "symbol": row.get("symbol", ""),
         "asset_class": asset_class_of(row.get("symbol", "")),
+        "sleeve": notifier.sleeve_of(row),
         "side": row.get("side", "") or row.get("signal", "").lower(),
         "qty": _number(row.get("qty")),
         "price": _number(row.get("price")),
         "order_status": row.get("order_status", ""),
-        "reason": row.get("details", ""),
+        "reason": notifier.plain_details(row),
         "ai_decision": row.get("ai_decision", ""),
         "ai_reason": row.get("ai_reason", ""),
     } for row in reversed(wanted[-MAX_TRADES:])]
@@ -107,12 +109,17 @@ def trade_rows(log_rows):
 def position_rows(positions):
     """Open positions with unrealized profit or loss."""
     rows = []
+    owners = sleeves.load_state()["positions"]
     for position in positions:
         entry = float(position.avg_entry_price)
         is_crypto = crypto.is_crypto(position)
+        symbol = crypto.normalize(position.symbol) if is_crypto else position.symbol
+        record = owners.get(symbol, {})
+        stop = record.get("stop") if config.USE_ATR_STOPS and record.get("stop") else risk.stop_price(entry)
         rows.append({
-            "symbol": crypto.normalize(position.symbol) if is_crypto else position.symbol,
+            "symbol": symbol,
             "asset_class": "crypto" if is_crypto else "stock",
+            "sleeve": record.get("sleeve", ""),
             "qty": float(position.qty),
             "avg_entry_price": entry,
             "current_price": _number(position.current_price),
@@ -120,7 +127,7 @@ def position_rows(positions):
             "unrealized_pl": _number(position.unrealized_pl),
             "unrealized_pl_pct": _number(position.unrealized_plpc),
             "change_today_pct": _number(getattr(position, "change_today", None)),
-            "stop_price": round(risk.stop_price(entry), 2),
+            "stop_price": round(stop, 2),
         })
     return sorted(rows, key=lambda row: row["symbol"])
 
@@ -170,6 +177,11 @@ def save_candidates(market, plan):
     _write_json("candidates.json", saved)
 
 
+def counts_toward_cap(row):
+    """Sleeves cap new entries only, because exits always go through. The old strategy caps every order."""
+    return row.get("event") == "ORDER" and (config.STRATEGY_MODE != "sleeves" or row.get("side") == "buy")
+
+
 def build_status(now, exit_code, error_text, dry_run, market_open, equity, start_equity,
                  todays_rows):
     if exit_code or error_text:
@@ -197,11 +209,11 @@ def build_status(now, exit_code, error_text, dry_run, market_open, equity, start
         "paper": True,
         "crypto_enabled": config.CRYPTO_ENABLED,
         "universe": {market: universe.info(market) for market in universe.FILES},
-        "trades_today": sum(row.get("event") == "ORDER" and "/" not in row.get("symbol", "")
-                            for row in todays_rows),
+        "trades_today": sum(counts_toward_cap(row) and "/" not in row.get("symbol", "") for row in todays_rows),
         "limits": {
             "max_trades_per_day": config.MAX_TRADES_PER_DAY,
-            "max_open_positions": config.MAX_OPEN_POSITIONS,
+            "max_open_positions": (config.SLEEVE_MAX_OPEN_POSITIONS if config.STRATEGY_MODE == "sleeves"
+                                   else config.MAX_OPEN_POSITIONS),
             "max_position_pct": config.MAX_POSITION_PCT,
             "stop_loss_pct": config.STOP_LOSS_PCT,
             "kill_switch_pct": config.KILL_SWITCH_PCT,
@@ -265,14 +277,16 @@ def _update(log_file, day_start, exit_code, error_text, dry_run, orders):
         status[name] = figures.get(name, previous.get(name))
     crypto_day = crypto.utc_midnight().strftime("%Y-%m-%d %H:%M:%S")
     status["crypto_trades_today"] = sum(
-        row.get("event") == "ORDER" and "/" in row.get("symbol", "")
+        counts_toward_cap(row) and "/" in row.get("symbol", "")
         and row.get("time_utc", "") >= crypto_day for row in log_rows)
     _write_json("status.json", status)
     _write_json("trades.json", trade_rows(log_rows))
     _write_json("runs.json", add_run(_read_json("runs.json", []), now,
                                      status["last_run"]["status"], orders))
     if positions is not None:
-        _write_json("positions.json", position_rows(positions))
+        rows = position_rows(positions)
+        _write_json("positions.json", rows)
+        _write_json("sleeves.json", sleeves.summary(rows))
         _write_json("equity_history.json",
                     add_equity_point(_read_json("equity_history.json", []), now, equity))
     print("Dashboard data written to docs/data/")

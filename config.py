@@ -36,6 +36,9 @@ UNIVERSE_LOOKBACK_DAYS = 20        # average dollar volume over this many tradin
 UNIVERSE_MIN_DAYS = 15             # needs prices on at least this many of those days
 UNIVERSE_MIN_STOCKS = 100          # a shorter list than this means the refresh went wrong
 UNIVERSE_MIN_CRYPTO = 2            # the same check for crypto
+# Always kept, because the RSI(2) evidence is strongest on index and sector funds.
+UNIVERSE_ALWAYS_INCLUDE = ["SPY", "QQQ", "IWM", "DIA", "XLF", "XLK", "XLE", "XLV", "XLI",
+                           "XLY", "XLP", "XLU", "XLB", "XLRE", "XLC"]
 # Names matching any of these are left out. Leveraged and inverse funds move 2 or 3
 # times as fast as the market, so a 7% stop-loss wouldn't mean what it means elsewhere.
 UNIVERSE_EXCLUDED_NAME_PATTERNS = [
@@ -77,6 +80,7 @@ SLIPPAGE_PCT = 0.0005
 # Crypto backtest only. Alpaca's crypto fees start at 0.25% for orders that fill
 # straight away, which is much more than stocks, so using FEE_PCT would flatter it.
 CRYPTO_FEE_PCT = 0.0025
+CRYPTO_LIMIT_FEE_PCT = 0.0015     # the lower fee when a limit order rests on the book
 
 
 # ---------------------------------------------------------------------------
@@ -97,6 +101,43 @@ KILL_SWITCH_PCT = 0.03      # stop trading for the day if equity falls 3%
 # At 5% each, 18 positions is 90% of the account. The other 10% stays as cash,
 # because crypto can't be bought on margin.
 MAX_OPEN_POSITIONS = {"stock": 12, "crypto": 6}
+
+
+# ---------------------------------------------------------------------------
+# Strategy sleeves (see sleeves.py). Nothing here trades until you approve it.
+# ---------------------------------------------------------------------------
+STRATEGY_MODE = "sleeves"          # "sleeves", or "crossover" for the old strategy
+ENABLE_RSI2_STOCKS = True          # short-term: RSI(2) pullback on stocks
+ENABLE_CRYPTO_TREND = False        # short-term: trend following on crypto
+ENABLE_MOMENTUM_STOCKS = True      # long-term: 12-1 momentum on stocks
+ENABLE_CRYPTO_HOLD = False         # long-term: BTC and ETH above their 200-day average
+
+SHORT_TERM_ALLOCATION = 0.80       # share of equity for the two short-term sleeves
+LONG_TERM_ALLOCATION = 0.20        # share of equity for the two long-term sleeves
+SLEEVES = {                        # listed in priority order for the daily entry cap
+    "rsi2_stocks": {"horizon": "SHORT", "market": "stock", "allocation": 0.50},
+    "crypto_trend": {"horizon": "SHORT", "market": "crypto", "allocation": 0.30},
+    "momentum_stocks": {"horizon": "LONG", "market": "stock", "allocation": 0.15},
+    "crypto_hold": {"horizon": "LONG", "market": "crypto", "allocation": 0.05},
+}
+SLEEVE_MAX_OPEN_POSITIONS = {"stock": 20, "crypto": 10}   # used only in sleeves mode
+RISK_PER_TRADE = 0.005             # hitting a stop loses at most 0.5% of equity
+ATR_DAYS = 14
+ATR_STOP_MULTIPLE = 3              # stops sit 3 x ATR from entry; crypto stops trail
+USE_ATR_STOPS = False              # False keeps the fixed STOP_LOSS_PCT. Approve before changing
+RSI_DAYS = 2
+RSI_ENTRY_BELOW = 10
+RSI_EXIT_SMA_DAYS = 5
+RSI_MAX_HOLD_DAYS = 10
+TREND_FILTER_SMA_DAYS = 200
+CRYPTO_TREND_TOP_N = 8
+CRYPTO_TREND_EMA_PAIRS = [(8, 24), (16, 48), (32, 96)]
+CRYPTO_TREND_VOL_DAYS = 63
+CRYPTO_HOLD_SYMBOLS = ["BTC/USD", "ETH/USD"]
+MOMENTUM_TOP_N = 10
+MOMENTUM_LOOKBACK_DAYS = 252       # 12 months
+MOMENTUM_SKIP_DAYS = 21            # leave out the most recent month
+MOMENTUM_MARKET_SYMBOL = "SPY"
 
 
 # ---------------------------------------------------------------------------
