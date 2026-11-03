@@ -15,6 +15,7 @@ and answers APPROVE or VETO with a one-line reason. That is all it can do:
   * if anything goes wrong (no key, no internet, a strange answer, free-tier
     limit reached) the answer is VETO, so in "enforce" the bot never trades on an
     AI error. Those answers don't count against the AI in the shadow scoreboard.
+    In "shadow" a missing key just means the AI isn't asked (OFF).
 
 The AI only sees prices, not news, and has no proven ability to pick trades.
 Treat it as a learning experiment, not an edge.
@@ -87,7 +88,7 @@ def _ask_gemini(prompt):
     decision = str(answer.get("decision", "")).strip().upper()
     reason = " ".join(str(answer.get("reason", "")).split())[:200] or "(no reason given)"
     if decision not in (APPROVE, VETO):
-        return VETO, f"{UNCLEAR_PREFIX} ({decision!r}), so no trade"
+        return VETO, f"{UNCLEAR_PREFIX} ({decision!r}){_outcome()}"
     return decision, reason
 
 
@@ -105,11 +106,19 @@ def review(symbol, signal, reason, recent_prices, rule=None):
     """
     if not config.USE_AI_ANALYST:
         return OFF, "AI analyst is turned off in config.py"
+    load_dotenv()
+    if config.AI_VETO_MODE != "enforce" and not os.getenv("GEMINI_API_KEY", "").strip():
+        return OFF, "no Gemini key is set, so the AI wasn't asked"
     try:
         return _ask_gemini(_build_prompt(symbol, signal, reason, recent_prices.tail(30), rule))
     except Exception as error:
         short = " ".join(str(error).split())[:150]
-        return VETO, f"{ERROR_PREFIX}, so no trade: {short}"
+        return VETO, f"{ERROR_PREFIX}{_outcome()}: {short}"
+
+
+def _outcome():
+    """Only "enforce" stops the trade, so only then does the reason say so."""
+    return ", so no trade" if config.AI_VETO_MODE == "enforce" else ", trade not blocked"
 
 
 if __name__ == "__main__":

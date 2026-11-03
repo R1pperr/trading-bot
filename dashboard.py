@@ -92,9 +92,14 @@ def asset_class_of(symbol):
 
 
 def trade_rows(log_rows):
-    """Orders and AI vetoes, newest first."""
+    """Orders and the AI vetoes that blocked a trade, newest first. In shadow mode a veto
+    blocks nothing, and its answer is already on the order row."""
+    went_ahead = {(row.get("symbol"), row.get("time_utc", "")[:10]) for row in log_rows
+                  if row.get("event") == "ORDER" and row.get("side") == "buy"}
     wanted = [row for row in log_rows if row.get("event") == "ORDER"
-              or (row.get("event") == "AI_DECISION" and row.get("ai_decision") == ai_analyst.VETO)]
+              or (row.get("event") == "AI_DECISION" and row.get("ai_decision") == ai_analyst.VETO
+                  and config.AI_VETO_MODE == "enforce"
+                  and (row.get("symbol"), row.get("time_utc", "")[:10]) not in went_ahead)]
     return [{
         "time_utc": row.get("time_utc", ""),
         "event": row.get("event", ""),
