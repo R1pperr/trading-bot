@@ -196,7 +196,7 @@ def save(market, payload):
 def refresh():
     """Rebuild both lists. A list that fails keeps its last good version."""
     exit_code = 0
-    for market in FILES:
+    for market in [name for name in FILES if name == "stock" or config.CRYPTO_ENABLED]:
         try:
             payload = build(market)
             save(market, payload)

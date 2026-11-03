@@ -9,13 +9,13 @@ What one run does, in order:
      (7%) or more below its buy price.
   4. Downloads daily prices and works out each symbol's signal (strategy.py).
   5. For each BUY or SELL: trade limit -> size cap (5% of equity) ->
-     optional AI approve/veto -> market order.
+     optional AI review -> market order.
   6. Writes every signal, AI decision, order and block to logs/trade_log.csv.
 
-Orders are only placed while the US market is open; at other times a run just
-says so and stops. Run it as often as you like (e.g. every hour): it never
-trades the same symbol twice in one day, so extra runs just re-check the
-stop-losses.
+Orders are only placed while the US market is open, or in the half hour before
+it, when they queue to fill at the open. At other times a run just says so and
+stops. Run it as often as you like (e.g. every hour): it never trades the same
+symbol twice in one day, so extra runs just re-check the stop-losses.
 
     python bot.py               normal run
     python bot.py --dry-run     show what it would do, place nothing
@@ -143,6 +143,14 @@ def latest_price(data_client, symbol, fallback):
         return fallback
 
 
+def is_pre_open(clock):
+    """True in the half hour before a trading day's open. Alpaca's clock knows the holidays."""
+    opens, now = getattr(clock, "next_open", None), getattr(clock, "timestamp", None)
+    if getattr(clock, "is_open", False) or opens is None or now is None:
+        return False
+    return timedelta(0) < opens - now <= timedelta(minutes=config.PRE_OPEN_MINUTES)
+
+
 def place_order(trading, symbol, side, qty, wait_for_fill):
     """Submit a PAPER market order. Returns (order_id, status, fill_price or None)."""
     request = MarketOrderRequest(symbol=symbol, qty=qty, side=side, time_in_force=TimeInForce.DAY)
@@ -171,6 +179,7 @@ def run(args):
     data_client = StockHistoricalDataClient(api_key, secret_key)
 
     account = trading.get_account()
+    config.require_paper_account(trading, account)
     if account.trading_blocked or account.account_blocked:
         print("❌ Alpaca says this account is blocked from trading. Check your dashboard.")
         log_event(event="ERROR", details="account is blocked from trading")
@@ -179,13 +188,15 @@ def run(args):
     equity = float(account.equity)
     start_equity = float(account.last_equity)
     change = risk.daily_change(equity, start_equity)
-    market_open = trading.get_clock().is_open
+    clock = trading.get_clock()
+    market_open = clock.is_open
+    pre_open = config.STRATEGY_MODE == "sleeves" and is_pre_open(clock)
     dry_run = args.dry_run
 
     print(f"=== Trading bot · Alpaca PAPER · {new_york_now():%a %d %b %Y, %H:%M} New York time ===")
     print(f"Equity {money(equity)} (yesterday's close {money(start_equity)}, {change:+.2%})"
           f" · Market {'OPEN' if market_open else 'CLOSED'}")
-    if not market_open and not dry_run and not args.test_order:
+    if not market_open and not pre_open and not dry_run and not args.test_order:
         print("The US market is closed, so there is nothing to do.")
         print("To see what the bot would do right now:  python bot.py --dry-run")
         return 0
@@ -217,7 +228,7 @@ def run(args):
         sleeves.run("stock", trading, equity, spendable, killed, dry_run,
                     new_york_now().date().isoformat(), todays_log, log_event, get_daily_bars,
                     lambda symbol, fallback: latest_price(data_client, symbol, fallback),
-                    lambda plan: dashboard.save_candidates("stock", plan))
+                    lambda plan: dashboard.save_candidates("stock", plan), pre_open=pre_open)
         print("\nDone.")
         return 0
 
@@ -343,7 +354,7 @@ def handle_candidate(trading, data_client, candidate, prices_for, positions, ope
         return
 
     # --- Optional AI analyst: approve or veto only -----------------------------
-    if already_logged(todays_log, "AI_DECISION", symbol, date, decision=ai_analyst.VETO):
+    if config.AI_VETO_MODE == "enforce" and already_logged(todays_log, "AI_DECISION", symbol, date, decision=ai_analyst.VETO):
         print(f"  {symbol}: AI already vetoed this signal today, skipping")
         candidate.update(status="vetoed", ai_decision=ai_analyst.VETO)
         return
@@ -354,7 +365,7 @@ def handle_candidate(trading, data_client, candidate, prices_for, positions, ope
         log_event(event="AI_DECISION", symbol=symbol, signal=action, signal_date=date,
                   ai_decision=decision, ai_reason=ai_reason, equity=equity)
         print(f"  {symbol}: AI analyst says {decision} · {ai_reason}")
-    if decision == ai_analyst.VETO:
+    if decision == ai_analyst.VETO and config.AI_VETO_MODE == "enforce":
         candidate["status"] = "vetoed"
         return
 
@@ -407,6 +418,7 @@ def open_crypto_session(args):
     api_key, secret_key = config.get_alpaca_keys()
     trading = TradingClient(api_key, secret_key, paper=True)   # PAPER ONLY
     account = trading.get_account()
+    config.require_paper_account(trading, account)
     equity = float(account.equity)
     start_equity = float(account.last_equity)
     killed_earlier = any(row["event"] == "KILL_SWITCH" for row in read_todays_log())

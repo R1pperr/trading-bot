@@ -20,7 +20,7 @@ from zoneinfo import ZoneInfo
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 NEW_YORK = ZoneInfo("America/New_York")
-FIRST_TICK = (9, 20)     # New York time, so the first buys land just after the 09:30 open
+FIRST_TICK = (9, 5)      # New York time, so one tick lands before the 09:30 open and orders fill at it
 LAST_TICK = (17, 0)      # an hour past the close, late enough for the 20:45 UTC daily summary
 BOT_ACCOUNT = "github-actions[bot]"
 
@@ -33,6 +33,8 @@ def in_market_hours(now):
 
 def crypto_is_trading(settings_text):
     """The old strategy trades crypto. In sleeves mode, only the crypto sleeves do."""
+    if re.search(r"^CRYPTO_ENABLED = False", settings_text, re.M):
+        return False
     if not re.search(r'^STRATEGY_MODE = "sleeves"', settings_text, re.M):
         return True
     return re.search(r"^ENABLE_CRYPTO_(TREND|HOLD) = True", settings_text, re.M) is not None

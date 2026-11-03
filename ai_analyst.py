@@ -1,15 +1,20 @@
 """
 ai_analyst.py  -  optional second opinion from Google's Gemini (free tier).
 
-OFF by default. To turn it on, set USE_AI_ANALYST = True in config.py and put
-your key in .env as GEMINI_API_KEY=...
+Set USE_AI_ANALYST in config.py to turn it on or off, and put your key in .env as
+GEMINI_API_KEY=... (or in GitHub Secrets for the scheduled runs).
+
+config.AI_VETO_MODE decides what its answer does. In "shadow" it only logs its
+decision and reason, and the trade goes ahead either way, so you can see how the
+trades it would have vetoed actually did. In "enforce" a VETO blocks the trade.
 
 Before a strategy trade, the AI sees the signal and the last 30 closing prices
 and answers APPROVE or VETO with a one-line reason. That is all it can do:
   * it never sees or decides the position size (risk.py does that)
   * it is never asked about stop-loss sells (those always go through)
   * if anything goes wrong (no key, no internet, a strange answer, free-tier
-    limit reached) the answer is VETO, so the bot never trades on an AI error.
+    limit reached) the answer is VETO, so in "enforce" the bot never trades on an
+    AI error. Those answers don't count against the AI in the shadow scoreboard.
 
 The AI only sees prices, not news, and has no proven ability to pick trades.
 Treat it as a learning experiment, not an edge.
@@ -27,6 +32,8 @@ import config
 APPROVE = "APPROVE"
 VETO = "VETO"
 OFF = "OFF"
+ERROR_PREFIX = "AI error"
+UNCLEAR_PREFIX = "AI gave an unclear answer"
 
 INSTRUCTIONS = """You are a cautious reviewer for a student's paper-trading (simulated money) project.
 A simple rule-based strategy wants to make one trade. Decide only whether to APPROVE or VETO it.
@@ -36,12 +43,13 @@ Otherwise APPROVE. You cannot change the trade size, and you must not suggest on
 Reply with JSON only: {"decision": "APPROVE" or "VETO", "reason": "<one sentence, at most 25 words>"}"""
 
 
-def _build_prompt(symbol, signal, reason, recent_prices):
+def _build_prompt(symbol, signal, reason, recent_prices, rule=None):
     lines = [f"{day.date().isoformat()}: {close:.2f}" for day, close in recent_prices["close"].items()]
+    rule = rule or f"{config.FAST_SMA_DAYS}/{config.SLOW_SMA_DAYS}-day moving-average crossover"
     return (
         f"{INSTRUCTIONS}\n\n"
         f"Proposed trade: {signal} {symbol}\n"
-        f"Strategy: {config.FAST_SMA_DAYS}/{config.SLOW_SMA_DAYS}-day moving-average crossover\n"
+        f"Strategy: {rule}\n"
         f"Why the strategy wants it: {reason}\n"
         f"Last {len(lines)} daily closing prices, oldest first:\n" + "\n".join(lines)
     )
@@ -79,23 +87,29 @@ def _ask_gemini(prompt):
     decision = str(answer.get("decision", "")).strip().upper()
     reason = " ".join(str(answer.get("reason", "")).split())[:200] or "(no reason given)"
     if decision not in (APPROVE, VETO):
-        return VETO, f"AI gave an unclear answer ({decision!r}), so no trade"
+        return VETO, f"{UNCLEAR_PREFIX} ({decision!r}), so no trade"
     return decision, reason
 
 
-def review(symbol, signal, reason, recent_prices):
+def is_real_veto(decision, reason):
+    """True for a veto the AI chose, not one forced by an error or a strange answer."""
+    return decision == VETO and not str(reason).startswith((ERROR_PREFIX, UNCLEAR_PREFIX))
+
+
+def review(symbol, signal, reason, recent_prices, rule=None):
     """
     Ask the AI about one proposed trade.
     recent_prices: a table with a 'close' column and dates as the index.
+    rule: one line on what the strategy does. The old crossover is the default.
     Returns (decision, one_line_reason) where decision is APPROVE, VETO or OFF.
     """
     if not config.USE_AI_ANALYST:
         return OFF, "AI analyst is turned off in config.py"
     try:
-        return _ask_gemini(_build_prompt(symbol, signal, reason, recent_prices.tail(30)))
+        return _ask_gemini(_build_prompt(symbol, signal, reason, recent_prices.tail(30), rule))
     except Exception as error:
         short = " ".join(str(error).split())[:150]
-        return VETO, f"AI error, so no trade: {short}"
+        return VETO, f"{ERROR_PREFIX}, so no trade: {short}"
 
 
 if __name__ == "__main__":

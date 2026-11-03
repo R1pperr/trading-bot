@@ -1,5 +1,5 @@
 """
-sleeve_backtest.py  -  an honest whole-portfolio backtest of the four sleeves.
+sleeve_backtest.py  -  an honest whole-portfolio backtest of the sleeves.
 
     python sleeve_backtest.py
 
@@ -8,9 +8,9 @@ Rules of the test:
     can't see the future. Stops fill at the stop, or at the open if it gapped past.
   * Costs: crypto 0.25% a side, stocks 0.05%. The limit-order version charges 0.15%
     on crypto buys only, because the live bot's sells are market orders.
-  * Everything shares one account, with the same caps as the live bot: sleeve
-    allocations, position limits, 3 new entries a day per market (short-term
-    sleeves first), exits always allowed, one owner per symbol, and the kill switch.
+  * Everything shares one account, with the same caps as the live bot: horizon
+    allocations, position limits, the daily cap on new entries (short-term sleeves
+    first), exits always allowed, one owner per symbol, and the kill switch.
   * The oldest 70% of the history is in-sample, the newest 30% is out-of-sample.
   * The AI veto can't be tested honestly, so it is left out.
 
@@ -39,7 +39,7 @@ STOCK_HISTORY_START = "2016-01-01"
 CRYPTO_HISTORY_START = "2021-01-01"
 OLD_LIMITS = dict(config.MAX_OPEN_POSITIONS)
 FUND_WORDS = (" ETF", "ISHARES", "SPDR", "INVESCO QQQ", " FUND")     # how the names mark a fund
-PRIORITY_SHORT = {name for name, sleeve in config.SLEEVES.items() if sleeve["horizon"] == "SHORT"}
+PRIORITY = {name: rank for rank, name in enumerate(config.SLEEVES)}   # the daily cap fills in this order
 
 
 @dataclass
@@ -50,9 +50,13 @@ class Panel:
     is_crypto: np.ndarray
     fields: dict
     etf: set = field(default_factory=set)
+    scanned: np.ndarray = None      # False for symbols that only one sleeve follows, like DBC
 
     def __getitem__(self, name):
         return self.fields[name]
+
+    def column(self, symbol):
+        return self.symbols.index(symbol) if symbol in self.symbols else None
 
 
 @dataclass
@@ -64,14 +68,23 @@ class Options:
     one_owner: bool = True
     only_symbols: set = None
     start: str = None
+    allocations: dict = None             # replaces the horizon split, for the old live setup
+    excluded: tuple = tuple(config.ONLY_FOR_TURN_OF_MONTH)     # no other sleeve may hold these
+    vol_sizing: bool = False             # the A/B challenger for position size
+    vol_scaled: bool = False             # the A/B challenger for momentum
+    stop_mode: str = "alpaca"            # "alpaca" or "check", used with stop_bars
+    stop_bars: object = None             # (symbol, date) -> that day's 15-minute bars
+    ibs_at_close: bool = False           # the close-to-close IBS version, as a reference only
+    params: dict = field(default_factory=dict)     # nearby values, for the robustness report only
 
 
-def build_panel(tables, etf=()):
-    """Line up every symbol's prices on one calendar. Days a symbol didn't trade stay empty."""
+def build_panel(tables, etf=(), not_scanned=()):
+    """Line up every symbol's prices on one calendar. Days a symbol didn't trade stay empty.
+    Symbols in not_scanned are there for one sleeve's own list, not for the stock scans."""
     dates = pd.DatetimeIndex(sorted(set().union(*[set(t.index) for t in tables.values()])))
     symbols = list(tables)
-    names = ("open", "high", "low", "close", "rsi", "sma_exit", "sma_trend", "atr", "trend",
-             "momentum", "cross")
+    computed = ("rsi", "sma_exit", "sma_trend", "atr", "trend", "momentum", "ibs", "rotation", "vol")
+    names = ("open", "high", "low", "close", "cross") + computed
     fields = {name: np.full((len(dates), len(symbols)), np.nan) for name in names}
     for column, symbol in enumerate(symbols):
         table = tables[symbol]
@@ -79,7 +92,7 @@ def build_panel(tables, etf=()):
         for name in ("open", "high", "low", "close"):
             fields[name][rows, column] = table[name].to_numpy()
         values = strategies.indicators(table)
-        for name in ("rsi", "sma_exit", "sma_trend", "atr", "trend", "momentum"):
+        for name in computed:
             fields[name][rows, column] = values[name].to_numpy()
         fast = table["close"].rolling(config.FAST_SMA_DAYS).mean().to_numpy()
         slow = table["close"].rolling(config.SLOW_SMA_DAYS).mean().to_numpy()
@@ -93,7 +106,8 @@ def build_panel(tables, etf=()):
         signal[ready & ~above & (signal == 0)] = -0.5   # already below: the "missed sell" rule
         fields["cross"][rows, column] = signal
     is_crypto = np.array(["/" in symbol for symbol in symbols])
-    return Panel(dates, symbols, is_crypto, fields, set(etf))
+    scanned = np.array([symbol not in set(not_scanned) for symbol in symbols])
+    return Panel(dates, symbols, is_crypto, fields, set(etf), scanned)
 
 
 class Book:
@@ -130,7 +144,8 @@ def close_position(book, key, price, t, panel, options, reason):
     pnl = value - fee - position["cost"]
     book.trades.append({"sleeve": key[0], "symbol": panel.symbols[key[1]], "entry": position["entry_day"],
                         "exit": t, "days": t - position["entry_day"], "pnl": pnl, "reason": reason,
-                        "win": pnl > 0, "fee": fee + position["entry_fee"]})
+                        "win": pnl > 0, "fee": fee + position["entry_fee"], "ret": pnl / position["cost"],
+                        "impact": pnl / position.get("equity", START_CASH)})
 
 
 def stop_for(price, atr_value, options, market_crypto):
@@ -139,25 +154,113 @@ def stop_for(price, atr_value, options, market_crypto):
     return risk.stop_price(price)
 
 
+def shares_of(options):
+    """Each sleeve's share of the account."""
+    return options.allocations or strategies.split_by_horizon(options.sleeves)
+
+
+def stop_fill(options, panel, column, t, stop, day_open, day_close):
+    """The price a stop fills at, or None if it didn't. Daily bars can't tell the order of a
+    day's trades, so the stop test uses 15-minute bars on the days a stop could have been hit."""
+    if options.stop_bars is None:
+        return min(day_open, stop)
+    bars = options.stop_bars(panel.symbols[column], panel.dates[t])
+    if len(bars):
+        return strategies.intraday_stop_fill(bars, stop, options.stop_mode)
+    if options.stop_mode == "alpaca":
+        return min(day_open, stop)
+    return day_close if day_close < stop else None
+
+
+def basket_scale(panel, columns, days_so_far):
+    """The volatility-scaled momentum sleeve's exposure, from the stocks it's about to hold."""
+    rows = days_so_far[-(config.MOMENTUM_VOL_DAYS + 1):]
+    prices = pd.DataFrame(panel["close"][rows][:, columns])
+    return strategies.vol_scale(prices.pct_change(fill_method=None).mean(axis=1))
+
+
 def simulate(panel, options):
     """Run the whole history day by day. Returns the daily equity and everything that happened."""
     T, N = panel["close"].shape
     is_crypto = panel.is_crypto
     last_price = pd.DataFrame(panel["close"]).ffill().to_numpy()
     last_atr = pd.DataFrame(panel["atr"]).ffill().to_numpy()    # stocks have no row on weekends
+    last_vol = pd.DataFrame(panel["vol"]).ffill().to_numpy()
+    scanned = panel.scanned if panel.scanned is not None else np.ones(N, dtype=bool)
+    allowed = scanned & ~np.isin(panel.symbols, list(options.excluded))
+    shares = shares_of(options)
+    params = options.params
+    ibs_columns = [panel.column(s) for s in config.IBS_SYMBOLS if panel.column(s) is not None]
+    rotation_columns = [panel.column(s) for s in config.ROTATION_SYMBOLS if panel.column(s) is not None]
+    rotation_top = params.get("rotation_top", config.ROTATION_TOP_N)
+    turn_column = panel.column(config.TURN_OF_MONTH_SYMBOL)
     book = Book()
+    exposure = {sleeve: np.zeros(T) for sleeve in options.sleeves}
+    cash_curve = np.full(T, START_CASH)
     equity_curve = np.full(T, START_CASH)
     pending_exits, pending_entries = {}, []
     last_trade = np.full(N, -1)
     skips = {sleeve: {"owned": 0, "daily_cap": 0} for sleeve in options.sleeves}
     targets, stopped, month = set(), set(), None
-    held_days = {}
+    rotation_targets, rotation_stopped = set(), set()
+    momentum_scale = 1.0
     killed = False
-    spy = panel.symbols.index(config.MOMENTUM_MARKET_SYMBOL) if config.MOMENTUM_MARKET_SYMBOL in panel.symbols else None
+    spy = panel.column(config.MOMENTUM_MARKET_SYMBOL)
+    market_days = np.flatnonzero(np.isfinite(panel["close"][:, spy])) if spy is not None else np.array([], dtype=int)
+    calendar = panel.dates[market_days]         # the exchange's own days, known in advance
+    place_in_calendar = {int(t): i for i, t in enumerate(market_days)}
     start = 1 if options.start is None else max(1, int(panel.dates.searchsorted(pd.Timestamp(options.start))))
     equity_curve[:start] = START_CASH
     old_mode = any(sleeve.startswith("crossover") for sleeve in options.sleeves)
     limits = OLD_LIMITS if old_mode else config.SLEEVE_MAX_OPEN_POSITIONS
+
+    def enter(sleeve, column, price, t, marks, entries_today):
+        """Buy if every limit allows it. marks are the prices the account is valued at."""
+        crypto = bool(is_crypto[column])
+        if (sleeve, column) in book.positions or killed:
+            return
+        if options.one_owner and column in book.owned:
+            skips[sleeve]["owned"] += 1
+            return
+        if last_trade[column] == t:
+            return
+        if options.daily_cap and entries_today[crypto] >= options.daily_cap:
+            skips[sleeve]["daily_cap"] += 1
+            return
+        if book.count(is_crypto, crypto) >= limits["crypto" if crypto else "stock"]:
+            return
+        equity_now = book.cash + sum(p["qty"] * marks[k[1]] for k, p in book.positions.items())
+        allocation = 1.0 if old_mode else shares[sleeve]
+        left = equity_now * allocation - book.sleeve_value(sleeve, marks)
+        room = left
+        if sleeve == "momentum_stocks":
+            room = min(room, equity_now * allocation / config.MOMENTUM_TOP_N * momentum_scale)
+        elif sleeve == "rotation":
+            room = min(room, equity_now * allocation / rotation_top)
+        elif sleeve == "crypto_trend":
+            room = min(room, equity_now * allocation / config.CRYPTO_TREND_TOP_N)
+        elif sleeve == "crypto_hold":
+            room = min(room, equity_now * allocation / len(config.CRYPTO_HOLD_SYMBOLS))
+        stop = stop_for(price, last_atr[t - 1][column], options, crypto) if not old_mode else risk.stop_price(price)
+        dollars = risk.risk_sized_dollars(equity_now, price, stop, min(room, book.cash))
+        rate = fee_for(panel, column, options, sleeve in ("crypto_trend", "crypto_hold"))
+        if options.vol_sizing and not old_mode and not crypto:
+            typical = float(np.nanmedian(last_vol[t - 1][~is_crypto])) if (~is_crypto).any() else 0.0
+            dollars = risk.vol_sized_dollars(dollars, last_vol[t - 1][column], typical, equity_now, min(left, book.cash))
+        dollars = min(dollars, book.cash / (1 + rate))
+        if old_mode:
+            dollars = min(equity_now * config.MAX_POSITION_PCT, book.cash / (1 + rate))
+        if dollars < 1:
+            return
+        fee = dollars * rate
+        book.cash -= dollars + fee
+        book.fees += fee
+        book.positions[(sleeve, column)] = {"qty": dollars / price, "cost": dollars + fee, "stop": stop,
+                                            "entry_fee": fee, "entry_day": t, "high": price, "bars": 0,
+                                            "equity": equity_now}
+        book.owned[column] = sleeve
+        last_trade[column] = t
+        entries_today[crypto] += 1
 
     for t in range(start, T):
         opens, lows, closes = panel["open"][t], panel["low"][t], panel["close"][t]
@@ -174,48 +277,10 @@ def simulate(panel, options):
         entries_today = {True: 0, False: 0}
         waiting = []
         for sleeve, column in pending_entries:
-            crypto = bool(is_crypto[column])
             if not np.isfinite(opens[column]):
                 waiting.append((sleeve, column))     # a stock signal waits for the next open
                 continue
-            if (sleeve, column) in book.positions or killed:
-                continue
-            if options.one_owner and column in book.owned:
-                skips[sleeve]["owned"] += 1
-                continue
-            if last_trade[column] == t:
-                continue
-            if options.daily_cap and entries_today[crypto] >= options.daily_cap:
-                skips[sleeve]["daily_cap"] += 1
-                continue
-            if book.count(is_crypto, crypto) >= limits["crypto" if crypto else "stock"]:
-                continue
-            equity_now = book.cash + sum(p["qty"] * last_price[t - 1][k[1]] for k, p in book.positions.items())
-            allocation = 1.0 if old_mode else config.SLEEVES[sleeve]["allocation"]
-            room = equity_now * allocation - book.sleeve_value(sleeve, last_price[t - 1])
-            if sleeve == "momentum_stocks":
-                room = min(room, equity_now * allocation / config.MOMENTUM_TOP_N)
-            elif sleeve == "crypto_trend":
-                room = min(room, equity_now * allocation / config.CRYPTO_TREND_TOP_N)
-            elif sleeve == "crypto_hold":
-                room = min(room, equity_now * allocation / len(config.CRYPTO_HOLD_SYMBOLS))
-            price = opens[column]
-            stop = stop_for(price, last_atr[t - 1][column], options, crypto) if not old_mode else risk.stop_price(price)
-            dollars = risk.risk_sized_dollars(equity_now, price, stop, min(room, book.cash))
-            rate = fee_for(panel, column, options, sleeve in ("crypto_trend", "crypto_hold"))
-            dollars = min(dollars, book.cash / (1 + rate))
-            if old_mode:
-                dollars = min(equity_now * config.MAX_POSITION_PCT, book.cash / (1 + rate))
-            if dollars < 1:
-                continue
-            fee = dollars * rate
-            book.cash -= dollars + fee
-            book.fees += fee
-            book.positions[(sleeve, column)] = {"qty": dollars / price, "cost": dollars + fee, "stop": stop,
-                                                "entry_fee": fee, "entry_day": t, "high": price, "bars": 0}
-            book.owned[column] = sleeve
-            last_trade[column] = t
-            entries_today[crypto] += 1
+            enter(sleeve, column, opens[column], t, last_price[t - 1], entries_today)
         pending_entries = waiting
 
         # 2. Stops during the day. Stop-loss sells always go through.
@@ -225,14 +290,22 @@ def simulate(panel, options):
                 continue
             position = book.positions[key]
             if lows[column] <= position["stop"]:
-                close_position(book, key, min(opens[column], position["stop"]), t, panel, options, "stop")
+                fill = stop_fill(options, panel, column, t, position["stop"], opens[column], closes[column])
+                if fill is None:
+                    continue
+                close_position(book, key, fill, t, panel, options, "stop")
                 last_trade[column] = t
                 if key[0] == "momentum_stocks":
                     stopped.add(column)
+                elif key[0] == "rotation":
+                    rotation_stopped.add(column)
 
         # 3. The close: value the account, then decide tomorrow's orders.
         equity = book.cash + sum(p["qty"] * last_price[t][k[1]] for k, p in book.positions.items())
         equity_curve[t] = equity
+        cash_curve[t] = book.cash
+        for key, position in book.positions.items():
+            exposure[key[0]][t] += position["qty"] * last_price[t][key[1]]
         killed = equity <= equity_curve[t - 1] * (1 - config.KILL_SWITCH_PCT)
 
         for key, position in book.positions.items():
@@ -255,10 +328,38 @@ def simulate(panel, options):
                     if key[0] == sleeve and np.isfinite(closes[column]) and strategies.rsi2_exit(
                             closes[column], panel["sma_exit"][t][column], panel["sma_trend"][t][column], position["bars"]):
                         pending_exits[key] = "signal"
-                wanted = strategies.rsi2_entry(closes, panel["sma_trend"][t], panel["rsi"][t]) & ~is_crypto
+                wanted = strategies.rsi2_entry(closes, panel["sma_trend"][t], panel["rsi"][t]) & ~is_crypto & allowed
                 if options.only_symbols is not None:
                     wanted &= np.array([s in options.only_symbols for s in panel.symbols])
                 order += [(sleeve, column) for column in np.flatnonzero(wanted)]
+            elif sleeve == "ibs_etfs" and market_day:
+                above, days = params.get("ibs_exit", config.IBS_EXIT_ABOVE), params.get("ibs_days", config.IBS_MAX_HOLD_DAYS)
+                for key, position in book.positions.items():
+                    column = key[1]
+                    if key[0] == sleeve and np.isfinite(closes[column]) and strategies.ibs_exit(
+                            panel["ibs"][t][column], position["bars"], above, days):
+                        pending_exits[key] = "signal"
+                below = params.get("ibs_entry", config.IBS_ENTRY_BELOW)
+                order += [(sleeve, column) for column in ibs_columns
+                          if strategies.ibs_entry(panel["ibs"][t][column], below)]
+            elif sleeve == "turn_of_month" and market_day and turn_column is not None:
+                tomorrow = place_in_calendar[t] + 1
+                if tomorrow < len(calendar):
+                    action = strategies.turn_of_month_order(calendar, tomorrow)
+                    if action == "sell" and (sleeve, turn_column) in book.positions:
+                        pending_exits[(sleeve, turn_column)] = "signal"
+                    elif action == "buy":
+                        order.append((sleeve, turn_column))
+            elif sleeve == "rotation" and market_day:
+                if new_month:
+                    names = strategies.rotation_picks(rotation_columns, panel["rotation"][t][rotation_columns],
+                                                      closes[rotation_columns], panel["sma_trend"][t][rotation_columns],
+                                                      rotation_top)
+                    rotation_targets, rotation_stopped = set(names), set()
+                for key in book.positions:
+                    if key[0] == sleeve and key[1] not in rotation_targets:
+                        pending_exits[key] = "signal"
+                order += [(sleeve, column) for column in sorted(rotation_targets) if column not in rotation_stopped]
             elif sleeve == "crypto_trend":
                 top = np.flatnonzero(is_crypto)[:config.CRYPTO_TREND_TOP_N]
                 for key in book.positions:
@@ -269,9 +370,11 @@ def simulate(panel, options):
             elif sleeve == "momentum_stocks" and market_day:
                 market_up = strategies.above_trend(closes[spy], panel["sma_trend"][t][spy])
                 if new_month:
-                    stocks = np.flatnonzero(~is_crypto)
+                    stocks = np.flatnonzero(~is_crypto & allowed)
                     names = strategies.top_momentum(stocks, panel["momentum"][t][stocks])
                     targets, stopped = set(names), set()
+                    if options.vol_scaled and names:
+                        momentum_scale = basket_scale(panel, names, market_days[market_days <= t])
                 for key in book.positions:
                     if key[0] == sleeve and (not market_up or key[1] not in targets):
                         pending_exits[key] = "signal"
@@ -298,13 +401,24 @@ def simulate(panel, options):
                     wanted = (panel["cross"][t] == 1) & (is_crypto == crypto)
                     order += [(sleeve, column) for column in np.flatnonzero(wanted)]
 
+        if options.ibs_at_close:         # the reference version trades at today's close, which can't be done live
+            for key in [k for k in pending_exits if k[0] == "ibs_etfs" and k in book.positions]:
+                close_position(book, key, closes[key[1]], t, panel, options, pending_exits.pop(key))
+                last_trade[key[1]] = t
+            today_entries = {True: 0, False: 0}
+            for sleeve, column in [item for item in order if item[0] == "ibs_etfs"]:
+                enter(sleeve, column, closes[column], t, last_price[t], today_entries)
+            order = [item for item in order if item[0] != "ibs_etfs"]
+
         already = set(pending_entries)
         pending_entries += [item for item in order if item not in already]
-        pending_entries.sort(key=lambda item: 0 if item[0] in PRIORITY_SHORT else 1)
+        pending_entries.sort(key=lambda item: PRIORITY.get(item[0], len(PRIORITY)))
 
-    trades = pd.DataFrame(book.trades, columns=["sleeve", "symbol", "entry", "exit", "days", "pnl", "reason", "win", "fee"])
+    trades = pd.DataFrame(book.trades, columns=["sleeve", "symbol", "entry", "exit", "days", "pnl", "reason", "win",
+                                                "fee", "ret", "impact"])
     return {"equity": pd.Series(equity_curve, index=panel.dates), "trades": trades, "fees": book.fees,
-            "skips": skips, "dates": panel.dates}
+            "skips": skips, "dates": panel.dates, "cash": pd.Series(cash_curve, index=panel.dates),
+            "exposure": pd.DataFrame(exposure, index=panel.dates)}
 
 
 # ---------------------------------------------------------------------------
@@ -384,6 +498,7 @@ def print_rows(rows):
 # ---------------------------------------------------------------------------
 def load_tables():
     stocks = [row["symbol"] for row in universe.rows("stock")]
+    stocks += [s for s in config.ROTATION_SYMBOLS + [config.TURN_OF_MONTH_SYMBOL] if s not in stocks]
     pairs = [row["symbol"] for row in universe.rows("crypto")]
     end = last_complete_utc_day_end()
     print(f"Downloading {len(stocks)} stocks and {len(pairs)} crypto pairs ...")
@@ -413,7 +528,7 @@ def main():
         return report_row(name, result, crypto_first, crypto_last)
 
     def row_for(name, result):
-        return stock_row(name, result) if name.split()[0] in stock_sleeves else crypto_row(name, result)
+        return stock_row(name, result) if config.SLEEVES[name.split()[0]]["market"] == "stock" else crypto_row(name, result)
 
     print("\nEach sleeve alone, with its own share of $100,000 and the rest in cash:")
     alone = {}

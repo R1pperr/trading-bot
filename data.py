@@ -20,7 +20,7 @@ import pandas as pd
 from alpaca.data.enums import Adjustment, DataFeed
 from alpaca.data.historical import CryptoHistoricalDataClient, StockHistoricalDataClient
 from alpaca.data.requests import CryptoBarsRequest, CryptoLatestTradeRequest, StockBarsRequest
-from alpaca.data.timeframe import TimeFrame
+from alpaca.data.timeframe import TimeFrame, TimeFrameUnit
 
 import config
 
@@ -141,6 +141,34 @@ def _stock_tables(client, symbols, start, end):
         tables[symbol] = table.sort_index()
 
     return tables
+
+
+def get_intraday_bars(symbol, start, end, minutes, feed=DataFeed.SIP):
+    """
+    Minute bars during regular market hours, for backtests. They are adjusted the same
+    way as the daily bars, so the two can be compared. Times are New York time.
+    """
+    api_key, secret_key = config.get_alpaca_keys()
+    client = StockHistoricalDataClient(api_key, secret_key)
+    request = StockBarsRequest(symbol_or_symbols=symbol, timeframe=TimeFrame(minutes, TimeFrameUnit.Minute),
+                               start=_to_utc(start), end=_to_utc(end), adjustment=Adjustment.ALL, feed=feed)
+    for attempt in range(config.ALPACA_RETRIES):
+        try:
+            raw = client.get_stock_bars(request).df
+            break
+        except Exception:
+            if attempt == config.ALPACA_RETRIES - 1:
+                raise
+            time.sleep(2 ** (attempt + 1))
+    if raw is None or raw.empty:
+        return pd.DataFrame(columns=["open", "high", "low", "close", "volume"])
+    table = raw.xs(symbol, level="symbol") if "symbol" in raw.index.names else raw
+    stamps = pd.DatetimeIndex(table.index).tz_convert(NEW_YORK)
+    minutes_in = stamps.hour * 60 + stamps.minute
+    regular = (minutes_in >= 570) & (minutes_in < 960)      # 09:30 to 16:00 New York time
+    table = table[regular][["open", "high", "low", "close", "volume"]].astype(float)
+    table.index = stamps[regular].tz_localize(None)
+    return table.sort_index()
 
 
 def last_complete_utc_day_end():

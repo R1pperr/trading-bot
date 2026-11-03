@@ -26,7 +26,8 @@ import config
 SEND_URL = "https://api.telegram.org/bot{token}/sendMessage"
 TIMEOUT_SECONDS = 10
 MAX_MESSAGE_LENGTH = 4000   # Telegram allows 4096 characters
-SECRET_NAMES = ("ALPACA_API_KEY", "ALPACA_SECRET_KEY", "GEMINI_API_KEY", "TELEGRAM_BOT_TOKEN")
+SECRET_NAMES = ("ALPACA_API_KEY", "ALPACA_SECRET_KEY", "RT_ALPACA_API_KEY", "RT_ALPACA_SECRET_KEY",
+                "GEMINI_API_KEY", "TELEGRAM_BOT_TOKEN")
 BOTH_LABEL = "[STOCK] [CRYPTO]"
 
 
@@ -113,6 +114,8 @@ def _message_text(row):
         return _order_message(row)
     if event == "KILL_SWITCH":
         return f"⛔ KILL SWITCH ON\n{row.get('details', '')}"
+    if event == "STOP_FIXED":
+        return f"🛡️ Stop orders fixed\n{row.get('details', '')}"
     if event == "ERROR":     # AI vetoes are counted in the daily summary instead
         return f"❌ Bot run crashed\n{row.get('details', '')}"
     return None

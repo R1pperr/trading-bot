@@ -66,6 +66,18 @@ def risk_sized_dollars(equity, price, stop, room):
     return max(0.0, min(by_risk, equity * config.MAX_POSITION_PCT, room))
 
 
+def vol_sized_dollars(usual_dollars, volatility, typical_volatility, equity, room):
+    """
+    Inverse-volatility sizing. A stock as jumpy as the day's typical stock gets the usual
+    size, a stock twice as jumpy gets half, and a calmer one gets more, always within the
+    5% rule and the room left in its sleeve.
+    Example: usual $2,000, volatility 2%, typical 1%, equity $100,000 -> $1,000.
+    """
+    if not (volatility > 0 and typical_volatility > 0):
+        return usual_dollars
+    return max(0.0, min(usual_dollars * typical_volatility / volatility, equity * config.MAX_POSITION_PCT, room))
+
+
 def stop_price(entry_price, stop_pct=None):
     stop_pct = config.STOP_LOSS_PCT if stop_pct is None else stop_pct
     return entry_price * (1 - stop_pct)

@@ -21,10 +21,13 @@ from alpaca.trading.client import TradingClient
 import ai_analyst
 import config
 import crypto
+import drift
+import journal
 import notifier
 import risk
 import signals
 import sleeves
+import stops
 import universe
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -32,6 +35,8 @@ DATA_DIR = os.path.join(BASE_DIR, "docs", "data")
 MAX_EQUITY_POINTS = 5000    # about 8 months of 15-minute runs
 MAX_TRADES = 100            # newest rows kept in trades.json
 MAX_RUNS = 120              # newest runs kept in runs.json, about 4 trading days
+MAX_HISTORY_DAYS = 520      # daily rows kept in history.json, about 2 years
+MAX_REALTIME_FILLS = 300    # newest fills kept in realtime.json
 
 
 # ---------------------------------------------------------------------------
@@ -106,16 +111,17 @@ def trade_rows(log_rows):
     } for row in reversed(wanted[-MAX_TRADES:])]
 
 
-def position_rows(positions):
-    """Open positions with unrealized profit or loss."""
+def position_rows(positions, working=None):
+    """Open positions with unrealized profit or loss. working: the stop orders waiting at Alpaca."""
     rows = []
     owners = sleeves.load_state()["positions"]
+    working = working or {}
     for position in positions:
         entry = float(position.avg_entry_price)
         is_crypto = crypto.is_crypto(position)
         symbol = crypto.normalize(position.symbol) if is_crypto else position.symbol
         record = owners.get(symbol, {})
-        stop = record.get("stop") if config.USE_ATR_STOPS and record.get("stop") else risk.stop_price(entry)
+        stop = stops.level_for(record, entry)
         rows.append({
             "symbol": symbol,
             "asset_class": "crypto" if is_crypto else "stock",
@@ -128,6 +134,8 @@ def position_rows(positions):
             "unrealized_pl_pct": _number(position.unrealized_plpc),
             "change_today_pct": _number(getattr(position, "change_today", None)),
             "stop_price": round(stop, 2),
+            "entry_date": record.get("entry_date", ""),
+            "stop_at_alpaca": symbol in working,
         })
     return sorted(rows, key=lambda row: row["symbol"])
 
@@ -165,6 +173,19 @@ def account_figures(account, positions):
     }
 
 
+def add_history(history, day, equity, cash, sleeve_summary):
+    """One row a day: what each horizon and sleeve held and had made. Later runs replace today's row."""
+    held = {"SHORT": 0.0, "MEDIUM": 0.0, "LONG": 0.0}
+    made = {}
+    for row in sleeve_summary["sleeves"]:
+        held[row["horizon"]] += row["value"]
+        made[row["name"]] = round(row["open_pl"] + row["closed_pl"], 2)
+    today = {"date": day, "equity": equity, "cash": cash, "short": round(held["SHORT"], 2),
+             "medium": round(held["MEDIUM"], 2), "long": round(held["LONG"], 2), "sleeves": made}
+    earlier = [row for row in history if row["date"] != day]
+    return (earlier + [today])[-MAX_HISTORY_DAYS:]
+
+
 def load_candidates():
     """Today's short lists. This file is the cache that later runs act on, so it holds
     no prices: Alpaca doesn't allow republishing its data, and the file is public."""
@@ -190,12 +211,12 @@ def crypto_trading():
 
 
 def build_status(now, exit_code, error_text, dry_run, market_open, equity, start_equity,
-                 todays_rows):
+                 todays_rows, orders=0):
     if exit_code or error_text:
         state, message = "error", error_text or "The run stopped with an error."
     elif dry_run:
         state, message = "dry_run", "Dry run: no orders placed."
-    elif market_open is False:
+    elif market_open is False and not orders:
         state, message = "market_closed", "The US market is closed, so there was nothing to do."
     else:
         state, message = "ok", "The run finished normally."
@@ -213,6 +234,8 @@ def build_status(now, exit_code, error_text, dry_run, market_open, equity, start
             "reason": kill_row.get("details", "") if kill_row else "",
         },
         "ai_analyst_on": config.USE_AI_ANALYST,
+        "ai_veto_mode": config.AI_VETO_MODE,
+        "stop_execution": config.STOP_EXECUTION,
         "paper": True,
         "crypto_enabled": config.CRYPTO_ENABLED,
         "crypto_trading": crypto_trading(),
@@ -242,6 +265,8 @@ def summary_text(orders_today):
     saved = load_candidates()
     lines = []
     for market, title in (("stock", "Stock"), ("crypto", "Crypto")):
+        if market == "crypto" and not config.CRYPTO_ENABLED:
+            continue
         numbers = signals.counts(saved.get(market, {}))
         lines.append(f"{title} candidates: {numbers['found']} found, "
                      f"{numbers['approved']} approved, {numbers['vetoed']} vetoed")
@@ -259,7 +284,57 @@ def fetch_account():
     """Fresh account numbers from Alpaca's PAPER server. Reads only, places nothing."""
     api_key, secret_key = config.get_alpaca_keys()
     trading = TradingClient(api_key, secret_key, paper=True)   # PAPER ONLY
-    return trading.get_account(), trading.get_all_positions(), trading.get_clock().is_open
+    account = trading.get_account()
+    config.require_paper_account(trading, account)
+    return account, trading.get_all_positions(), trading.get_clock().is_open
+
+
+def fetch_orders():
+    """(closed orders for the journal, stop orders waiting at Alpaca). Reads only, places nothing."""
+    from alpaca.trading.enums import QueryOrderStatus
+    from alpaca.trading.requests import GetOrdersRequest
+    api_key, secret_key = config.get_alpaca_keys()
+    trading = TradingClient(api_key, secret_key, paper=True)   # PAPER ONLY
+    waiting = trading.get_orders(filter=GetOrdersRequest(status=QueryOrderStatus.OPEN, limit=500))
+    return journal.recent_orders(trading), stops.by_symbol(waiting)
+
+
+def update_journal(log_rows, day):
+    """Finished trades, the drift check and the AI scoreboard. Returns the stops waiting at Alpaca."""
+    closed, working = fetch_orders()
+    book = journal.update(_read_json("journal.json", None), closed)
+    _write_json("journal.json", book)
+    ranges = _read_json("backtest.json", {}).get("drift_ranges", {})
+    rows = drift.compare(book["trades"], ranges)
+    saved = _read_json("drift.json", {})
+    warned = saved.get("warned", {})
+    if config.STRATEGY_MODE == "sleeves":
+        warned = drift.warn(rows, warned, day)
+    _write_json("drift.json", {"rows": rows, "warned": warned})
+    _write_json("ai_shadow.json", journal.scoreboard(book["trades"], log_rows))
+    return working
+
+
+def update_realtime(now):
+    """The real-time engine's account, in its own Alpaca paper account. Only reads. Skipped until its keys are set."""
+    api_key = os.getenv("RT_ALPACA_API_KEY", "").strip()
+    secret_key = os.getenv("RT_ALPACA_SECRET_KEY", "").strip()
+    if not api_key or not secret_key:
+        return
+    config.require_paper_key(api_key)
+    trading = TradingClient(api_key, secret_key, paper=True)   # PAPER ONLY, reads only
+    account = trading.get_account()
+    config.require_paper_account(trading, account)
+    saved = _read_json("realtime.json", {"history": [], "fills": []})
+    day = now[:10]
+    history = [row for row in saved["history"] if row["date"] != day] + [{"date": day, "equity": float(account.equity)}]
+    known = {row["id"] for row in saved["fills"]}
+    fresh = [{"id": str(order.id), "time_utc": str(order.filled_at)[:19].replace(" ", "T") + "Z", "side": crypto.text(order.side),
+              "qty": float(order.filled_qty), "price": float(order.filled_avg_price)}
+             for order in reversed(journal.recent_orders(trading))
+             if str(order.id) not in known and crypto.text(order.status) == "filled"]
+    _write_json("realtime.json", {"updated_utc": now, "equity": float(account.equity), "history": history[-MAX_HISTORY_DAYS:],
+                                  "fills": (saved["fills"] + fresh)[-MAX_REALTIME_FILLS:]})
 
 
 def _update(log_file, day_start, exit_code, error_text, dry_run, orders):
@@ -279,7 +354,7 @@ def _update(log_file, day_start, exit_code, error_text, dry_run, orders):
         equity = previous.get("equity")
 
     status = build_status(now, exit_code, error_text, dry_run, market_open,
-                          equity, start_equity, todays_rows)
+                          equity, start_equity, todays_rows, orders)
     figures = account_figures(account, positions)
     for name in ("cash", "buying_power", "invested", "open_pl", "stock_value", "crypto_value"):
         status[name] = figures.get(name, previous.get(name))
@@ -291,12 +366,21 @@ def _update(log_file, day_start, exit_code, error_text, dry_run, orders):
     _write_json("trades.json", trade_rows(log_rows))
     _write_json("runs.json", add_run(_read_json("runs.json", []), now,
                                      status["last_run"]["status"], orders))
+    working = {}
+    if not dry_run:
+        try:
+            working = update_journal(log_rows, now[:10])
+            update_realtime(now)
+        except (Exception, SystemExit) as error:
+            print("⚠️  Trade journal not updated:", notifier.redact(error))
     if positions is not None:
-        rows = position_rows(positions)
+        rows = position_rows(positions, working)
+        summary = sleeves.summary(rows)
         _write_json("positions.json", rows)
-        _write_json("sleeves.json", sleeves.summary(rows))
+        _write_json("sleeves.json", summary)
         _write_json("equity_history.json",
                     add_equity_point(_read_json("equity_history.json", []), now, equity))
+        _write_json("history.json", add_history(_read_json("history.json", []), now[:10], equity, status["cash"], summary))
     print("Dashboard data written to docs/data/")
 
 

@@ -21,8 +21,8 @@ SYMBOLS = ["SPY", "QQQ", "AAPL", "MSFT", "JPM"]
 
 # Crypto pairs, written the way Alpaca orders them. See the crypto backtest with
 # python backtest.py --crypto. Crypto needs the every-day schedule in the workflow
-# file, because it never closes. Set this to False to stop all crypto activity.
-CRYPTO_ENABLED = True
+# file, because it never closes. False stops all crypto activity, and the code stays.
+CRYPTO_ENABLED = False
 CRYPTO_SYMBOLS = ["BTC/USD", "ETH/USD"]
 
 
@@ -108,17 +108,26 @@ MAX_OPEN_POSITIONS = {"stock": 12, "crypto": 6}
 # ---------------------------------------------------------------------------
 STRATEGY_MODE = "sleeves"          # "sleeves", or "crossover" for the old strategy
 ENABLE_RSI2_STOCKS = True          # short-term: RSI(2) pullback on stocks
+ENABLE_IBS_ETFS = True             # short-term: IBS mean reversion on index and sector funds
+ENABLE_TURN_OF_MONTH = True        # short-term: hold IVV over the turn of the month
 ENABLE_CRYPTO_TREND = False        # short-term: trend following on crypto
+ENABLE_ROTATION = True             # medium-term: asset-class rotation
 ENABLE_MOMENTUM_STOCKS = True      # long-term: 12-1 momentum on stocks
 ENABLE_CRYPTO_HOLD = False         # long-term: BTC and ETH above their 200-day average
 
-SHORT_TERM_ALLOCATION = 0.80       # share of equity for the two short-term sleeves
-LONG_TERM_ALLOCATION = 0.20        # share of equity for the two long-term sleeves
+# Each horizon is split equally among its enabled sleeves. Unused money stays in cash.
+SHORT_ALLOCATION = 0.60            # holds of 1 to 5 trading days
+MEDIUM_ALLOCATION = 0.20           # weeks to months
+LONG_ALLOCATION = 0.20             # months
+HORIZONS = {"SHORT": SHORT_ALLOCATION, "MEDIUM": MEDIUM_ALLOCATION, "LONG": LONG_ALLOCATION}
 SLEEVES = {                        # listed in priority order for the daily entry cap
-    "rsi2_stocks": {"horizon": "SHORT", "market": "stock", "allocation": 0.50},
-    "crypto_trend": {"horizon": "SHORT", "market": "crypto", "allocation": 0.30},
-    "momentum_stocks": {"horizon": "LONG", "market": "stock", "allocation": 0.15},
-    "crypto_hold": {"horizon": "LONG", "market": "crypto", "allocation": 0.05},
+    "turn_of_month": {"horizon": "SHORT", "market": "stock"},      # one trade a month, so it goes first
+    "ibs_etfs": {"horizon": "SHORT", "market": "stock"},
+    "rsi2_stocks": {"horizon": "SHORT", "market": "stock"},
+    "crypto_trend": {"horizon": "SHORT", "market": "crypto"},
+    "rotation": {"horizon": "MEDIUM", "market": "stock"},
+    "momentum_stocks": {"horizon": "LONG", "market": "stock"},
+    "crypto_hold": {"horizon": "LONG", "market": "crypto"},
 }
 SLEEVE_MAX_OPEN_POSITIONS = {"stock": 20, "crypto": 10}   # used only in sleeves mode
 RISK_PER_TRADE = 0.005             # hitting a stop loses at most 0.5% of equity
@@ -139,11 +148,49 @@ MOMENTUM_LOOKBACK_DAYS = 252       # 12 months
 MOMENTUM_SKIP_DAYS = 21            # leave out the most recent month
 MOMENTUM_MARKET_SYMBOL = "SPY"
 
+# IBS mean reversion (Pagonidis 2013): where the day's close sits in the day's range.
+IBS_SYMBOLS = UNIVERSE_ALWAYS_INCLUDE
+IBS_ENTRY_BELOW = 0.2
+IBS_EXIT_ABOVE = 0.8
+IBS_MAX_HOLD_DAYS = 5
+
+# Turn of the month: buy at the open of the month's last trading day, sell at the open of
+# the new month's 4th. IVV trades only here, so no other sleeve may hold it.
+TURN_OF_MONTH_SYMBOL = "IVV"
+TURN_OF_MONTH_SELL_DAY = 4
+ONLY_FOR_TURN_OF_MONTH = [TURN_OF_MONTH_SYMBOL]
+
+# Asset-class rotation (Faber 2010). Ranked on the first trading day of each month.
+ROTATION_SYMBOLS = ["SPY", "QQQ", "IWM", "EFA", "EEM", "VNQ", "DBC", "GLD", "IEF", "TLT"]
+ROTATION_TOP_N = 3
+ROTATION_LOOKBACK_DAYS = [21, 63, 126, 252]     # 1, 3, 6 and 12 months
+
+# Volatility-scaled momentum (Barroso & Santa-Clara 2015). Never above 1.0, so no leverage.
+MOMENTUM_VOL_TARGET = 0.12
+MOMENTUM_VOL_DAYS = 126
+
+# Volatility-based position size: the inverse of each symbol's 20-day volatility.
+VOL_SIZING_DAYS = 20
+
+# The three choices the A/B test decides. quant_lab.py reports the winners, and they are
+# written here by hand. The challenger needs a clear win, see strategies.ab_winner.
+STOP_EXECUTION = "alpaca"          # "alpaca": a stop order waits at Alpaca. "check": the 15-minute check
+VOL_SCALED_MOMENTUM = False        # False: plain 12-1 momentum. True: volatility-scaled
+VOL_SIZING = False                 # False: the current sizing. True: inverse-volatility sizing
+AB_MIN_SHARPE_GAIN = 0.10          # the challenger's out-of-sample Sharpe must beat this much
+AB_MAX_DRAWDOWN_LOSS = 0.02        # and its max drawdown may be at most this much worse
+
+FRACTIONAL_SHARES = True           # buy parts of a share where Alpaca allows it
+PRE_OPEN_MINUTES = 30              # the day's orders queue this close to the open, to fill at it
+
 
 # ---------------------------------------------------------------------------
-# Optional AI analyst (Stage 3). OFF unless you change this to True.
+# Optional AI analyst. Set USE_AI_ANALYST to False to stop asking it.
 # ---------------------------------------------------------------------------
-USE_AI_ANALYST = False
+USE_AI_ANALYST = True
+# "shadow": Gemini logs its decision and reason but can't block a trade.
+# "enforce": a veto blocks the trade.
+AI_VETO_MODE = "shadow"
 GEMINI_MODEL = "gemini-3.8-flash"
 # Only the top candidates are looked at each day, sells first and then the most
 # traded buys. That caps Gemini at 10 calls a day. Google doesn't publish the free
@@ -170,4 +217,21 @@ def get_alpaca_keys():
         print("   Run this from inside your trading-bot folder, and check that .env contains")
         print("   ALPACA_API_KEY=... and ALPACA_SECRET_KEY=... (no spaces, no quotes).")
         sys.exit(1)
+    require_paper_key(api_key)
     return api_key, secret_key
+
+
+def require_paper_key(api_key):
+    """Alpaca's live keys start with AK and its paper keys with PK. A live key stops the bot here."""
+    if api_key.startswith("AK"):
+        print("❌ This is a LIVE Alpaca key. This bot is paper only, so it will not run.")
+        sys.exit(1)
+
+
+def require_paper_account(trading, account):
+    """Stop unless the client talks to Alpaca's paper server and the account is a paper one."""
+    url = str(getattr(getattr(trading, "_base_url", None), "value", getattr(trading, "_base_url", "")))
+    number = str(getattr(account, "account_number", ""))
+    if "paper-api" not in url or not number.startswith("PA"):
+        print("❌ This isn't an Alpaca paper account. This bot is paper only, so it will not run.")
+        sys.exit(1)
