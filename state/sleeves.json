@@ -1,40 +1,71 @@
 {
-  "closed_pl": {},
+  "closed_pl": {
+    "rsi2_stocks": -13.62
+  },
   "days": {
     "crypto": "2026-11-02",
-    "stock": "2026-11-02"
+    "stock": "2026-11-03"
   },
   "momentum": {
-    "month": "2026-10",
+    "month": "2026-11",
     "stopped": [],
     "targets": [
       "AXTI",
       "SNDK",
-      "MRNA",
       "TXG",
+      "MRNA",
       "TWST",
       "LITE",
       "MU",
-      "STX",
+      "DELL",
       "RVMD",
-      "DELL"
+      "AAOI"
     ]
   },
   "positions": {
+    "DIA": {
+      "entry_date": "2026-11-03",
+      "sleeve": "ibs_etfs",
+      "stop": 481.4889
+    },
+    "IWM": {
+      "entry_date": "2026-11-03",
+      "sleeve": "ibs_etfs",
+      "stop": 260.0094
+    },
     "MSFT": {
       "entry_date": "2026-11-02",
       "sleeve": "rsi2_stocks",
       "stop": 487.9152
     },
-    "NVDA": {
-      "entry_date": "2026-11-02",
+    "MU": {
+      "entry_date": "2026-11-03",
       "sleeve": "rsi2_stocks",
-      "stop": 193.0401
+      "stop": 804.0315
     },
     "QQQ": {
       "entry_date": "2026-11-02",
       "sleeve": "rsi2_stocks",
       "stop": 645.5409
+    },
+    "XLE": {
+      "entry_date": "2026-11-03",
+      "sleeve": "ibs_etfs",
+      "stop": 62.031
+    },
+    "XLK": {
+      "entry_date": "2026-11-03",
+      "sleeve": "ibs_etfs",
+      "stop": 162.0618
     }
+  },
+  "rotation": {
+    "month": "2026-11",
+    "stopped": [],
+    "targets": [
+      "DBC",
+      "VNQ",
+      "EFA"
+    ]
   }
 }

@@ -1,23 +1,50 @@
 {
   "mode": "sleeves",
+  "horizons": {
+    "SHORT": 0.6,
+    "MEDIUM": 0.2,
+    "LONG": 0.2
+  },
   "sleeves": [
+    {
+      "name": "turn_of_month",
+      "horizon": "SHORT",
+      "market": "stock",
+      "allocation": 0.19999999999999998,
+      "enabled": true,
+      "positions": 0,
+      "value": 0,
+      "open_pl": 0,
+      "closed_pl": 0.0
+    },
+    {
+      "name": "ibs_etfs",
+      "horizon": "SHORT",
+      "market": "stock",
+      "allocation": 0.19999999999999998,
+      "enabled": true,
+      "positions": 0,
+      "value": 0,
+      "open_pl": 0,
+      "closed_pl": 0.0
+    },
     {
       "name": "rsi2_stocks",
       "horizon": "SHORT",
       "market": "stock",
-      "allocation": 0.5,
+      "allocation": 0.19999999999999998,
       "enabled": true,
-      "positions": 3,
-      "value": 14201.25,
-      "open_pl": -366.84,
-      "closed_pl": 0.0
+      "positions": 2,
+      "value": 9364.75,
+      "open_pl": -218.12,
+      "closed_pl": -13.62
     },
     {
-      "name": "crypto_trend",
-      "horizon": "SHORT",
-      "market": "crypto",
-      "allocation": 0.3,
-      "enabled": false,
+      "name": "rotation",
+      "horizon": "MEDIUM",
+      "market": "stock",
+      "allocation": 0.2,
+      "enabled": true,
       "positions": 0,
       "value": 0,
       "open_pl": 0,
@@ -27,19 +54,8 @@
       "name": "momentum_stocks",
       "horizon": "LONG",
       "market": "stock",
-      "allocation": 0.15,
+      "allocation": 0.2,
       "enabled": true,
-      "positions": 0,
-      "value": 0,
-      "open_pl": 0,
-      "closed_pl": 0.0
-    },
-    {
-      "name": "crypto_hold",
-      "horizon": "LONG",
-      "market": "crypto",
-      "allocation": 0.05,
-      "enabled": false,
       "positions": 0,
       "value": 0,
       "open_pl": 0,

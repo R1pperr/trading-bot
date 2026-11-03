@@ -1,1 +1,80 @@
-{"rows": [], "warned": {}}
+{
+  "rows": [
+    {
+      "sleeve": "turn_of_month",
+      "trades": 0,
+      "status": "waiting",
+      "expectancy": null,
+      "win_rate": null,
+      "limits": {
+        "expectancy_low": -0.00416,
+        "expectancy_high": 0.00224,
+        "win_low": 0.55,
+        "win_high": 0.65,
+        "trades": 39
+      },
+      "problems": []
+    },
+    {
+      "sleeve": "ibs_etfs",
+      "trades": 0,
+      "status": "waiting",
+      "expectancy": null,
+      "win_rate": null,
+      "limits": {
+        "expectancy_low": -0.00948,
+        "expectancy_high": 0.0089,
+        "win_low": 0.3,
+        "win_high": 0.85,
+        "trades": 957
+      },
+      "problems": []
+    },
+    {
+      "sleeve": "rsi2_stocks",
+      "trades": 0,
+      "status": "waiting",
+      "expectancy": null,
+      "win_rate": null,
+      "limits": {
+        "expectancy_low": -0.02297,
+        "expectancy_high": 0.02713,
+        "win_low": 0.35,
+        "win_high": 0.85,
+        "trades": 1672
+      },
+      "problems": []
+    },
+    {
+      "sleeve": "rotation",
+      "trades": 0,
+      "status": "waiting",
+      "expectancy": null,
+      "win_rate": null,
+      "limits": {
+        "expectancy_low": 0.02717,
+        "expectancy_high": 0.07157,
+        "win_low": 0.55,
+        "win_high": 0.665,
+        "trades": 34
+      },
+      "problems": []
+    },
+    {
+      "sleeve": "momentum_stocks",
+      "trades": 0,
+      "status": "waiting",
+      "expectancy": null,
+      "win_rate": null,
+      "limits": {
+        "expectancy_low": -0.041,
+        "expectancy_high": 0.35678,
+        "win_low": 0.0775,
+        "win_high": 0.45,
+        "trades": 191
+      },
+      "problems": []
+    }
+  ],
+  "warned": {}
+}
