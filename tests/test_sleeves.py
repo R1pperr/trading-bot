@@ -126,6 +126,8 @@ class SleeveCase(unittest.TestCase):
         self.start(mock.patch.object(sleeves, "STATE_FILE", os.path.join(self.folder, "state", "sleeves.json")))
         self.start(mock.patch.object(config, "USE_AI_ANALYST", False))
         self.start(mock.patch.object(config, "USE_ATR_STOPS", False))
+        self.start(mock.patch.object(config, "STOP_EXECUTION", "check"))     # stops at Alpaca have their own tests
+        self.start(mock.patch.object(config, "AI_VETO_MODE", "enforce"))
         for flag in ALL_FLAGS:
             self.start(mock.patch.object(config, flag, False))
         self.events, self.plans = [], []
@@ -362,10 +364,11 @@ class SizingTests(SleeveCase):
         self.assertEqual(risk.risk_sized_dollars(100_000, 100, 100, room=1_000), 0)
 
     def test_sleeves_split_their_share_into_slots(self):
-        self.assertAlmostEqual(sleeves.entry_room("momentum_stocks", 100_000, 0), 1_500)
-        self.assertAlmostEqual(sleeves.entry_room("crypto_trend", 100_000, 0), 3_750)
-        self.assertAlmostEqual(sleeves.entry_room("crypto_hold", 100_000, 0), 2_500)
-        self.assertAlmostEqual(sleeves.entry_room("rsi2_stocks", 100_000, 49_000), 1_000)
+        self.enable("ENABLE_MOMENTUM_STOCKS", "ENABLE_CRYPTO_TREND", "ENABLE_CRYPTO_HOLD", "ENABLE_RSI2_STOCKS")
+        self.assertAlmostEqual(sleeves.entry_room("momentum_stocks", 100_000, 0), 1_000)       # 10% over 10 slots
+        self.assertAlmostEqual(sleeves.entry_room("crypto_trend", 100_000, 0), 3_750)          # 30% over 8 slots
+        self.assertAlmostEqual(sleeves.entry_room("crypto_hold", 100_000, 0), 5_000)           # 10% over 2 slots
+        self.assertAlmostEqual(sleeves.entry_room("rsi2_stocks", 100_000, 29_000), 1_000)      # 30% less what it holds
 
     def test_stocks_buy_whole_shares_and_crypto_buys_fractions(self):
         self.assertEqual(sleeves.units(9.99, "stock"), 9)
@@ -458,7 +461,7 @@ class AllocationTests(SleeveCase):
 
     def test_buys_in_the_same_run_count_against_the_sleeve_share(self):
         self.enable("ENABLE_RSI2_STOCKS")
-        with mock.patch.dict(config.SLEEVES["rsi2_stocks"], {"allocation": 0.06}):
+        with mock.patch.dict(config.HORIZONS, {"SHORT": 0.06}):
             self.go("stock", self.tables())
         self.assertLessEqual(self.spent(), 6_000)
         self.assertEqual(len(self.trading.buys()), 2)
@@ -466,7 +469,7 @@ class AllocationTests(SleeveCase):
     def test_what_the_sleeve_already_holds_counts_too(self):
         self.enable("ENABLE_RSI2_STOCKS")
         self.own(HELD="rsi2_stocks")
-        held = fake_position("HELD", qty=460, entry=100, price=100)        # $46,000 of the $50,000 share
+        held = fake_position("HELD", qty=560, entry=100, price=100)        # $56,000 of the $60,000 share
         tables = {**self.tables(), "HELD": stock_bars([100.0] * 300)}
         self.go("stock", tables, FakeTrading([held]))
         self.assertLessEqual(self.spent(), 4_000)
@@ -884,20 +887,17 @@ class DashboardTests(SleeveCase):
         sleeves.save_state(state)
         rows = [{"sleeve": "rsi2_stocks", "market_value": 1000.0, "unrealized_pl": 40.0}]
         summary = {row["name"]: row for row in sleeves.summary(rows)["sleeves"]}
-        self.assertAlmostEqual(sum(row["allocation"] for row in summary.values()), 1.0)
+        self.assertAlmostEqual(summary["momentum_stocks"]["allocation"], config.LONG_ALLOCATION)
+        self.assertEqual(summary["rsi2_stocks"]["allocation"], 0.0)       # a sleeve that's off gets no share
         self.assertEqual((summary["rsi2_stocks"]["open_pl"], summary["rsi2_stocks"]["closed_pl"]), (40.0, 12.5))
         self.assertFalse(summary["rsi2_stocks"]["enabled"])
         self.assertTrue(summary["momentum_stocks"]["enabled"])
 
 
 class SettingsTests(unittest.TestCase):
-    def test_shares_add_up_and_match_the_short_and_long_split(self):
-        shares = config.SLEEVES
-        self.assertAlmostEqual(sum(s["allocation"] for s in shares.values()), 1.0)
-        self.assertAlmostEqual(sum(s["allocation"] for s in shares.values() if s["horizon"] == "SHORT"),
-                               config.SHORT_TERM_ALLOCATION)
-        self.assertAlmostEqual(sum(s["allocation"] for s in shares.values() if s["horizon"] == "LONG"),
-                               config.LONG_TERM_ALLOCATION)
+    def test_the_three_horizons_share_the_whole_account(self):
+        self.assertEqual((config.SHORT_ALLOCATION, config.MEDIUM_ALLOCATION, config.LONG_ALLOCATION), (0.60, 0.20, 0.20))
+        self.assertAlmostEqual(sum(config.HORIZONS.values()), 1.0)
 
     def test_short_term_sleeves_come_first(self):
         horizons = [s["horizon"] for s in config.SLEEVES.values()]
@@ -933,14 +933,14 @@ class MarketHoursTests(unittest.TestCase):
         return market_hours.should_run(self.at(when), by_hand, settings or self.SLEEVES_ONLY, state or self.NOTHING_HELD)
 
     def test_winter_hours(self):       # New York is UTC-5 on Monday 2 November 2026
-        self.assertFalse(self.decide("2026-11-02T14:19:00"))
-        self.assertTrue(self.decide("2026-11-02T14:20:00"))
+        self.assertFalse(self.decide("2026-11-02T14:04:00"))
+        self.assertTrue(self.decide("2026-11-02T14:05:00"))
         self.assertTrue(self.decide("2026-11-02T21:59:00"))
         self.assertFalse(self.decide("2026-11-02T22:00:00"))
 
     def test_summer_hours(self):       # New York is UTC-4 on Monday 15 June 2026
-        self.assertFalse(self.decide("2026-06-15T13:19:00"))
-        self.assertTrue(self.decide("2026-06-15T13:20:00"))
+        self.assertFalse(self.decide("2026-06-15T13:04:00"))
+        self.assertTrue(self.decide("2026-06-15T13:05:00"))
         self.assertTrue(self.decide("2026-06-15T20:59:00"))
         self.assertFalse(self.decide("2026-06-15T21:00:00"))
 
@@ -1066,6 +1066,8 @@ class BotWiringTests(unittest.TestCase):
                         mock.patch.object(dashboard, "DATA_DIR", os.path.join(self.folder, "data")),
                         mock.patch.object(config, "get_alpaca_keys", return_value=("fake", "fake")),
                         mock.patch.object(config, "CRYPTO_ENABLED", True),
+                        mock.patch.object(config, "require_paper_account"),
+                        mock.patch.object(dashboard, "fetch_orders", return_value=([], {})),
                         mock.patch.object(bot, "summary_due", return_value=False),
                         mock.patch.object(bot, "get_daily_bars", return_value={}),
                         mock.patch.object(universe, "rows", return_value=[]),

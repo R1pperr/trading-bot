@@ -36,6 +36,7 @@ class DashboardTests(unittest.TestCase):
         for patcher in (mock.patch.object(dashboard, "DATA_DIR", os.path.join(self.folder, "data")),
                         mock.patch.object(dashboard, "fetch_account",
                                           return_value=(ACCOUNT, [POSITION], True)),
+                        mock.patch.object(dashboard, "fetch_orders", return_value=([], {})),
                         mock.patch.object(config, "SYMBOLS", ["SPY", "NEW"]),
                         mock.patch.object(config, "CRYPTO_ENABLED", False)):
             patcher.start()
@@ -79,7 +80,8 @@ class DashboardTests(unittest.TestCase):
         position = self.load("positions.json")[0]
         self.assertEqual(set(position), {"symbol", "asset_class", "sleeve", "qty", "avg_entry_price",
                                          "current_price", "market_value", "unrealized_pl",
-                                         "unrealized_pl_pct", "change_today_pct", "stop_price"})
+                                         "unrealized_pl_pct", "change_today_pct", "stop_price",
+                                         "entry_date", "stop_at_alpaca"})
         self.assertEqual(position["asset_class"], "stock")
         self.assertEqual(position["unrealized_pl"], 70.0)
         self.assertEqual(position["stop_price"], 651.0)
@@ -199,7 +201,9 @@ class DashboardTests(unittest.TestCase):
         dashboard.save_candidates("stock", {"found": 11, "candidates": [
             {"ai_decision": "APPROVE"}, {"ai_decision": "VETO"}, {"ai_decision": "VETO"}]})
         self.assertIn("Stock candidates: 11 found, 1 approved, 2 vetoed", dashboard.summary_text(0))
-        self.assertIn("Crypto candidates: 0 found, 0 approved, 0 vetoed", dashboard.summary_text(0))
+        self.assertNotIn("Crypto", dashboard.summary_text(0).split("\n", 1)[1])     # crypto is off here
+        with mock.patch.object(config, "CRYPTO_ENABLED", True):
+            self.assertIn("Crypto candidates: 0 found, 0 approved, 0 vetoed", dashboard.summary_text(0))
 
     def test_summary_text_reads_the_files_just_written(self):
         self.update()

@@ -124,6 +124,7 @@ class RefreshTests(unittest.TestCase):
         self.addCleanup(shutil.rmtree, self.folder)
         for patcher in (mock.patch.object(universe, "FOLDER", self.folder),
                         mock.patch.dict(os.environ, {"TELEGRAM_BOT_TOKEN": "1:FAKE", "TELEGRAM_CHAT_ID": "42"}),
+                        mock.patch.object(config, "CRYPTO_ENABLED", True),
                         mock.patch.object(config, "get_alpaca_keys", return_value=("fake", "fake"))):
             patcher.start()
             self.addCleanup(patcher.stop)
@@ -257,6 +258,9 @@ class CachedRunTests(unittest.TestCase):
         self.start(mock.patch.object(bot, "LOG_FILE", os.path.join(self.folder, "log.csv")))
         self.start(mock.patch.object(dashboard, "DATA_DIR", os.path.join(self.folder, "data")))
         self.start(mock.patch.object(config, "get_alpaca_keys", return_value=("fake", "fake")))
+        self.start(mock.patch.object(dashboard, "fetch_orders", return_value=([], {})))
+        self.start(mock.patch.object(config, "require_paper_account"))
+        self.start(mock.patch.object(config, "AI_VETO_MODE", "enforce"))
         self.start(mock.patch.object(config, "USE_AI_ANALYST", True))
         self.start(mock.patch.object(config, "CRYPTO_ENABLED", True))
         self.start(mock.patch.object(config, "STRATEGY_MODE", "crossover"))

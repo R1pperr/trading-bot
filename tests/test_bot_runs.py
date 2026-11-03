@@ -76,6 +76,9 @@ class BotRunTests(unittest.TestCase):
         self.start(mock.patch.object(dashboard, "DATA_DIR", os.path.join(self.folder, "data")))
         self.start(mock.patch.object(config, "get_alpaca_keys", return_value=("fake", "fake")))
         self.start(mock.patch.object(config, "SYMBOLS", ["SPY"]))
+        self.start(mock.patch.object(dashboard, "fetch_orders", return_value=([], {})))
+        self.start(mock.patch.object(config, "require_paper_account"))
+        self.start(mock.patch.object(config, "AI_VETO_MODE", "enforce"))
         self.start(mock.patch.object(config, "USE_AI_ANALYST", False))
         self.start(mock.patch.object(config, "CRYPTO_ENABLED", False))   # these tests are about stocks
         self.start(mock.patch.object(config, "STRATEGY_MODE", "crossover"))
