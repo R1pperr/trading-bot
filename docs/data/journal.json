@@ -21,19 +21,68 @@
       "day": "2026-11-02",
       "order_id": "644c2bff-9814-4bfe-97e0-c67731fd2b13"
     },
-    "NVDA": {
-      "qty": 24.0,
-      "cost": 4985.22,
+    "XLE": {
+      "qty": 74.783838,
+      "cost": 5002.420150292064,
+      "sleeve": "ibs_etfs",
+      "day": "2026-11-03",
+      "order_id": "60ce0eb0-4388-4302-859b-d6e2940cb830"
+    },
+    "MU": {
+      "qty": 5.76957,
+      "cost": 4994.17157656113,
       "sleeve": "rsi2_stocks",
-      "day": "2026-11-02",
-      "order_id": "80c07080-87e5-4da9-b4f3-e91883cfc002"
+      "day": "2026-11-03",
+      "order_id": "ceb18052-ba8f-4e48-ac69-6f766f3f05bd"
+    },
+    "XLK": {
+      "qty": 28.624365,
+      "cost": 5019.359659911135,
+      "sleeve": "ibs_etfs",
+      "day": "2026-11-03",
+      "order_id": "591429b0-c4ef-4bf2-b625-fd05f78c1506"
+    },
+    "DIA": {
+      "qty": 9.634523,
+      "cost": 4980.071681596352,
+      "sleeve": "ibs_etfs",
+      "day": "2026-11-03",
+      "order_id": "eeabcf27-b7fd-40e7-be37-67ad7d2ace09"
+    },
+    "IWM": {
+      "qty": 17.84134,
+      "cost": 4987.668524717559,
+      "sleeve": "ibs_etfs",
+      "day": "2026-11-03",
+      "order_id": "4253ae0c-45b2-4b40-b8bc-b27065389dc9"
     }
   },
   "seen": [
     "c867d4b3-c87f-4d15-be97-745db56ed27c",
     "6da36f10-1a02-42f6-937d-280b6153c0f6",
     "644c2bff-9814-4bfe-97e0-c67731fd2b13",
-    "80c07080-87e5-4da9-b4f3-e91883cfc002"
+    "80c07080-87e5-4da9-b4f3-e91883cfc002",
+    "60ce0eb0-4388-4302-859b-d6e2940cb830",
+    "ceb18052-ba8f-4e48-ac69-6f766f3f05bd",
+    "591429b0-c4ef-4bf2-b625-fd05f78c1506",
+    "eeabcf27-b7fd-40e7-be37-67ad7d2ace09",
+    "4253ae0c-45b2-4b40-b8bc-b27065389dc9",
+    "8d1ef485-890a-4d66-a926-408094b5be73"
   ],
-  "trades": []
+  "trades": [
+    {
+      "symbol": "NVDA",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-02",
+      "exit_day": "2026-11-03",
+      "days": 1,
+      "qty": 24.0,
+      "entry": 207.7175,
+      "exit": 208.0433,
+      "pnl": 7.82,
+      "ret": 0.00157,
+      "stop": false,
+      "entry_order": "80c07080-87e5-4da9-b4f3-e91883cfc002"
+    }
+  ]
 }

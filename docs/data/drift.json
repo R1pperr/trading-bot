@@ -32,7 +32,7 @@
     },
     {
       "sleeve": "rsi2_stocks",
-      "trades": 0,
+      "trades": 1,
       "status": "waiting",
       "expectancy": null,
       "win_rate": null,
