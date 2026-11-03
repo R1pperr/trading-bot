@@ -4,12 +4,13 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#061A22">
-  <!-- The browser may load this site's files, the chart library and fonts from jsDelivr, and
-       TradingView's stock chart. Nothing else, so this page can't contact Alpaca or Gemini. -->
-  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; font-src https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self'; frame-src https://www.tradingview-widget.com https://s.tradingview.com; base-uri 'none'; form-action 'none'">
+  <!-- The browser may load this site's files, the chart libraries and fonts from jsDelivr,
+       TradingView's stock chart, and your own Cloudflare Worker. Nothing else, so this page
+       can't contact Alpaca or Gemini. -->
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' https://cdn.jsdelivr.net https://s3.tradingview.com; style-src 'self' 'unsafe-inline'; font-src https://cdn.jsdelivr.net; img-src 'self' data:; connect-src 'self' https://*.workers.dev; frame-src https://www.tradingview-widget.com https://s.tradingview.com; base-uri 'none'; form-action 'none'">
   <title>Tach Trading Bot</title>
   <link rel="icon" href="data:,">
-  <link rel="stylesheet" href="style.css?v=2">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <div class="scene" aria-hidden="true">
@@ -24,14 +25,19 @@
       <a class="brand" href="#/">Tach Trading Bot</a>
       <p class="paper">Paper account, simulated money</p>
     </div>
-    <nav class="gear" aria-label="Pages">
-      <span id="gear-thumb" class="gear-thumb" aria-hidden="true"></span>
-      <a href="#/" data-page="overview">Overview</a>
-      <a href="#/strategy" data-page="strategy">Strategy</a>
-      <a href="#/stocks" data-page="stocks">Stocks</a>
-      <a href="#/crypto" data-page="crypto">Crypto</a>
-      <a href="#/trades" data-page="trades">Trades</a>
-    </nav>
+    <div class="masthead-tools">
+      <button type="button" id="theme-toggle" class="theme-toggle">Light</button>
+      <nav class="gear" aria-label="Pages">
+        <span id="gear-thumb" class="gear-thumb" aria-hidden="true"></span>
+        <a href="#/" data-page="live">Live</a>
+        <a href="#/overview" data-page="overview">Overview</a>
+        <a href="#/strategy" data-page="strategy">Strategy</a>
+        <a href="#/stocks" data-page="stocks">Stocks</a>
+        <a id="nav-crypto" href="#/crypto" data-page="crypto" hidden>Crypto</a>
+        <a href="#/trades" data-page="trades">Trades</a>
+        <a href="#/lab" data-page="lab">Lab</a>
+      </nav>
+    </div>
   </header>
 
   <p id="stale-warning" class="warning" role="status" hidden>
@@ -44,8 +50,44 @@
 
   <footer class="foot">
     <p>Updated after each bot run. This page holds no keys and never contacts Alpaca or Gemini.
-    Stock and crypto charts come from TradingView.</p>
+    The Live page reads your own Cloudflare Worker. Charts use TradingView Lightweight Charts and Apache ECharts.</p>
   </footer>
+
+  <template id="live-page">
+    <h1 class="page-title">Live</h1>
+    <p id="live-intro" class="page-intro"></p>
+    <p id="live-flag" class="flag" hidden>Experimental: failed backtest</p>
+    <dl class="pods live-pods">
+      <div class="pod"><dt>Position</dt><dd id="live-position">–</dd></div>
+      <div class="pod"><dt>Today's profit or loss</dt><dd id="live-pl">–</dd></div>
+      <div class="pod"><dt>Mode</dt><dd id="live-mode">–</dd></div>
+      <div class="pod"><dt>Updated</dt><dd id="live-updated">–</dd></div>
+    </dl>
+    <section class="panel">
+      <div class="block-head">
+        <h2 id="live-title">SPY today</h2>
+        <span id="live-market" class="chip">–</span>
+      </div>
+      <div id="live-chart" class="lw-chart is-tall"></div>
+      <div id="live-lock" class="lock" hidden>
+        <p>Prices stay private, because Alpaca's data can't be published. Enter your viewer code to see the chart on this device.</p>
+        <div class="lock-row">
+          <input id="viewer-code" type="password" autocomplete="off" aria-label="Viewer code" placeholder="Viewer code">
+          <button type="button" id="viewer-save">Show prices</button>
+        </div>
+        <p id="viewer-note" class="note"></p>
+      </div>
+      <p id="live-legend" class="chart-legend"></p>
+    </section>
+    <section class="panel">
+      <h2>Today's fills</h2>
+      <div id="live-fills"></div>
+    </section>
+    <section class="panel">
+      <h2>The engine's rules</h2>
+      <ul id="live-rules" class="house-rules"></ul>
+    </section>
+  </template>
 
   <template id="overview-page">
     <section id="cockpit" class="cockpit" aria-label="Account summary">
@@ -112,6 +154,53 @@
     </div>
 
     <section class="panel">
+      <h2>Horizons</h2>
+      <div id="horizon-cards" class="horizon-cards"></div>
+    </section>
+
+    <section class="panel">
+      <div class="block-head">
+        <h2>Account against SPY</h2>
+        <div id="compare-ranges" class="choices" role="group" aria-label="Time range">
+          <button type="button" data-range="7">1W</button>
+          <button type="button" data-range="31">1M</button>
+          <button type="button" data-range="92">3M</button>
+          <button type="button" data-range="ytd">YTD</button>
+          <button type="button" data-range="all" aria-pressed="true">All</button>
+        </div>
+      </div>
+      <p id="compare-note" class="note">Both start at 100.</p>
+      <div id="compare-chart" class="lw-chart"></div>
+      <h3>How far below its peak</h3>
+      <div id="underwater-chart" class="lw-chart is-short"></div>
+      <p id="compare-legend" class="chart-legend"></p>
+    </section>
+
+    <section class="panel">
+      <h2>Where the money sat</h2>
+      <div id="exposure-chart" class="e-chart is-squat"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Profit by sleeve</h2>
+      <p class="note">Tap a name to hide or show its line.</p>
+      <div id="sleeve-chart" class="e-chart is-squat"></div>
+    </section>
+
+    <div class="split even">
+      <section class="panel">
+        <h2>Monthly returns</h2>
+        <div id="monthly-chart" class="e-chart is-squat"></div>
+      </section>
+      <section class="panel">
+        <h2>Rolling 63-day Sharpe</h2>
+        <div id="rolling-sharpe" class="e-chart is-short"></div>
+        <h3>Rolling 63-day volatility</h3>
+        <div id="rolling-vol" class="e-chart is-short"></div>
+      </section>
+    </div>
+
+    <section class="panel">
       <div class="block-head">
         <h2>Strategies</h2>
         <a class="more" href="#/strategy">How they work</a>
@@ -155,6 +244,21 @@
     </section>
     <div id="sleeve-cards" class="sleeve-cards"></div>
     <section class="panel">
+      <h2>Live against the backtest</h2>
+      <p class="note">After 20 finished trades, each sleeve is compared with its out-of-sample range. This only warns, and it never changes anything.</p>
+      <div id="drift-panel"></div>
+    </section>
+    <section class="panel">
+      <h2>AI shadow scoreboard</h2>
+      <p id="shadow-note" class="note"></p>
+      <div id="shadow-panel"></div>
+    </section>
+    <section class="panel">
+      <h2>How the sleeves move together</h2>
+      <p class="note">Simulated daily returns, out-of-sample. Near 0 means they rarely move together, which is what you want.</p>
+      <div id="correlation-chart" class="e-chart"></div>
+    </section>
+    <section class="panel">
       <h2>Rules that always apply</h2>
       <ul id="house-rules" class="house-rules"></ul>
     </section>
@@ -187,10 +291,65 @@
       <button type="button" data-filter="sell">Sells</button>
       <button type="button" data-filter="veto">AI vetoes</button>
     </div>
+    <section class="panel">
+      <h2>How finished trades turned out</h2>
+      <dl id="trade-stats" class="stat-row"></dl>
+      <div class="split even" style="margin-top: 0">
+        <div><h3>Profit or loss per trade</h3><div id="pl-histogram" class="e-chart is-short"></div></div>
+        <div><h3>Days held</h3><div id="days-histogram" class="e-chart is-short"></div></div>
+      </div>
+    </section>
     <section class="panel"><div id="all-trades"></div></section>
   </template>
 
+  <template id="lab-page">
+    <h1 class="page-title">Backtest lab</h1>
+    <p class="flag">Simulated history, not real trading</p>
+    <p id="lab-intro" class="page-intro"></p>
+    <section class="panel">
+      <h2>Out-of-sample curves</h2>
+      <p id="lab-curve-note" class="note">All start at 100.</p>
+      <div id="lab-curves" class="lw-chart is-tall"></div>
+      <p id="lab-legend" class="chart-legend"></p>
+    </section>
+    <section class="panel">
+      <div class="block-head">
+        <h2>The numbers</h2>
+        <div id="lab-period" class="choices" role="group" aria-label="Period">
+          <button type="button" data-period="out_of_sample" aria-pressed="true">Out-of-sample</button>
+          <button type="button" data-period="in_sample">In-sample</button>
+        </div>
+      </div>
+      <div id="lab-table"></div>
+    </section>
+    <section class="panel">
+      <h2>A/B tests</h2>
+      <p class="note">The challenger wins only with a Sharpe at least 0.10 higher and a max drawdown no more than 2 points worse, on out-of-sample results.</p>
+      <div id="lab-ab"></div>
+    </section>
+    <section class="panel">
+      <h2>Monte Carlo</h2>
+      <p class="note">Each sleeve's out-of-sample trades, shuffled 1,000 times. This shows how deep the worst drop could have been with the same trades in a different order.</p>
+      <div id="lab-carlo"></div>
+    </section>
+    <section class="panel">
+      <h2>Robustness</h2>
+      <p class="note">Nearby settings, as a report only. The live bot never moves to the best-looking one.</p>
+      <div id="lab-grid"></div>
+    </section>
+    <section class="panel">
+      <h2>Signals skipped in the mix</h2>
+      <div id="lab-skips"></div>
+    </section>
+    <section class="panel">
+      <h2>Real-time engine</h2>
+      <p id="lab-rt-note" class="note"></p>
+      <div id="lab-rt"></div>
+    </section>
+  </template>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.5.1/dist/chart.umd.min.js" integrity="sha384-jb8JQMbMoBUzgWatfe6COACi2ljcDdZQ2OxczGA3bGNeWe+6DChMTBJemed7ZnvJ" crossorigin="anonymous"></script>
-  <script src="app.js?v=2"></script>
+  <script src="charts.js?v=3"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

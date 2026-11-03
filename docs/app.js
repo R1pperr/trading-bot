@@ -1,6 +1,8 @@
 // Tach Trading Bot dashboard. It reads the JSON files in data/ that the bot writes after each
-// run, and shows stock price charts from TradingView. It talks to nothing else. All text goes
-// in through textContent, so words from the trade log or the AI can only appear as plain text.
+// run, shows stock price charts from TradingView, and reads your own Cloudflare Worker for the
+// Live page. It talks to nothing else. Prices only load with your viewer code, which stays on
+// this device. All text goes in through textContent, so words from the trade log or the AI can
+// only appear as plain text.
 // Everything that moves is written here or in style.css, and all of it stops for anyone who
 // has asked their device to reduce motion.
 "use strict";
@@ -33,8 +35,41 @@
     runs: "runs",
     candidates: "candidates",
     sleeves: "sleeves",
+    daily: "history",
+    journal: "journal",
+    drift: "drift",
+    shadow: "ai_shadow",
+    realtime: "realtime",
+    site: "site",
   };
   const SLEEVES = {
+    turn_of_month: {
+      name: "Turn of the month",
+      summary: "Holds IVV over the few days around each new month.",
+      rules: [
+        "Buys IVV at the open of the month's last trading day.",
+        "Sells at the open of the new month's 4th trading day.",
+        "IVV trades only here, so no other sleeve can hold it.",
+      ],
+    },
+    ibs_etfs: {
+      name: "IBS funds",
+      summary: "Buys an index or sector fund after a weak close, then sells the bounce.",
+      rules: [
+        "IBS shows where the close sat in the day's range, from 0 to 1.",
+        "Buys when IBS is under 0.2.",
+        "Sells when IBS is over 0.8, or after 5 trading days.",
+      ],
+    },
+    rotation: {
+      name: "Asset rotation",
+      summary: "Holds the strongest of ten asset classes, re-ranked every month.",
+      rules: [
+        "Ranks stocks, bonds, gold, property and commodities by their 1, 3, 6 and 12-month returns.",
+        "Holds the top 3 equally, on the first trading day of each month.",
+        "A pick below its 200-day average leaves its slot in cash.",
+      ],
+    },
     rsi2_stocks: {
       name: "RSI(2) stocks",
       summary: "Buys a strong stock after a sharp dip, then sells the bounce a few days later.",
@@ -71,12 +106,24 @@
       ],
     },
   };
-  const PAGES = ["overview", "strategy", "stocks", "crypto", "trades"];
+  const PAGES = ["live", "overview", "strategy", "stocks", "crypto", "trades", "lab"];
   const REFRESH_MS = 60000;
+  const LIVE_MS = 60000;
+  const SPY_DAYS = 4200;
+  const HORIZON_NAMES = { SHORT: "Short", MEDIUM: "Medium", LONG: "Long" };
+  const ENGINE_RULES = [
+    "Trades SPY in its own separate paper account, so it never touches the main bot.",
+    "Buys when EMA(9) crosses above EMA(21), and sells when it crosses back below. Long only.",
+    "Each trade is 25% of the account, in whole shares.",
+    "A protective stop waits at Alpaca, 2% below the entry.",
+    "At most 20 entries a day, and none once the account is down 2% on the day.",
+    "No new entries after 15:45 New York time, and flat by 15:55.",
+  ];
 
   const data = {
     status: null, positions: [], trades: [], history: [], runs: [], candidates: {},
     sleeves: { mode: "", sleeves: [] },
+    daily: [], journal: { trades: [] }, drift: { rows: [] }, shadow: null, realtime: { history: [], fills: [] }, site: {},
   };
   const root = document.documentElement;
   const view = document.getElementById("view");
@@ -88,6 +135,51 @@
   let currentPage = "";
   let ignited = false;
   let reveal = null;
+  let backtest = null;
+  let viewerCode = stored("tach-viewer-code");
+  let unlocked = false;
+  let liveStatus = null;
+  let liveTimer = 0;
+  let liveClock = 0;
+  let spyBars = null;
+
+  // ------------------------------------------------------------------------
+  // Remembered on this device only. Storage can be blocked, so nothing depends on it.
+  // ------------------------------------------------------------------------
+  function stored(name) {
+    try {
+      return localStorage.getItem(name) || "";
+    } catch {
+      return "";
+    }
+  }
+
+  function remember(name, value) {
+    try {
+      localStorage.setItem(name, value);
+    } catch {
+      // the setting just lasts for this visit
+    }
+  }
+
+  function setTheme(name) {
+    root.dataset.theme = name;
+    const button = byId("theme-toggle");
+    button.textContent = name === "dark" ? "Light" : "Dark";
+    button.setAttribute("aria-label", `Switch to the ${name === "dark" ? "light" : "dark"} theme`);
+  }
+
+  function startTheme() {
+    const preferred = matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+    setTheme(stored("tach-theme") || preferred);
+    byId("theme-toggle").addEventListener("click", () => {
+      const next = root.dataset.theme === "dark" ? "light" : "dark";
+      remember("tach-theme", next);
+      setTheme(next);
+      setMood();
+      route(false, true);
+    });
+  }
 
   // ------------------------------------------------------------------------
   // Small helpers
@@ -103,6 +195,10 @@
   const plural = (number, word) => `${number} ${word}${number === 1 ? "" : "s"}`;
   const wholePercent = (value) => `${Math.round(value * 100)}%`;
   const sleeveName = (name) => (SLEEVES[name] ? SLEEVES[name].name : "Old strategy");
+  const onePercent = (value) => (hasNumber(value) ? signed(`${(value * 100).toFixed(1)}%`, value).replace("-", "−") : "–");
+  const plainPercent = (value) => (hasNumber(value) ? `${(value * 100).toFixed(1)}%`.replace("-", "−") : "–");
+  const decimal = (value) => (hasNumber(value) ? value.toFixed(2).replace("-", "−") : "–");
+  const workerUrl = () => (data.site.worker_url || "").replace(/\/$/, "");
 
   function element(tag, className, text) {
     const node = document.createElement(tag);
@@ -232,6 +328,7 @@
     root.style.setProperty("--mood", color(name));
     road.color = color(name);
     road.pace = status.market_open ? 1.5 : 0.85;   // it idles while the market sleeps
+    road.warm = color("--amber");
   }
 
   // Tunnel lights rushing past. They idle on their own, and surge when the page moves.
@@ -280,7 +377,7 @@
         const cos = Math.cos(streak.angle);
         const sin = Math.sin(streak.angle);
         context.globalAlpha = Math.min(0.72, streak.depth * 0.95);
-        context.strokeStyle = sin < 0 ? "#ffb238" : road.color;
+        context.strokeStyle = sin < 0 ? road.warm : road.color;
         context.lineWidth = streak.weight * (0.5 + streak.depth * 1.6);
         context.beginPath();
         context.moveTo(centerX + cos * distance, centerY + sin * distance * 0.62);
@@ -661,7 +758,7 @@
     const market = status.market_open ? "The US market is open" : "The US market is closed";
     const holding = count ? `the bot holds ${plural(count, "position")} worth ${money(status.invested)}`
       : "the bot holds nothing right now";
-    let next = status.market_open ? "It checks every stop on each run." : "It looks for new buys on the first run after the next open.";
+    let next = status.market_open ? "It checks every stop on each run." : "It looks for new buys shortly before the next open.";
     if ((status.kill_switch || {}).on) next = "The kill switch is on, so there are no new buys today.";
     return `${market} and ${holding}. ${next}`;
   }
@@ -897,7 +994,8 @@
       { name: "Stocks", value: status.stock_value, className: "is-stock" },
       { name: "Crypto", value: status.crypto_value, className: "is-crypto" },
       { name: "Cash", value: status.cash, className: "is-cash" },
-    ].map((part) => ({ ...part, value: hasNumber(part.value) ? Math.max(0, part.value) : 0 }));
+    ].map((part) => ({ ...part, value: hasNumber(part.value) ? Math.max(0, part.value) : 0 }))
+      .filter((part) => part.name !== "Crypto" || status.crypto_enabled || part.value > 0);
     const total = parts.reduce((sum, part) => sum + part.value, 0);
     const share = (part) => (total ? (part.value / total) * 100 : 0);
 
@@ -925,7 +1023,7 @@
   // The whole account as one bar, each sleeve sized by its share and filled by what it uses.
   function renderBank() {
     const holder = byId("bank");
-    const rows = data.sleeves.sleeves;
+    const rows = data.sleeves.sleeves.filter((row) => row.enabled);
     if (!holder) return;
     if (!rows.length) return show(holder, "Sleeve numbers appear after the next run.");
     const equity = (data.status || {}).equity || 0;
@@ -971,7 +1069,7 @@
     renderBank();
     show(byId("sleeves"), rows.length ? buildTable([
       { title: "Sleeve", value: (s) => sleeveName(s.name) },
-      { title: "Term", value: (s) => (s.horizon === "SHORT" ? "Short" : "Long") },
+      { title: "Term", value: (s) => HORIZON_NAMES[s.horizon] || s.horizon },
       { title: "Status", value: (s) => (s.enabled ? "On" : "Off"), chip: (s) => (s.enabled ? "chip-on" : "") },
       { title: "Share", value: (s) => wholePercent(s.allocation), numeric: true },
       { title: "Positions", value: (s) => s.positions, numeric: true },
@@ -1040,7 +1138,8 @@
 
   function renderTabs() {
     renderMarketTab();
-    const tabs = [...document.querySelectorAll('[role="tab"]')];
+    byId("tab-crypto").hidden = !(data.status || {}).crypto_enabled;
+    const tabs = [...document.querySelectorAll('[role="tab"]')].filter((tab) => !tab.hidden);
     const panel = byId("market-panel");
     const choose = (tab) => {
       root.style.setProperty("--dir", tab.dataset.market === "crypto" ? "1" : "-1");
@@ -1102,6 +1201,8 @@
     renderSleeves();
     renderTabs();
     renderRuns();
+    renderHorizons();
+    renderAccountCharts();
   }
 
   // ------------------------------------------------------------------------
@@ -1122,7 +1223,7 @@
       group.append(element("dt", "", term), element("dd", className || "", detail));
       figures.append(group);
     };
-    figure(row.horizon === "SHORT" ? "Short-term share" : "Long-term share", wholePercent(row.allocation));
+    figure(`${HORIZON_NAMES[row.horizon] || ""}-term share`, row.enabled ? wholePercent(row.allocation) : "Off");
     figure("Positions", String(row.positions));
     figure("Open profit or loss", signed(money(row.open_pl), row.open_pl), tone(row.open_pl));
     figure("Closed profit or loss", signed(money(row.closed_pl), row.closed_pl), tone(row.closed_pl));
@@ -1152,6 +1253,9 @@
       "A symbol belongs to one sleeve at a time, and never trades twice in a day.",
       "Long only, with no shorting and no borrowed money.",
     ].map((rule) => element("li", "", rule)));
+    renderDrift();
+    renderShadow();
+    renderCorrelation();
   }
 
   // ------------------------------------------------------------------------
@@ -1286,7 +1390,7 @@
       fact(facts, "Stop-loss sells at", money(position.stop_price));
     }
 
-    mountPriceChart(byId("stock-chart"), symbol);
+    mountPositionChart(symbol, position);
     const trades = data.trades.filter((trade) => trade.symbol === symbol);
     show(byId("stock-trades"), trades.length ? tradeTable(trades, false, market) : "The bot hasn't traded this yet.");
   }
@@ -1314,6 +1418,513 @@
       pressOnly(button);
       render(button.dataset.filter);
     });
+    renderTradeAnalytics();
+  }
+
+  // ------------------------------------------------------------------------
+  // Your Worker. Prices only come back with your viewer code, and this asks once whether it's right.
+  // ------------------------------------------------------------------------
+  async function workerGet(path) {
+    const headers = viewerCode ? { "x-viewer-code": viewerCode } : {};
+    const response = await fetch(`${workerUrl()}${path}`, { headers, cache: "no-store" });
+    if (!response.ok) throw new Error(`${response.status}`);
+    return response.json();
+  }
+
+  async function checkViewerCode() {
+    if (!workerUrl()) return;
+    try {
+      liveStatus = await workerGet("/status");
+      unlocked = !liveStatus.locked;
+    } catch {
+      unlocked = false;
+    }
+  }
+
+  async function pricesFor(symbol, days) {
+    if (!unlocked) return [];
+    const body = await workerGet(`/prices?symbol=${encodeURIComponent(symbol)}&days=${days}`);
+    return body.bars || [];
+  }
+
+  async function spyDaily() {
+    if (!unlocked) return [];
+    if (!spyBars) {
+      spyBars = pricesFor("SPY", SPY_DAYS).then((bars) => bars.map((bar) => ({
+        time: new Date(bar.t).toISOString().slice(0, 10), value: bar.c,
+      }))).catch(() => []);
+    }
+    return spyBars;
+  }
+
+  function empty(id, text) {
+    const holder = typeof id === "string" ? byId(id) : id;
+    if (holder) holder.replaceChildren(element("p", "chart-empty", text));
+  }
+
+  // ------------------------------------------------------------------------
+  // Live page
+  // ------------------------------------------------------------------------
+  function stopLive() {
+    clearTimeout(liveTimer);
+    clearInterval(liveClock);
+    liveTimer = 0;
+    liveClock = 0;
+  }
+
+  function agoSeconds(ms) {
+    const seconds = Math.max(0, Math.round((Date.now() - ms) / 1000));
+    return seconds < 120 ? `${seconds}s ago` : agoText(new Date(ms).toISOString());
+  }
+
+  function renderLive() {
+    const status = liveStatus;
+    const saved = data.realtime || {};
+    const mode = status ? status.mode : "not running";
+    const experimental = status ? status.experimental : Boolean(backtest && backtest.realtime && backtest.realtime.experimental);
+    byId("live-flag").hidden = !experimental;
+    setText("live-mode", mode === "live" ? "Live (paper)" : mode === "dry" ? "Dry run" : mode === "off" ? "Off" : "Not running");
+    const lock = byId("live-lock");
+    const box = byId("live-chart");
+    if (!workerUrl()) {
+      setText("live-intro", "This page will follow the real-time engine, which checks SPY every minute in its own paper account. It isn't running yet.");
+      setText("live-position", "–");
+      setText("live-pl", "–");
+      setText("live-updated", saved.updated_utc ? timeText(saved.updated_utc) : "–");
+      setText("live-market", "Engine not running");
+      empty(box, "The chart appears here once the engine is deployed.");
+      return;
+    }
+    if (!status) {
+      setText("live-market", "Can't reach the engine");
+      empty(box, "The engine didn't answer. This page tries again in a minute.");
+      return;
+    }
+    setText("live-intro", `The real-time engine checks SPY on ${status.timeframe === "1Min" ? "1-minute" : "5-minute"} bars in its own paper account.`);
+    setText("live-title", `SPY today, ${status.timeframe === "1Min" ? "1-minute" : "5-minute"} bars`);
+    const position = status.position;
+    setText("live-position", position ? `${shares(position.qty)} SPY at ${money(position.avgEntry)}` : "No position");
+    setText("live-pl", `${signed(money(status.pl_today), status.pl_today)} (${percent(status.pl_today_pct)})`, tone(status.pl_today));
+    setText("live-market", status.market_open ? "Market open" : "Market closed");
+    byId("live-market").className = `chip ${status.market_open ? "chip-up" : ""}`;
+    lock.hidden = unlocked;
+    box.hidden = !unlocked;
+    const legend = byId("live-legend");
+    legend.hidden = !unlocked;
+    const fills = status.fills || [];
+    show(byId("live-fills"), fills.length ? buildTable([
+      { title: "Time", value: (fill) => timeText(fill.t) },
+      { title: "Side", value: (fill) => fill.side.toUpperCase(), chip: (fill) => (fill.side === "buy" ? "chip-up" : "chip-down") },
+      { title: "Shares", value: (fill) => shares(fill.qty), numeric: true },
+      { title: "Price", value: (fill) => money(fill.price), numeric: true },
+    ], fills) : "No fills today.");
+    if (unlocked) {
+      legend.dataset.resting = "EMA(21): green while EMA(9) is above it, red otherwise. ▲▼ mark real fills.";
+      legend.textContent = legend.dataset.resting;
+      if ((status.bars || []).length) {
+        window.TachCharts.clear();
+        window.TachCharts.liveChart(box, status, legend).catch(() => empty(box, "The chart library didn't load."));
+      } else {
+        empty(box, status.market_open ? "The first bar of the day finishes soon." : "Market closed");
+      }
+    }
+  }
+
+  function tickLive() {
+    if (liveStatus && byId("live-updated")) setText("live-updated", agoSeconds(liveStatus.updated_ms));
+  }
+
+  async function pollLive() {
+    if (currentPage !== "live" || !workerUrl()) return;
+    try {
+      liveStatus = await workerGet("/status");
+      unlocked = !liveStatus.locked;
+    } catch {
+      liveStatus = null;
+    }
+    if (currentPage !== "live" || !byId("live-chart")) return;
+    renderLive();
+    tickLive();
+    if (liveStatus && liveStatus.market_open) liveTimer = setTimeout(pollLive, LIVE_MS);
+  }
+
+  function showLive() {
+    byId("live-rules").replaceChildren(...ENGINE_RULES.map((rule) => element("li", "", rule)));
+    show(byId("live-fills"), "No fills today.");
+    byId("viewer-save").addEventListener("click", async () => {
+      viewerCode = byId("viewer-code").value.trim();
+      await checkViewerCode();
+      if (unlocked) remember("tach-viewer-code", viewerCode);
+      setText("viewer-note", unlocked ? "" : "That code didn't work.");
+      spyBars = null;
+      stopLive();
+      pollLive();
+    });
+    renderLive();
+    tickLive();
+    liveClock = setInterval(tickLive, 1000);
+    if (workerUrl()) liveTimer = setTimeout(pollLive, liveStatus ? (liveStatus.market_open ? 0 : LIVE_MS) : 0);
+  }
+
+  // ------------------------------------------------------------------------
+  // Account charts
+  // ------------------------------------------------------------------------
+  function renderHorizons() {
+    const rows = data.sleeves.sleeves;
+    const caps = data.sleeves.horizons || { SHORT: 0.6, MEDIUM: 0.2, LONG: 0.2 };
+    const equity = (data.status || {}).equity || 0;
+    byId("horizon-cards").replaceChildren(...Object.keys(HORIZON_NAMES).map((horizon) => {
+      const mine = rows.filter((row) => row.horizon === horizon);
+      const held = mine.reduce((sum, row) => sum + row.value, 0);
+      const made = mine.reduce((sum, row) => sum + row.open_pl + row.closed_pl, 0);
+      const count = mine.reduce((sum, row) => sum + row.positions, 0);
+      const on = mine.filter((row) => row.enabled).map((row) => sleeveName(row.name));
+      const share = equity ? held / equity : 0;
+      const cap = caps[horizon] || 0;
+      const card = element("article", "horizon-card");
+      card.append(element("h3", "", HORIZON_NAMES[horizon]));
+      const meter = element("div", "horizon-meter");
+      const fill = element("i");
+      fill.style.width = `${cap ? clamp(share / cap, 0, 1) * 100 : 0}%`;
+      meter.append(fill);
+      meter.setAttribute("role", "img");
+      meter.setAttribute("aria-label", `${plainPercent(share)} used of a ${wholePercent(cap)} cap`);
+      card.append(meter, element("p", "note", `${plainPercent(share)} of the account, cap ${wholePercent(cap)}`));
+      const figures = element("dl");
+      const add = (term, detail, className) => {
+        const group = element("div");
+        group.append(element("dt", "", term), element("dd", className || "", detail));
+        figures.append(group);
+      };
+      add("Profit or loss", signed(money(made), made), tone(made));
+      add("Open positions", String(count));
+      card.append(figures, element("p", "horizon-on", on.length ? `On: ${on.join(", ")}` : "No sleeves on"));
+      return card;
+    }));
+  }
+
+  // One account value per day, from the daily file and the older run-by-run file.
+  function dailyEquity() {
+    const days = new Map();
+    for (const point of data.history) days.set(point.time_utc.slice(0, 10), point.equity);
+    for (const row of data.daily) if (hasNumber(row.equity)) days.set(row.date, row.equity);
+    return [...days].sort(([a], [b]) => (a < b ? -1 : 1)).map(([time, value]) => ({ time, value }));
+  }
+
+  function inRange(points, range) {
+    if (range === "all" || !points.length) return points;
+    const newest = new Date(`${points[points.length - 1].time}T12:00:00Z`);
+    const first = range === "ytd" ? `${newest.getUTCFullYear()}-01-01`
+      : new Date(newest.getTime() - Number(range) * 86400000).toISOString().slice(0, 10);
+    return points.filter((point) => point.time >= first);
+  }
+
+  function drawCompare(range) {
+    const account = inRange(dailyEquity(), range);
+    window.TachCharts.whenNear(byId("compare-chart"), async () => {
+      const spy = inRange(await spyDaily(), range);
+      setText("compare-note", unlocked ? "Both start at 100."
+        : "Your account, from 100. Enter your viewer code on the Live page to add SPY.");
+      await window.TachCharts.equityVsSpy(byId("compare-chart"), byId("underwater-chart"), byId("compare-legend"), account, spy);
+    });
+  }
+
+  function monthlyReturns(points) {
+    const ends = new Map();
+    for (const point of points) ends.set(point.time.slice(0, 7), point.value);
+    const months = [...ends.keys()];
+    return months.map((month, i) => {
+      const before = i ? ends.get(months[i - 1]) : points[0].value;
+      return { month, value: ends.get(month) / before - 1 };
+    });
+  }
+
+  function drawMonthly(points) {
+    const holder = byId("monthly-chart");
+    if (points.length < 2) return empty(holder, "This fills in after two days of results.");
+    const rows = monthlyReturns(points);
+    const years = [...new Set(rows.map((row) => row.month.slice(0, 4)))].sort().reverse();
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const cells = rows.map((row) => [Number(row.month.slice(5)) - 1, years.indexOf(row.month.slice(0, 4)), Math.round(row.value * 10000) / 100]);
+    const widest = Math.max(...cells.map((cell) => Math.abs(cell[2])), 0.5);
+    const shortMonths = innerWidth < 761 ? months.map((name) => name[0]) : months;
+    window.TachCharts.whenNear(holder, () => window.TachCharts.heatmap(holder, shortMonths, years, cells, [-widest, widest], (value) => `${value.toFixed(1)}%`));
+    return undefined;
+  }
+
+  function rollingFigures(points, window_) {
+    const returns = points.slice(1).map((point, i) => point.value / points[i].value - 1);
+    const rows = [];
+    for (let end = window_; end <= returns.length; end += 1) {
+      const part = returns.slice(end - window_, end);
+      const mean = part.reduce((sum, value) => sum + value, 0) / window_;
+      const spread = Math.sqrt(part.reduce((sum, value) => sum + (value - mean) ** 2, 0) / (window_ - 1));
+      rows.push({ time: points[end].time, sharpe: spread ? (mean / spread) * Math.sqrt(252) : 0, vol: spread * Math.sqrt(252) });
+    }
+    return rows;
+  }
+
+  function drawRolling(points) {
+    const rows = rollingFigures(points, 63);
+    if (!rows.length) {
+      const text = `This needs 64 trading days of results, and there ${points.length === 1 ? "is 1" : `are ${points.length}`} so far.`;
+      empty("rolling-sharpe", text);
+      empty("rolling-vol", text);
+      return;
+    }
+    const days = rows.map((row) => row.time);
+    const round = (value) => Math.round(value * 100) / 100;
+    window.TachCharts.whenNear(byId("rolling-sharpe"), () => window.TachCharts.lineChart(
+      byId("rolling-sharpe"), days, rows.map((row) => round(row.sharpe)), "Sharpe", (value) => Number(value).toFixed(2)));
+    window.TachCharts.whenNear(byId("rolling-vol"), () => window.TachCharts.lineChart(
+      byId("rolling-vol"), days, rows.map((row) => round(row.vol * 100)), "Volatility", (value) => `${Number(value).toFixed(1)}%`));
+  }
+
+  function renderAccountCharts() {
+    const points = dailyEquity();
+    if (points.length < 2) {
+      for (const id of ["compare-chart", "underwater-chart"]) empty(id, "This fills in after two days of results.");
+    } else {
+      drawCompare("all");
+      byId("compare-ranges").addEventListener("click", (event) => {
+        const button = event.target.closest("button");
+        if (!button) return;
+        pressOnly(button);
+        window.TachCharts.clear();
+        drawCompare(button.dataset.range === "all" || button.dataset.range === "ytd" ? button.dataset.range : Number(button.dataset.range));
+        redrawBelowCompare();
+      });
+    }
+    redrawBelowCompare();
+  }
+
+  function redrawBelowCompare() {
+    const points = dailyEquity();
+    if (data.daily.length) {
+      window.TachCharts.whenNear(byId("exposure-chart"), () => window.TachCharts.exposure(byId("exposure-chart"), data.daily));
+      window.TachCharts.whenNear(byId("sleeve-chart"), () => window.TachCharts.sleeveCurves(byId("sleeve-chart"), data.daily, sleeveName));
+    } else {
+      empty("exposure-chart", "This fills in after the next bot run.");
+      empty("sleeve-chart", "This fills in after the next bot run.");
+    }
+    drawMonthly(points);
+    drawRolling(points);
+  }
+
+  // ------------------------------------------------------------------------
+  // Trade numbers
+  // ------------------------------------------------------------------------
+  function tradeFigures(trades) {
+    const wins = trades.filter((trade) => trade.pnl > 0).map((trade) => trade.pnl);
+    const losses = trades.filter((trade) => trade.pnl <= 0).map((trade) => trade.pnl);
+    const sum = (values) => values.reduce((total, value) => total + value, 0);
+    return {
+      expectancy: trades.length ? sum(trades.map((trade) => trade.pnl)) / trades.length : null,
+      averageWin: wins.length ? sum(wins) / wins.length : null,
+      averageLoss: losses.length ? sum(losses) / losses.length : null,
+      profitFactor: losses.length && sum(losses) < 0 ? sum(wins) / -sum(losses) : null,
+    };
+  }
+
+  function renderTradeAnalytics() {
+    const trades = data.journal.trades || [];
+    const figures = tradeFigures(trades);
+    const list = byId("trade-stats");
+    const add = (term, detail, className) => {
+      const group = element("div");
+      group.append(element("dt", "", term), element("dd", className || "", detail));
+      list.append(group);
+    };
+    add("Average per trade", signed(money(figures.expectancy), figures.expectancy), tone(figures.expectancy));
+    add("Profit factor", decimal(figures.profitFactor));
+    add("Average win", money(figures.averageWin), "good");
+    add("Average loss", money(figures.averageLoss), "critical");
+    if (!trades.length) {
+      empty("pl-histogram", "No finished trades yet.");
+      empty("days-histogram", "No finished trades yet.");
+      return;
+    }
+    const whole = (value) => `$${Math.round(value)}`.replace("$-", "−$");
+    window.TachCharts.whenNear(byId("pl-histogram"), () => window.TachCharts.histogram(byId("pl-histogram"), trades.map((trade) => trade.pnl), whole));
+    window.TachCharts.whenNear(byId("days-histogram"), () => window.TachCharts.histogram(byId("days-histogram"), trades.map((trade) => trade.days), (value) => `${Math.round(value)}d`));
+  }
+
+  // ------------------------------------------------------------------------
+  // Live against the backtest, and the AI
+  // ------------------------------------------------------------------------
+  function renderDrift() {
+    const rows = (data.drift || {}).rows || [];
+    const states = { waiting: ["", "Waiting"], ok: ["chip-up", "In range"], outside: ["chip-warn", "Outside range"] };
+    show(byId("drift-panel"), rows.length ? buildTable([
+      { title: "Sleeve", value: (row) => sleeveName(row.sleeve) },
+      { title: "Trades", value: (row) => row.trades, numeric: true },
+      { title: "Status", value: (row) => states[row.status][1], chip: (row) => states[row.status][0] },
+      { title: "Average per trade", value: (row) => percent(row.expectancy), numeric: true },
+      { title: "Tested range", value: (row) => (row.limits ? `${percent(row.limits.expectancy_low)} to ${percent(row.limits.expectancy_high)}` : "–"), numeric: true },
+      { title: "Win rate", value: (row) => plainPercent(row.win_rate), numeric: true },
+      { title: "Tested range", value: (row) => (row.limits ? `${plainPercent(row.limits.win_low)} to ${plainPercent(row.limits.win_high)}` : "–"), numeric: true },
+    ], rows) : "No sleeve has live trades to compare yet.");
+  }
+
+  function renderShadow() {
+    const board = data.shadow;
+    if (!board) return show(byId("shadow-panel"), "Nothing to show yet.");
+    setText("shadow-note", board.mode === "shadow"
+      ? "Gemini only gives its opinion here and can't block a trade. This shows how the trades it would have vetoed actually did."
+      : "Gemini's veto blocks trades right now.");
+    const row = (name, part) => ({ name, ...part });
+    show(byId("shadow-panel"), buildTable([
+      { title: "Trades", value: (item) => item.name },
+      { title: "Finished", value: (item) => item.trades, numeric: true },
+      { title: "Win rate", value: (item) => plainPercent(item.win_rate), numeric: true },
+      { title: "Average per trade", value: (item) => percent(item.expectancy_pct), numeric: true },
+      { title: "Profit or loss", value: (item) => signed(money(item.pnl), item.pnl), numeric: true, tone: (item) => tone(item.pnl) },
+    ], [row("Would have vetoed", board.would_veto), row("Approved", board.approved)]));
+    return undefined;
+  }
+
+  async function needBacktest() {
+    if (backtest) return backtest;
+    try {
+      const response = await fetch(`data/backtest.json?t=${Date.now()}`, { cache: "no-store" });
+      backtest = response.ok ? await response.json() : {};
+    } catch {
+      backtest = {};
+    }
+    return backtest;
+  }
+
+  async function renderCorrelation() {
+    const holder = byId("correlation-chart");
+    const results = await needBacktest();
+    if (!holder || !byId("correlation-chart")) return;
+    const table = results.correlation;
+    if (!table || !table.names) return empty(holder, "This fills in once the backtest has run.");
+    const labels = table.names.map((name) => sleeveName(name).replace("Turn of the month", "Turn").replace("Momentum stocks", "Momentum")
+      .replace("RSI(2) stocks", "RSI(2)").replace("IBS funds", "IBS").replace("Asset rotation", "Rotation"));
+    const cells = table.matrix.flatMap((row, y) => row.map((value, x) => [x, y, value ?? 0]));
+    window.TachCharts.whenNear(holder, () => window.TachCharts.heatmap(holder, labels, labels, cells, [-1, 1], (value) => value.toFixed(2)));
+    return undefined;
+  }
+
+  // ------------------------------------------------------------------------
+  // Position detail
+  // ------------------------------------------------------------------------
+  function mountPositionChart(symbol, position) {
+    const holder = byId("stock-chart");
+    if (!unlocked || marketOf(symbol) !== "stock") return mountPriceChart(holder, symbol);
+    const legend = element("p", "chart-legend");
+    holder.after(legend);
+    const finished = (data.journal.trades || []).filter((trade) => trade.symbol === symbol);
+    const marks = finished.flatMap((trade) => [
+      { time: trade.entry_day, side: "buy", text: "Buy" },
+      { time: trade.exit_day, side: "sell", text: trade.stop ? "Stop" : "Sell" },
+    ]);
+    if (position && position.entry_date) marks.push({ time: position.entry_date, side: "buy", text: "Buy" });
+    pricesFor(symbol, 420).then((bars) => {
+      if (!bars.length) return mountPriceChart(holder, symbol);
+      return window.TachCharts.positionChart(holder, legend, bars, {
+        sleeve: position ? position.sleeve : "", entry: position ? position.avg_entry_price : null, stop: position ? position.stop_price : null, marks,
+      });
+    }).catch(() => mountPriceChart(holder, symbol));
+    return undefined;
+  }
+
+  // ------------------------------------------------------------------------
+  // Backtest lab
+  // ------------------------------------------------------------------------
+  function metricsTable(rows, period) {
+    return buildTable([
+      { title: "", value: (row) => row.name },
+      { title: "Per year", value: (row) => onePercent(row[period].cagr), numeric: true },
+      { title: "Sharpe", value: (row) => decimal(row[period].sharpe), numeric: true },
+      { title: "Sortino", value: (row) => decimal(row[period].sortino), numeric: true },
+      { title: "Worst drop", value: (row) => plainPercent(row[period].max_drawdown), numeric: true },
+      { title: "Average per trade", value: (row) => (hasNumber(row[period].expectancy) ? signed(money(row[period].expectancy), row[period].expectancy) : "–"), numeric: true },
+      { title: "Profit factor", value: (row) => decimal(row[period].profit_factor), numeric: true },
+      { title: "Win rate", value: (row) => plainPercent(row[period].win_rate), numeric: true },
+      { title: "Days held", value: (row) => (hasNumber(row[period].avg_days) ? row[period].avg_days.toFixed(1) : "–"), numeric: true },
+      { title: "Time invested", value: (row) => plainPercent(row[period].time_invested), numeric: true },
+      { title: "Trades", value: (row) => row[period].trades.toLocaleString("en-US"), numeric: true },
+    ], rows);
+  }
+
+  function abCard(test) {
+    const card = element("article", "ab-card");
+    const winner = test[test.winner];
+    const head = element("div", "block-head");
+    head.append(element("h3", "", test.title), element("span", "chip chip-on", `Winner: ${winner.name}`));
+    card.append(head, buildTable([
+      { title: "Version", value: (side) => side.name },
+      { title: "Sharpe", value: (side) => decimal(side.out_of_sample.sharpe), numeric: true },
+      { title: "Worst drop", value: (side) => plainPercent(side.out_of_sample.max_drawdown), numeric: true },
+      { title: "Per year", value: (side) => onePercent(side.out_of_sample.cagr), numeric: true },
+    ], [test.default, test.challenger]));
+    return card;
+  }
+
+  async function showLab() {
+    const results = await needBacktest();
+    if (!byId("lab-table")) return;
+    if (!results.rows) {
+      setText("lab-intro", "The results appear here once the backtest has run.");
+      for (const id of ["lab-curves", "lab-table", "lab-ab", "lab-carlo", "lab-grid", "lab-skips", "lab-rt"]) empty(id, "No results yet.");
+      return;
+    }
+    setText("lab-intro", `${results.symbols} symbols from ${dateText(results.from_day)}, ${results.from_day.slice(0, 4)} to ${dateText(results.to_day)}, ${results.to_day.slice(0, 4)}. Out-of-sample starts ${dateText(results.split_day)}, ${results.split_day.slice(0, 4)}. ${results.notes.slice(1).join(" ")}`);
+    window.TachCharts.whenNear(byId("lab-curves"), async () => {
+      const spy = (await spyDaily()).filter((point) => point.time >= results.split_day);
+      setText("lab-curve-note", spy.length ? "All start at 100." : "All start at 100. Enter your viewer code on the Live page to add SPY.");
+      await window.TachCharts.labCurves(byId("lab-curves"), byId("lab-legend"), results.curves, spy);
+    });
+    const drawTable = (period) => show(byId("lab-table"), metricsTable(results.rows, period));
+    drawTable("out_of_sample");
+    byId("lab-period").addEventListener("click", (event) => {
+      const button = event.target.closest("button");
+      if (!button) return;
+      pressOnly(button);
+      drawTable(button.dataset.period);
+    });
+    const tests = document.createDocumentFragment();
+    tests.append(...results.ab_tests.map(abCard));
+    show(byId("lab-ab"), tests);
+    const carlo = Object.entries(results.monte_carlo).filter(([, row]) => row);
+    show(byId("lab-carlo"), buildTable([
+      { title: "Sleeve", value: ([name]) => sleeveName(name) },
+      { title: "5th percentile, a deep drop", value: ([, row]) => plainPercent(row.p5), numeric: true },
+      { title: "50th percentile, typical", value: ([, row]) => plainPercent(row.p50), numeric: true },
+      { title: "95th percentile, a shallow drop", value: ([, row]) => plainPercent(row.p95), numeric: true },
+      { title: "Trades", value: ([, row]) => row.trades.toLocaleString("en-US"), numeric: true },
+    ], carlo));
+    show(byId("lab-grid"), buildTable([
+      { title: "Sleeve", value: (row) => sleeveName(row.sleeve) },
+      { title: "Setting", value: (row) => (row.standard ? `Standard: ${row.value}` : `${row.setting} ${row.value}`) },
+      { title: "Per year", value: (row) => onePercent(row.cagr), numeric: true },
+      { title: "Sharpe", value: (row) => decimal(row.sharpe), numeric: true },
+      { title: "Worst drop", value: (row) => plainPercent(row.max_drawdown), numeric: true },
+      { title: "Trades", value: (row) => row.trades, numeric: true },
+    ], results.robustness));
+    show(byId("lab-skips"), buildTable([
+      { title: "Sleeve", value: ([name]) => sleeveName(name) },
+      { title: "Trades taken", value: ([, row]) => row.taken.toLocaleString("en-US"), numeric: true },
+      { title: "Another sleeve owned it", value: ([, row]) => row.owned.toLocaleString("en-US"), numeric: true },
+      { title: "Daily limit reached", value: ([, row]) => row.daily_cap.toLocaleString("en-US"), numeric: true },
+    ], Object.entries(results.skipped)));
+    const engine = results.realtime;
+    if (!engine) return empty("lab-rt", "No results yet.");
+    setText("lab-rt-note", `${dateText(engine.from_day)}, ${engine.from_day.slice(0, 4)} to ${dateText(engine.to_day)}, ${engine.to_day.slice(0, 4)}, on the free one-exchange feed. Winner: ${engine.timeframe === "1Min" ? "1-minute" : "5-minute"} bars.${engine.experimental ? " It lost money after costs out-of-sample, so it runs as: Experimental: failed backtest." : ""}`);
+    const rows = [engine.default, engine.challenger, { name: "SPY buy and hold", out_of_sample: engine.spy.out_of_sample }];
+    show(byId("lab-rt"), buildTable([
+      { title: "Out-of-sample", value: (row) => row.name },
+      { title: "Return", value: (row) => onePercent(row.out_of_sample.total_return), numeric: true },
+      { title: "Sharpe", value: (row) => decimal(row.out_of_sample.sharpe), numeric: true },
+      { title: "Worst drop", value: (row) => plainPercent(row.out_of_sample.max_drawdown), numeric: true },
+      { title: "Trades", value: (row) => row.out_of_sample.trades, numeric: true },
+      { title: "Average per trade", value: (row) => (hasNumber(row.out_of_sample.expectancy) ? signed(money(row.out_of_sample.expectancy), row.out_of_sample.expectancy) : "–"), numeric: true },
+      { title: "Whipsaws", value: (row) => row.out_of_sample.whipsaws ?? "–", numeric: true },
+      { title: "Costs", value: (row) => money(row.out_of_sample.costs), numeric: true },
+    ], rows));
+    return undefined;
   }
 
   // ------------------------------------------------------------------------
@@ -1322,6 +1933,8 @@
   function open(templateId, page, quiet) {
     if (chart) chart.destroy();
     chart = null;
+    window.TachCharts.clear();
+    stopLive();
     document.title = "Tach Trading Bot";
     for (const credit of document.querySelectorAll(".chart-credit")) credit.remove();
     view.replaceChildren(document.importNode(byId(templateId).content, true));
@@ -1338,7 +1951,7 @@
   }
 
   function pageOf(parts) {
-    return PAGES.includes(parts[0]) ? parts[0] : "overview";
+    return PAGES.includes(parts[0]) ? parts[0] : "live";
   }
 
   function draw(parts, quiet) {
@@ -1364,9 +1977,15 @@
     } else if (parts[0] === "strategy") {
       open("strategy-page", "strategy", quiet);
       showStrategy();
-    } else {
+    } else if (parts[0] === "overview") {
       open("overview-page", "overview", quiet);
       showOverview();
+    } else if (parts[0] === "lab") {
+      open("lab-page", "lab", quiet);
+      showLab();
+    } else {
+      open("live-page", "live", quiet);
+      showLive();
     }
     watchPanels(quiet);
   }
@@ -1401,6 +2020,7 @@
       if (results[index].status === "fulfilled") data[name] = results[index].value;
     });
     setMood();
+    byId("nav-crypto").hidden = !(data.status || {}).crypto_enabled;
     if (data.status) showStaleWarning(data.status.last_run.time_utc);
   }
 
@@ -1435,13 +2055,15 @@
       renderSleeves();
       renderMarketTab();
       renderRuns();
-    } else {
+    } else if (page !== "live" && page !== "lab") {
       route(false, true);
     }
   }
 
   async function start() {
+    startTheme();
     await loadAll();
+    await checkViewerCode();
     startRoad();
     startPanels();
     route(false, false);
