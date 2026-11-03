@@ -67,6 +67,8 @@ jobs:
         env:
           ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
           ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+          RT_ALPACA_API_KEY: ${{ secrets.RT_ALPACA_API_KEY }}       # the real-time account, only ever read here
+          RT_ALPACA_SECRET_KEY: ${{ secrets.RT_ALPACA_SECRET_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
