@@ -1,0 +1,14 @@
+{
+  "name": "tach-realtime",
+  "private": true,
+  "type": "module",
+  "description": "The real-time paper-trading engine: a Cloudflare Worker that checks SPY every minute.",
+  "scripts": {
+    "test": "node --test test/",
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "4.156.2"
+  }
+}

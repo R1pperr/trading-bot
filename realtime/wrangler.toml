@@ -1,0 +1,16 @@
+# The real-time engine. It trades its own separate Alpaca paper account.
+# Secrets are never written here. You enter them yourself with: npx wrangler secret put NAME
+name = "tach-realtime"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+
+[triggers]
+# Every minute of 13:00 to 20:59 UTC on weekdays. That covers 09:30 to 16:00 New York time in
+# both summer and winter. Each run asks Alpaca's clock and does nothing if the market is closed.
+crons = ["* 13-20 * * MON-FRI"]
+
+[vars]
+RT_MODE = "dry"                 # "off", "dry" or "live". dry logs what it would do and places nothing
+RT_TIMEFRAME = "5Min"           # the A/B winner: "5Min" or "1Min"
+RT_EXPERIMENTAL = "true"        # the out-of-sample backtest lost money after costs, so it says so everywhere
+PAGES_ORIGIN = "https://r1pperr.github.io"
