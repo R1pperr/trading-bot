@@ -136,6 +136,7 @@ class DashboardTests(unittest.TestCase):
             self.assertNotIn("SECRET123", text, name)
             self.assertNotIn("order-abc", text, name)
 
+    @mock.patch.object(config, "AI_VETO_MODE", "enforce")     # only then does a veto block a trade
     def test_only_orders_and_vetoes_are_listed_newest_first(self):
         self.write_log(
             {"time_utc": "2026-11-02 15:00:00", "event": "SIGNAL", "symbol": "SPY"},

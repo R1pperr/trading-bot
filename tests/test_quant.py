@@ -653,6 +653,8 @@ class AiShadowTests(SleeveCase):
         super().setUp()
         self.enable("ENABLE_RSI2_STOCKS")
         config.USE_AI_ANALYST = True
+        self.start(mock.patch.object(ai_analyst, "load_dotenv"))
+        self.start(mock.patch.dict(os.environ, {"GEMINI_API_KEY": "made-up-for-tests"}))
 
     def ask(self, decision, reason):
         return self.start(mock.patch.object(ai_analyst, "_ask_gemini", return_value=(decision, reason)))
@@ -687,6 +689,44 @@ class AiShadowTests(SleeveCase):
         self.start(mock.patch.object(ai_analyst, "_ask_gemini", side_effect=RuntimeError("quota")))
         self.go("stock", self.tables())
         self.assertEqual(self.trading.buys(), [])
+
+    def test_a_shadow_error_never_says_the_trade_was_stopped(self):
+        config.AI_VETO_MODE = "shadow"
+        self.start(mock.patch.object(ai_analyst, "_ask_gemini", side_effect=RuntimeError("quota")))
+        decision, reason = ai_analyst.review("AAA", "BUY", "dip", stock_bars(pullback()))
+        self.assertEqual(decision, ai_analyst.VETO)
+        self.assertIn("trade not blocked", reason)
+        self.assertNotIn("no trade", reason)
+        self.assertFalse(ai_analyst.is_real_veto(decision, reason))
+
+    def test_without_a_key_shadow_mode_doesnt_ask_and_the_trade_goes_ahead(self):
+        config.AI_VETO_MODE = "shadow"
+        os.environ.pop("GEMINI_API_KEY")
+        asked = self.ask(ai_analyst.APPROVE, "Fine")
+        self.go("stock", self.tables())
+        self.assertEqual(len(self.trading.buys()), 1)
+        asked.assert_not_called()
+        order = next(e for e in self.events if e.get("event") == "ORDER")
+        self.assertEqual(order["ai_decision"], ai_analyst.OFF)
+        self.assertFalse(any(e.get("event") == "AI_DECISION" for e in self.events))
+
+    def test_without_a_key_enforce_mode_still_blocks(self):
+        config.AI_VETO_MODE = "enforce"
+        os.environ.pop("GEMINI_API_KEY")
+        self.go("stock", self.tables())
+        self.assertEqual(self.trading.buys(), [])
+
+    def test_the_trades_page_only_shows_vetoes_that_blocked_a_trade(self):
+        veto = {"event": "AI_DECISION", "symbol": "AAA", "time_utc": "2026-11-03 14:31:00", "ai_decision": "VETO",
+                "ai_reason": "Shaky", "details": "sleeve=rsi2_stocks; dip"}
+        order = {"event": "ORDER", "side": "buy", "symbol": "AAA", "time_utc": "2026-11-03 14:31:01",
+                 "ai_decision": "VETO", "ai_reason": "Shaky", "details": "sleeve=rsi2_stocks; dip"}
+        config.AI_VETO_MODE = "shadow"
+        self.assertEqual([row["event"] for row in dashboard.trade_rows([veto, order])], ["ORDER"])
+        self.assertEqual(dashboard.trade_rows([veto]), [])
+        config.AI_VETO_MODE = "enforce"
+        self.assertEqual([row["event"] for row in dashboard.trade_rows([veto])], ["AI_DECISION"])
+        self.assertEqual([row["event"] for row in dashboard.trade_rows([veto, order])], ["ORDER"])
 
     def test_only_a_real_veto_counts_as_one(self):
         self.assertTrue(ai_analyst.is_real_veto(ai_analyst.VETO, "Looks shaky"))
