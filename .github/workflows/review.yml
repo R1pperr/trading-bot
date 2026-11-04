@@ -1,0 +1,69 @@
+name: Daily review
+
+on:
+  schedule:
+    # 21:35 UTC is after the US close all year: 16:35 New York in winter, 17:35 in summer.
+    - cron: "35 21 * * 1-5"
+  workflow_dispatch:   # a "Run workflow" button to run the review by hand
+
+permissions:
+  contents: write      # saves the review pages, the switches and the fix pipeline's state
+  issues: write        # opens a GitHub issue for a bug, with the evidence
+
+concurrency:
+  group: daily-review
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40    # the first older-data test downloads about 10 years of prices
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+
+      - name: Install packages
+        run: pip install -r requirements.txt
+
+      - name: Reuse the saved price history
+        # Older prices for the fix tests, kept between runs. GitHub keeps this cache private.
+        uses: actions/cache@v4
+        with:
+          path: .cache
+          key: review-prices-${{ github.run_id }}
+          restore-keys: review-prices-
+
+      - name: Run the daily review (reads only, places no order)
+        env:
+          ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
+          ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
+          RT_ALPACA_API_KEY: ${{ secrets.RT_ALPACA_API_KEY }}
+          RT_ALPACA_SECRET_KEY: ${{ secrets.RT_ALPACA_SECRET_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: python review.py
+
+      - name: Save the review
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if [ -d docs/data ]; then git add docs/data; fi
+          if [ -d state ]; then git add state; fi
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -m "Daily review"
+          for attempt in 1 2 3 4 5; do
+            if git pull --rebase && git push; then exit 0; fi
+            git rebase --abort 2>/dev/null || true
+            sleep 10
+          done
+          echo "Could not save the review after 5 tries."
+          exit 1

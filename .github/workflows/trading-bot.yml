@@ -12,6 +12,14 @@ on:
         description: "Also send one Telegram test message (places no order)"
         type: boolean
         default: false
+      watchdog_test:
+        description: "Also send a [TEST] watchdog alert for a pretend missed engine run (places no order)"
+        type: boolean
+        default: false
+      ai_test:
+        description: "Also ask Gemini about a made-up example trade, to check the AI works (places no order)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write      # lets the job save the trade log and dashboard data back into the repository
@@ -63,6 +71,21 @@ jobs:
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python notifier.py
 
+      - name: Test the watchdog with a pretend missed run
+        if: inputs.watchdog_test
+        continue-on-error: true   # a test must never stop the bot
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python bot.py --watchdog-test
+
+      - name: Test the AI analyst with a made-up example
+        if: inputs.ai_test
+        continue-on-error: true
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python ai_analyst.py
+
       - name: Run the bot (paper account)
         env:
           ALPACA_API_KEY: ${{ secrets.ALPACA_API_KEY }}
@@ -104,6 +127,16 @@ jobs:
     permissions:
       actions: write
     steps:
+      - name: Keep the schedules alive
+        # GitHub switches off scheduled workflows in a public repository after 60 days without
+        # activity. Enabling them again through the API resets that clock. It never fails the chain.
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for file in trading-bot.yml universe-refresh.yml review.yml; do
+            gh api -X PUT "repos/$GITHUB_REPOSITORY/actions/workflows/$file/enable" >/dev/null 2>&1 || true
+          done
+
       - name: Start the next run
         env:
           GH_TOKEN: ${{ github.token }}
