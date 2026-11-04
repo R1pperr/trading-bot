@@ -581,6 +581,16 @@ test("watchdog test mode sends a [TEST] alert and touches no order, no Alpaca an
   assert.equal(result.report?.reason, "watchdog test");
 });
 
+test("AI test mode asks the main and backup model and touches no order, no Alpaca and no saved state", async () => {
+  const { kv, counts } = fakeKv();
+  const { call, calls } = fakeAlpaca({ gemini: "busy-once" });
+  const result = await quiet(() => scheduledRun(env({ RT_MODE: "live", ...AI, AI_TEST: "example", RT_STATE: kv }), signalEnd(), call));
+  assert.deepEqual(result.report?.messages, ["gemini-3.8-flash: AI error: Gemini said 503", "gemini-3.5-flash: answered APPROVE"]);
+  assert.equal(calls.filter((c) => !c.url.includes("generativelanguage")).length, 0);
+  assert.equal(counts.puts + counts.gets, 0);
+  assert.equal(result.report?.reason, "AI test");
+});
+
 test("the daily loss stop alerts once a day", async () => {
   const { kv } = fakeKv();
   const world = { equity: "97900", lastEquity: "100000" };
