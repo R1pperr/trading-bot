@@ -556,3 +556,34 @@ td a:hover { color: var(--amber); }
   *, *::before, *::after { animation: none !important; transition: none !important; }
   ::view-transition-group(*), ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; }
 }
+
+/* Both bots side by side, the activity feeds, and the Review and Fixes pages */
+.section-title { margin: 34px 0 0; font-size: 22px; font-weight: 600; }
+.bots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 12px; }
+.bot-card { min-width: 0; padding: 16px 18px; border: 1px solid var(--line); border-radius: 14px; background: rgb(var(--glass-2) / .7); }
+.bot-card h3 { margin: 0; font-size: 18px; }
+.bot-sub { margin: 2px 0 10px; color: var(--ink-3); font-size: 13.5px; }
+.bot-facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; margin: 0; }
+.bot-facts dt { color: var(--ink-3); font-size: 13px; }
+.bot-facts dd { margin: 0; font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.bot-alert { margin: 12px 0 0; padding: 8px 12px; border-radius: 10px; background: color-mix(in srgb, var(--down) 14%, transparent);
+  color: var(--down); font-size: 14px; font-weight: 600; }
+.bot-positions { margin-top: 12px; }
+.feeds { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.feeds h3 { margin-top: 6px; }
+.feed { max-height: 420px; margin: 6px 0 0; padding: 0; overflow-y: auto; list-style: none; font-size: 14px; }
+.feed li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 7px 0; border-top: 1px solid var(--line); }
+.feed li:first-child { border-top: 0; }
+.feed time { color: var(--ink-3); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.feed span { overflow-wrap: anywhere; }
+.feed .feed-empty { display: block; color: var(--ink-2); }
+.review-explain { font-size: 16px; line-height: 1.55; max-width: 72ch; }
+.review-facts { margin: 6px 0 0; padding-left: 20px; color: var(--ink-2); font-size: 14.5px; }
+.review-facts li { margin: 3px 0; overflow-wrap: anywhere; }
+.review-splits { margin-top: 14px; }
+.review-splits summary { cursor: pointer; color: var(--sky); font-weight: 600; }
+.review-splits h4 { margin: 14px 0 4px; font-size: 14.5px; color: var(--ink-2); }
+@media (max-width: 760px) {
+  .bots, .feeds { grid-template-columns: 1fr; }
+  .bot-facts dd { font-size: 18px; }
+}

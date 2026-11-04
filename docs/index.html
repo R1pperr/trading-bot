@@ -35,6 +35,8 @@
         <a href="#/stocks" data-page="stocks">Stocks</a>
         <a id="nav-crypto" href="#/crypto" data-page="crypto" hidden>Crypto</a>
         <a href="#/trades" data-page="trades">Trades</a>
+        <a href="#/review" data-page="review">Review</a>
+        <a href="#/fixes" data-page="fixes">Fixes</a>
         <a href="#/lab" data-page="lab">Lab</a>
       </nav>
     </div>
@@ -55,6 +57,53 @@
 
   <template id="live-page">
     <h1 class="page-title">Live</h1>
+    <p class="page-intro">Both bots, side by side. This page checks again every minute while the market is open.</p>
+    <section class="panel" aria-label="Both bots">
+      <div class="block-head">
+        <h2>Both bots</h2>
+        <span id="bots-market" class="chip">–</span>
+      </div>
+      <div class="bots">
+        <article class="bot-card">
+          <h3>Main bot</h3>
+          <p class="bot-sub">Five strategies, a run every 15 minutes</p>
+          <dl class="bot-facts">
+            <div><dt>Account</dt><dd id="bot1-equity">–</dd></div>
+            <div><dt>Today</dt><dd id="bot1-today">–</dd></div>
+            <div><dt>Since the start</dt><dd id="bot1-total">–</dd></div>
+            <div><dt>Last run</dt><dd id="bot1-run">–</dd></div>
+          </dl>
+          <p id="bot1-alert" class="bot-alert" hidden></p>
+          <div id="bot1-positions" class="bot-positions"></div>
+        </article>
+        <article class="bot-card">
+          <h3>Real-time engine</h3>
+          <p class="bot-sub">SPY, checked every minute</p>
+          <dl class="bot-facts">
+            <div><dt>Account</dt><dd id="bot2-equity">–</dd></div>
+            <div><dt>Today</dt><dd id="bot2-today">–</dd></div>
+            <div><dt>Since the start</dt><dd id="bot2-total">–</dd></div>
+            <div><dt>Last run</dt><dd id="bot2-run">–</dd></div>
+          </dl>
+          <p id="bot2-alert" class="bot-alert" hidden></p>
+          <div id="bot2-positions" class="bot-positions"></div>
+        </article>
+      </div>
+    </section>
+    <section class="panel" aria-label="Activity">
+      <h2>What they're doing</h2>
+      <div class="feeds">
+        <div>
+          <h3>Main bot</h3>
+          <ol id="feed-bot1" class="feed"></ol>
+        </div>
+        <div>
+          <h3>Real-time engine</h3>
+          <ol id="feed-bot2" class="feed"></ol>
+        </div>
+      </div>
+    </section>
+    <h2 class="section-title">The real-time engine</h2>
     <p id="live-intro" class="page-intro"></p>
     <p id="live-flag" class="flag" hidden>Experimental: failed backtest</p>
     <dl class="pods live-pods">
@@ -86,6 +135,45 @@
     <section class="panel">
       <h2>The engine's rules</h2>
       <ul id="live-rules" class="house-rules"></ul>
+    </section>
+  </template>
+
+  <template id="review-page">
+    <h1 class="page-title">Review</h1>
+    <p class="page-intro">Every weekday after the close, each strategy looks at its own finished trades: where it wins,
+      where it loses, and what keeps going wrong. Trades that were vetoed or skipped count too, as shadow trades.</p>
+    <p id="review-day" class="note"></p>
+    <section class="panel">
+      <h2>In plain English</h2>
+      <p id="review-explain" class="review-explain"></p>
+    </section>
+    <div id="review-strategies"></div>
+    <section class="panel">
+      <h2>The AI analyst's record</h2>
+      <div id="review-ai"></div>
+    </section>
+    <section class="panel">
+      <h2>Money between strategies</h2>
+      <div id="review-money"></div>
+    </section>
+    <section class="panel">
+      <h2>Bugs found</h2>
+      <div id="review-bugs"></div>
+    </section>
+  </template>
+
+  <template id="fixes-page">
+    <h1 class="page-title">Fixes</h1>
+    <p class="page-intro">A fix goes live only after it passes three tests: the problem shows in at least 10 trades, the fix
+      helps on older data in at least 60% of the years, and it beats the live version over 20 trading days in shadow.
+      If it then does worse, it rolls back by itself. It can never loosen a safety rule.</p>
+    <section class="panel">
+      <h2>Switches</h2>
+      <div id="fixes-switches"></div>
+    </section>
+    <section class="panel">
+      <h2>Every attempt</h2>
+      <div id="fixes-log"></div>
     </section>
   </template>
 

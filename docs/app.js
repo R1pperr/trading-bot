@@ -41,6 +41,10 @@
     shadow: "ai_shadow",
     realtime: "realtime",
     site: "site",
+    activity: "activity",
+    review: "review",
+    fixlog: "fixes",
+    control: "control",
   };
   const SLEEVES = {
     turn_of_month: {
@@ -106,7 +110,7 @@
       ],
     },
   };
-  const PAGES = ["live", "overview", "strategy", "stocks", "crypto", "trades", "lab"];
+  const PAGES = ["live", "overview", "strategy", "stocks", "crypto", "trades", "review", "fixes", "lab"];
   const REFRESH_MS = 60000;
   const LIVE_MS = 60000;
   const SPY_DAYS = 4200;
@@ -1478,6 +1482,8 @@
   }
 
   function renderLive() {
+    renderBoth();
+    renderFeeds();
     const status = liveStatus;
     const saved = data.realtime || {};
     const mode = status ? status.mode : "not running";
@@ -1532,6 +1538,9 @@
 
   function tickLive() {
     if (liveStatus && byId("live-updated")) setText("live-updated", agoSeconds(liveStatus.updated_ms));
+    for (const prefix of ["bot1", "bot2"]) {
+      if (botRuns[prefix] && byId(`${prefix}-run`)) setText(`${prefix}-run`, agoSeconds(botRuns[prefix]));
+    }
   }
 
   async function pollLive() {
@@ -1542,6 +1551,7 @@
     } catch {
       liveStatus = null;
     }
+    await refreshMainBotFiles();
     if (currentPage !== "live" || !byId("live-chart")) return;
     renderLive();
     tickLive();
@@ -1564,6 +1574,235 @@
     tickLive();
     liveClock = setInterval(tickLive, 1000);
     if (workerUrl()) liveTimer = setTimeout(pollLive, liveStatus ? (liveStatus.market_open ? 0 : LIVE_MS) : 0);
+  }
+
+  // ------------------------------------------------------------------------
+  // Both bots side by side, and what they're doing. Keys never reach this page: the engine's
+  // /status page reads both accounts itself and passes on only the numbers below.
+  // ------------------------------------------------------------------------
+  const START_CASH = 100000;
+  const STRATEGY_TITLES = {
+    turn_of_month: "Turn of the month", ibs_etfs: "IBS funds", rsi2_stocks: "RSI(2) stocks",
+    rotation: "Asset rotation", momentum_stocks: "12-1 momentum", realtime: "Real-time engine",
+  };
+  const TAG_TITLES = {
+    trend: "Market trend", vol: "Volatility", time: "Time of day", gap: "Overnight gap",
+    weekday: "Day of week", symbol: "Symbol", spread: "Spread", volume: "Volume",
+  };
+  const botRuns = { bot1: 0, bot2: 0 };
+  const shareOf = (value) => (hasNumber(value) ? `${Math.round(value * 100)}%` : "–");     // a win rate, not a gain
+  const minutesSince = (ms) => (ms ? (Date.now() - ms) / 60000 : Infinity);
+
+  function botFacts(prefix, facts) {
+    setText(`${prefix}-equity`, hasNumber(facts.equity) ? money(facts.equity) : "–");
+    const today = hasNumber(facts.today) ? signed(money(facts.today), facts.today) : "–";
+    setText(`${prefix}-today`, today + (hasNumber(facts.todayPct) ? ` (${percent(facts.todayPct)})` : ""), tone(facts.today));
+    setText(`${prefix}-total`, hasNumber(facts.total) ? signed(money(facts.total), facts.total) : "–", tone(facts.total));
+    botRuns[prefix] = facts.lastRunMs || 0;
+    setText(`${prefix}-run`, facts.lastRunMs ? agoSeconds(facts.lastRunMs) : "–");
+    const alert = byId(`${prefix}-alert`);
+    alert.hidden = !facts.alert;
+    alert.textContent = facts.alert ? `⚠️ ${facts.alert}` : "";
+    const rows = facts.positions || [];
+    show(byId(`${prefix}-positions`), rows.length ? buildTable([
+      { title: "Holding", value: (row) => row.symbol },
+      { title: "Shares", value: (row) => shares(row.qty), numeric: true },
+      { title: "Open P&L", value: (row) => (hasNumber(row.unrealized_pl) ? signed(money(row.unrealized_pl), row.unrealized_pl) : "–"),
+        numeric: true, tone: (row) => tone(row.unrealized_pl) },
+    ], rows) : "No open positions.");
+  }
+
+  function renderBoth() {
+    if (!byId("bot1-equity")) return;
+    const status = liveStatus;
+    const saved = data.status || {};
+    const marketOpen = status ? Boolean(status.market_open) : Boolean(saved.market_open);
+    setText("bots-market", marketOpen ? "Market open" : "Market closed");
+    byId("bots-market").className = `chip ${marketOpen ? "chip-up" : ""}`;
+    const main = status && status.bot1 && !status.bot1.error ? status.bot1 : null;
+    const lastRun = saved.last_run ? Date.parse(saved.last_run.time_utc) : 0;
+    const startEquity = hasNumber(saved.equity) && hasNumber(saved.day_change_pct) ? saved.equity / (1 + saved.day_change_pct) : null;
+    botFacts("bot1", {
+      equity: main ? main.equity : saved.equity,
+      today: main ? main.pl_today : (startEquity === null ? null : saved.equity - startEquity),
+      todayPct: main ? main.pl_today_pct : saved.day_change_pct,
+      total: main ? main.pl_total : (hasNumber(saved.equity) ? saved.equity - START_CASH : null),
+      lastRunMs: lastRun,
+      alert: marketOpen && minutesSince(lastRun) > 60 ? `Hasn't run for ${Math.round(minutesSince(lastRun))} minutes` : "",
+      positions: main ? main.positions : (data.positions || []),
+    });
+    if (!status) {
+      botFacts("bot2", { alert: workerUrl() ? "The engine didn't answer. This page tries again in a minute." : "Not set up yet", positions: [] });
+      return;
+    }
+    const beat = status.heartbeat ? status.heartbeat.last_run_ms : 0;
+    let engineAlert = "";
+    if (marketOpen && minutesSince(beat) > 5) engineAlert = `Hasn't run for ${Math.round(minutesSince(beat))} minutes`;
+    else if (status.heartbeat && status.heartbeat.last_result === "error") engineAlert = "Its last run failed";
+    botFacts("bot2", {
+      equity: status.equity, today: status.pl_today, todayPct: status.pl_today_pct,
+      total: hasNumber(status.pl_total) ? status.pl_total : (hasNumber(status.equity) ? status.equity - START_CASH : null),
+      lastRunMs: beat, alert: engineAlert,
+      positions: status.position ? [{ symbol: status.symbol || "SPY", qty: status.position.qty, unrealized_pl: null }] : [],
+    });
+  }
+
+  function feedItems(holder, rows, emptyText) {
+    if (!holder) return;
+    if (!rows.length) {
+      holder.replaceChildren(element("li", "feed-empty", emptyText));
+      return;
+    }
+    holder.replaceChildren(...rows.slice(0, 40).map((row) => {
+      const item = element("li");
+      const when = typeof row.t === "number" ? new Date(row.t).toISOString() : String(row.t || "");
+      const time = element("time", "", when ? timeText(when) : "");
+      time.dateTime = when;
+      item.append(time, element("span", "", row.detail && unlocked ? `${row.text} (${row.detail})` : row.text));
+      return item;
+    }));
+  }
+
+  function renderFeeds() {
+    feedItems(byId("feed-bot1"), Array.isArray(data.activity) ? data.activity : [], "Nothing yet. Each run adds a line here.");
+    feedItems(byId("feed-bot2"), liveStatus && Array.isArray(liveStatus.feed) ? liveStatus.feed : [],
+      workerUrl() ? "Nothing yet. Each minute adds a line here." : "The engine isn't set up yet.");
+  }
+
+  async function refreshMainBotFiles() {
+    for (const [name, file] of [["activity", "activity"], ["status", "status"], ["positions", "positions"]]) {
+      try {
+        const response = await fetch(`data/${file}.json?t=${Date.now()}`, { cache: "no-store" });
+        if (response.ok) data[name] = await response.json();
+      } catch {
+        // the old copy stays on screen
+      }
+    }
+  }
+
+  // ------------------------------------------------------------------------
+  // Review: what each strategy found out about itself after the close
+  // ------------------------------------------------------------------------
+  function fixLabel(id) {
+    const menu = (data.fixlog && data.fixlog.menu) || {};
+    return menu[id] || id;
+  }
+
+  function windowLine(label, numbers) {
+    if (!numbers || !numbers.trades) return `${label}: no finished trades`;
+    return `${label}: ${numbers.trades} trade${numbers.trades === 1 ? "" : "s"}, ${shareOf(numbers.win_rate)} won, `
+      + `${percent(numbers.avg_ret)} a trade after costs`;
+  }
+
+  function showReview() {
+    const report = data.review;
+    if (!report || !report.strategies) {
+      setText("review-explain", "The first review runs after the US close. It needs finished trades, so at first it will say there's nothing to judge yet.");
+      for (const id of ["review-ai", "review-money", "review-bugs"]) show(byId(id), "Nothing yet.");
+      return;
+    }
+    setText("review-day", `Review of ${dateText(report.day)}, made ${timeText(report.made_utc)}.`);
+    setText("review-explain", report.explanation || "");
+    byId("review-strategies").replaceChildren(...Object.entries(report.strategies).map(([key, part]) => {
+      const section = element("section", "panel");
+      section.append(element("h2", "", part.name || STRATEGY_TITLES[key] || key));
+      const facts = element("ul", "review-facts");
+      const windows = part.windows || {};
+      for (const [label, numbers] of [["Today", windows.today], ["Last 20 trading days", windows.d20],
+        ["Last 60 trading days", windows.d60], ["Shadow trades, last 60 days", windows.shadow_d60]]) {
+        facts.append(element("li", "", windowLine(label, numbers)));
+      }
+      section.append(facts);
+      const pipeline = part.pipeline || {};
+      const testing = pipeline.stage && pipeline.stage !== "idle" ? `Under test: ${fixLabel(pipeline.fix)} (${pipeline.stage}).` : "No fix under test.";
+      const on = (part.fixes_on || []).length ? ` Fixes on: ${part.fixes_on.join(", ")}.` : " Every fix is off.";
+      section.append(element("p", "note", testing + on));
+      section.append(element("h3", "", "Top repeated problems"));
+      const problems = part.problems || [];
+      section.append(problems.length ? buildTable([
+        { title: "Problem", value: (row) => row.label },
+        { title: "Trades", value: (row) => String(row.trades), numeric: true },
+        { title: "A trade, after costs", value: (row) => percent(row.avg_ret), numeric: true, tone: (row) => tone(row.avg_ret) },
+        { title: "The fix on the menu", value: (row) => (row.fix ? fixLabel(row.fix) : "None: a GitHub issue instead") },
+      ], problems) : element("p", "note", "None found yet. A problem needs 5 trades to show here, and 10 before a fix is tried."));
+      const details = element("details", "review-splits");
+      details.append(element("summary", "", "Where it wins and loses"));
+      let any = false;
+      for (const [tag, rows] of Object.entries(part.splits || {})) {
+        if (!rows.length) continue;
+        any = true;
+        details.append(element("h4", "", TAG_TITLES[tag] || tag), buildTable([
+          { title: "When", value: (row) => row.bucket },
+          { title: "Trades", value: (row) => String(row.trades), numeric: true },
+          { title: "Won", value: (row) => shareOf(row.win_rate), numeric: true },
+          { title: "A trade, after costs", value: (row) => percent(row.avg_ret), numeric: true, tone: (row) => tone(row.avg_ret) },
+        ], rows));
+      }
+      if (!any) details.append(element("p", "note", "No finished trades in the last 60 trading days."));
+      section.append(details);
+      return section;
+    }));
+    const ai = report.ai || {};
+    show(byId("review-ai"), buildTable([
+      { title: "Bot", value: (row) => row.name },
+      { title: "Mode", value: (row) => (row.mode === "enforce" ? "On: a veto blocks the trade" : "Shadow: opinion only") },
+      { title: "Calls", value: (row) => String(row.calls || 0), numeric: true },
+      { title: "Its record", value: (row) => row.record || "No results yet" },
+    ], [{ name: "Main bot", ...(ai.main || {}) }, { name: "Real-time engine", ...(ai.realtime || {}) }]));
+    const notes = (report.allocations && report.allocations.notes) || [];
+    show(byId("review-money"), notes.length ? listOf(notes)
+      : "No money moved. It only moves once a strategy has 10 finished trades in 60 trading days, and at most 5 points a day.");
+    const bugs = report.bugs || [];
+    show(byId("review-bugs"), bugs.length ? listOf(bugs.map((bug) => `${STRATEGY_TITLES[bug.strategy] || bug.strategy}: ${bug.bugs.join("; ")}`))
+      : "None found.");
+  }
+
+  function listOf(lines) {
+    const list = element("ul", "review-facts");
+    list.append(...lines.map((line) => element("li", "", line)));
+    return list;
+  }
+
+  // ------------------------------------------------------------------------
+  // Fixes: every switch, what's under test, and every attempt
+  // ------------------------------------------------------------------------
+  function switchesOn(fixset) {
+    if (!fixset) return [];
+    const on = [];
+    if (fixset.trend_filter && fixset.trend_filter !== "off") on.push(`trend filter (${fixset.trend_filter})`);
+    if (fixset.time_filter) on.push(`no entries in the first ${fixset.time_filter} minutes`);
+    for (const [key, label] of [["vol_filter", "volatility filter"], ["gap_filter", "gap filter"], ["liquidity_filter", "liquidity filter"],
+      ["confirmation", "confirmation bar"], ["time_exit", "earlier time exit"], ["trailing_stop", "trailing stop"],
+      ["tight_stop", "tighter stop"], ["vol_sizing", "volatility sizing"]]) {
+      if (fixset[key] === true) on.push(label);
+    }
+    return on;
+  }
+
+  function showFixes() {
+    const log = data.fixlog || {};
+    const control = data.control || {};
+    const switches = log.switches || control.fixes || {};
+    const shadow = log.shadow || control.shadow || {};
+    const stages = log.stages || {};
+    const rows = Object.keys(STRATEGY_TITLES).map((key) => ({
+      key, on: switchesOn(switches[key]), stage: stages[key] || { stage: "idle" },
+      cooldown: Object.entries((log.cooldown || {})[key] || {}),
+    }));
+    show(byId("fixes-switches"), buildTable([
+      { title: "Strategy", value: (row) => STRATEGY_TITLES[row.key] },
+      { title: "Fixes on", value: (row) => (row.on.length ? row.on.join(", ") : "None: every fix is off") },
+      { title: "Under test", value: (row) => (row.stage.stage === "idle" ? "Nothing" : `${fixLabel(row.stage.fix)}: ${row.stage.stage} since ${dateText(row.stage.since)}`) },
+      { title: "Waiting to retry", value: (row) => (row.cooldown.length ? row.cooldown.map(([fix, day]) => `${fixLabel(fix)} until ${dateText(day)}`).join(", ") : "–") },
+    ], rows));
+    const attempts = (log.attempts || []).slice().reverse();
+    show(byId("fixes-log"), attempts.length ? buildTable([
+      { title: "Day", value: (row) => dateText(row.day) },
+      { title: "Strategy", value: (row) => STRATEGY_TITLES[row.strategy] || row.strategy },
+      { title: "Fix", value: (row) => row.label || fixLabel(row.fix) },
+      { title: "Result", value: (row) => row.stage, chip: (row) => (["live", "kept", "shadow"].includes(row.stage) ? "chip-up" : "chip-down") },
+      { title: "What happened", value: (row) => row.note },
+    ], attempts) : "No fix has been tried yet. The first try needs a problem seen in at least 10 finished trades.");
   }
 
   // ------------------------------------------------------------------------
@@ -1983,6 +2222,12 @@
     } else if (parts[0] === "lab") {
       open("lab-page", "lab", quiet);
       showLab();
+    } else if (parts[0] === "review") {
+      open("review-page", "review", quiet);
+      showReview();
+    } else if (parts[0] === "fixes") {
+      open("fixes-page", "fixes", quiet);
+      showFixes();
     } else {
       open("live-page", "live", quiet);
       showLive();
