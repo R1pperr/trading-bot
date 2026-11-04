@@ -857,6 +857,18 @@ class AiShadowTests(SleeveCase):
             ai_analyst.with_retries(send, sleep=waits.append)
         self.assertEqual((asked, waits), ([config.GEMINI_MODEL], []))
 
+    def test_prices_in_the_ai_reason_are_blanked(self):
+        # 4 Nov 2026: a veto quoted two closing prices, and the reason goes into public files.
+        answer = SimpleNamespace(text=json.dumps({"decision": "VETO", "reason":
+                                 "The sharp single-day drop from 33.61 to 32.46 ($1,234.50) on 2026 volume"}))
+        self.start(mock.patch.object(ai_analyst, "generate", return_value=(answer, config.GEMINI_MODEL)))
+        decision, reason = ai_analyst._ask_gemini("prompt")
+        self.assertEqual(decision, ai_analyst.VETO)
+        for price in ("33.61", "32.46", "1,234.50", "2026"):
+            self.assertNotIn(price, reason)
+        self.assertIn("sharp single-day drop", reason)
+        self.assertEqual(ai_analyst.mask_prices("RSI(2) below 10 after 3 days"), "RSI(2) below 10 after 3 days")
+
     def test_the_client_stays_open_for_the_whole_call(self):
         # 4 Nov 2026: the review built the client inline, and it was closed before its request went out.
         from google import genai
