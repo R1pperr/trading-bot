@@ -13,6 +13,7 @@
 // always in it. Prices are only in it for a visitor with your viewer code, because Alpaca's data
 // can't be passed on publicly. GET /prices is the same, and always needs the code.
 
+import Anthropic from "@anthropic-ai/sdk";
 import * as alpaca from "./alpaca.ts";
 import type { Fetcher, Keys } from "./alpaca.ts";
 import {
@@ -27,6 +28,7 @@ export type Env = {
   RT_MODE?: string; RT_TIMEFRAME?: string; RT_EXPERIMENTAL?: string; PAGES_ORIGIN?: string;
   ALPACA_KEY: string; ALPACA_SECRET: string; TELEGRAM_BOT_TOKEN?: string; TELEGRAM_CHAT_ID?: string; VIEWER_CODE?: string;
   GEMINI_API_KEY?: string; GEMINI_MODEL?: string; GEMINI_BACKUP_MODEL?: string; AI_VETO_MODE?: string;
+  ANTHROPIC_API_KEY?: string; CLAUDE_MODEL?: string; CLAUDE_MONTHLY_BUDGET_USD?: string;
   MAIN_ALPACA_KEY?: string; MAIN_ALPACA_SECRET?: string; WATCHDOG_TEST?: string; AI_TEST?: string; RT_STATE?: Kv;
 };
 export type Report = { mode: string; ran: boolean; reason: string; would: string[]; placed: string[]; messages: string[] };
@@ -36,6 +38,9 @@ export const BOT1_STATUS_URL = "https://raw.githubusercontent.com/R1pperr/tradin
 export const GEMINI_HOST = "https://generativelanguage.googleapis.com";
 export const START_CASH = 100000;
 export const GEMINI_TIMEOUT_MS = 8000;
+export const CLAUDE_TIMEOUT_MS = 15000;
+const CLAUDE_PRICE_PER_MILLION = { input: 2, output: 10 };   // Claude Sonnet 5.5, in dollars
+const DEFAULT_CLAUDE_BUDGET_USD = 3;                          // the main bot has its own $6, so under $10 a month
 const FILL_WAIT_TRIES = 3;
 const STATUS_CACHE_MS = 20000;
 const MINUTE = 60000;
@@ -69,7 +74,7 @@ function labelFor(env: Env, mode: string): string {
 function scrub(env: Env, text: string): string {
   let result = text;
   for (const secret of [env.ALPACA_KEY, env.ALPACA_SECRET, env.MAIN_ALPACA_KEY, env.MAIN_ALPACA_SECRET, env.GEMINI_API_KEY,
-    env.TELEGRAM_BOT_TOKEN, env.VIEWER_CODE]) {
+    env.ANTHROPIC_API_KEY, env.TELEGRAM_BOT_TOKEN, env.VIEWER_CODE]) {
     if (secret) result = result.split(secret).join("[key]");
   }
   return result;
@@ -113,12 +118,14 @@ export type State = {
   daily: Daily | null;
   watchdog: { bot1_last_run_utc: string; checked_ms: number };
   nostop_runs: number;
+  claude: { month: string; usd: number; calls: number };   // this month's Claude spend, from token counts
 };
 
 export function freshState(): State {
   return {
     heartbeat: { last_run_ms: 0, last_result: "", mode: "" }, feed: [], ai: { failures_in_row: 0, decisions: [] },
     alerts: {}, control: null, daily: null, watchdog: { bot1_last_run_utc: "", checked_ms: 0 }, nostop_runs: 0,
+    claude: { month: "", usd: 0, calls: 0 },
   };
 }
 
@@ -134,7 +141,7 @@ export async function loadState(env: Env): Promise<State> {
       heartbeat: { ...base.heartbeat, ...saved.heartbeat }, feed: Array.isArray(saved.feed) ? saved.feed : [],
       ai: { failures_in_row: Number(saved.ai?.failures_in_row ?? 0), decisions: Array.isArray(saved.ai?.decisions) ? saved.ai!.decisions : [] },
       alerts: { ...(saved.alerts ?? {}) }, watchdog: { ...base.watchdog, ...saved.watchdog },
-      nostop_runs: Number(saved.nostop_runs ?? 0),
+      nostop_runs: Number(saved.nostop_runs ?? 0), claude: { ...base.claude, ...(saved.claude ?? {}) },
     };
   } catch {
     console.log("Saved state not read, starting fresh");
@@ -283,6 +290,69 @@ export function aiPrompt(series: Bar[], signalIndex: number, record: string): st
   ].join("\n");
 }
 
+// Claude first: the user chose it on 4 Nov 2026, with a limit of $10 a month across both bots.
+// Without a key, over this month's budget, or when Claude fails, the free Gemini models answer.
+const DECISION_SCHEMA = {
+  type: "object",
+  properties: { decision: { type: "string" }, reason: { type: "string" } },
+  required: ["decision", "reason"],
+  additionalProperties: false,
+};
+
+const monthOf = (now: number) => new Date(now).toISOString().slice(0, 7);
+
+export function claudeSpend(state: State, now: number): number {
+  return state.claude.month === monthOf(now) ? state.claude.usd : 0;
+}
+
+function addClaudeSpend(state: State, now: number, usage: { input_tokens?: number | null; output_tokens?: number | null }): void {
+  const cost = (Number(usage.input_tokens ?? 0) * CLAUDE_PRICE_PER_MILLION.input
+    + Number(usage.output_tokens ?? 0) * CLAUDE_PRICE_PER_MILLION.output) / 1_000_000;
+  const current = state.claude.month === monthOf(now) ? state.claude : { month: monthOf(now), usd: 0, calls: 0 };
+  state.claude = { month: monthOf(now), usd: Math.round((current.usd + cost) * 1e6) / 1e6, calls: current.calls + 1 };
+}
+
+// null when Claude isn't asked (no key, or this month's budget is used up).
+export async function askClaude(
+  call: Fetcher, env: Env, state: State, prompt: string, now: number, timeoutMs = CLAUDE_TIMEOUT_MS,
+): Promise<(Verdict & { model: string }) | null> {
+  if (!env.ANTHROPIC_API_KEY) return null;
+  const budget = Number(env.CLAUDE_MONTHLY_BUDGET_USD ?? DEFAULT_CLAUDE_BUDGET_USD);
+  if (claudeSpend(state, now) >= budget) return null;
+  const model = env.CLAUDE_MODEL || "claude-sonnet-5-5";
+  const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, fetch: call, maxRetries: 1, timeout: timeoutMs });
+  try {
+    const response = await client.beta.messages.create({
+      model, max_tokens: 4000,
+      betas: ["server-side-fallback-2026-07-01"],
+      fallbacks: "default",                 // a safety decline is retried on Anthropic's recommended model
+      output_config: { effort: "low", format: { type: "json_schema", schema: DECISION_SCHEMA } },
+      messages: [{ role: "user", content: prompt }],
+    });
+    addClaudeSpend(state, now, response.usage);
+    if (response.stop_reason === "refusal") return { decision: "VETO", reason: "AI error: Claude declined", failed: true, model };
+    let text = "";
+    for (const block of response.content) if (block.type === "text") text += block.text;
+    let answer: any = null;
+    try { answer = JSON.parse(text); } catch { answer = null; }
+    const decision = String(answer?.decision ?? "").trim().toUpperCase();
+    const reason = String(answer?.reason ?? "").split(/\s+/).join(" ").trim().slice(0, 200) || "(no reason given)";
+    if (decision !== "APPROVE" && decision !== "VETO") return { decision: "VETO", reason: "AI gave an unclear answer", failed: true, model };
+    return { decision, reason, failed: false, model: response.model || model };
+  } catch (error) {
+    const said = error instanceof Anthropic.APIError && error.status ? `said ${error.status}` : "not reached";
+    return { decision: "VETO", reason: `AI error: Claude ${said}`, failed: true, model };
+  }
+}
+
+export async function askAI(call: Fetcher, env: Env, state: State, prompt: string, now: number): Promise<Verdict> {
+  const claude = await askClaude(call, env, state, prompt, now);
+  if (claude && !claude.failed) return { decision: claude.decision, reason: claude.reason, failed: false };
+  const gemini = await askGemini(call, env, prompt);
+  if (!claude || !gemini.failed) return gemini;
+  return { ...gemini, reason: `AI error: ${claude.reason.replace(/^AI error: /, "")}, ${gemini.reason.replace(/^AI error: /, "")}` };
+}
+
 // Gemini's free tier sometimes answers 503 "high demand" (4 Nov 2026: gemini-3.8-flash for hours).
 // One more try after a short wait, with the backup model, then it's an error and there is no trade.
 // A bad key or model name (4xx) is not retried.
@@ -347,7 +417,7 @@ async function aiVerdict(
     const decision = known.decision === "APPROVE" ? "APPROVE" : "VETO";
     return { decision, reason: known.reason, failed: known.reason.startsWith("AI error") || known.reason.startsWith("AI gave"), cached: true };
   }
-  const verdict = await askGemini(call, env, aiPrompt(series, plan.signalIndex, control.aiRecord));
+  const verdict = await askAI(call, env, state, aiPrompt(series, plan.signalIndex, control.aiRecord), now);
   state.ai.decisions.unshift({
     t: now, bar_t: series[plan.signalIndex]?.t ?? 0, client_id: buy.clientId, decision: verdict.decision,
     reason: verdict.reason, qty: buy.qty, spread_pct: spread,
@@ -356,7 +426,7 @@ async function aiVerdict(
   state.ai.failures_in_row = verdict.failed ? state.ai.failures_in_row + 1 : 0;
   if (state.ai.failures_in_row >= GEMINI_FAILURE_ALERT) {
     await alert(call, env, state, "gemini_failures",
-      `${label} ⚠️ Gemini failed ${state.ai.failures_in_row} times in a row (${verdict.reason}). In enforce mode that means no buys.`,
+      `${label} ⚠️ The AI (Claude and Gemini) failed ${state.ai.failures_in_row} times in a row (${verdict.reason}). In enforce mode that means no buys.`,
       now, HALF_HOUR);
   }
   return { ...verdict, cached: false };
@@ -411,7 +481,7 @@ const isLiveOrder = (order: Order) => ["new", "accepted", "pending_new", "partia
 
 function aiWords(verdict: Verdict): string {
   if (verdict.reason.startsWith("AI error") || verdict.reason.startsWith("AI gave")) {
-    return `Gemini error (${maskPrices(verdict.reason.replace(/^AI error: /, ""))})`;
+    return `AI error (${maskPrices(verdict.reason.replace(/^AI error: /, ""))})`;
   }
   return `AI ${verdict.decision === "APPROVE" ? "approved" : "vetoed"} (${maskPrices(verdict.reason)})`;
 }
@@ -446,6 +516,10 @@ export async function runOnce(env: Env, now: number, call: Fetcher, state: State
       return { t: start + i * 5 * MINUTE, o: c, h: c, l: c, c };
     });
     const prompt = aiPrompt(series, series.length - 1, "");
+    const claude = await askClaude(call, env, state, prompt, now);
+    report.messages.push(claude
+      ? `${claude.model}: ${claude.failed ? claude.reason : `answered ${claude.decision}`}`
+      : "Claude: not asked (no ANTHROPIC_API_KEY, or this month's budget is used up)");
     for (const model of [...new Set([env.GEMINI_MODEL || "gemini-3.8-flash", env.GEMINI_BACKUP_MODEL || ""])].filter(Boolean)) {
       const { verdict } = await askGeminiOnce(call, env, prompt, GEMINI_TIMEOUT_MS, model);
       report.messages.push(`${model}: ${verdict.failed ? verdict.reason : `answered ${verdict.decision}`}`);
