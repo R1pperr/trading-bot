@@ -9,7 +9,7 @@ With hundreds of symbols, more will signal than the bot can buy, so:
   1. Sells come first. They free up cash and reduce risk.
   2. Then buys, the most traded first: the same dollar volume that ranks the
      universe. Busy markets fill closest to the price you saw.
-  3. Only the top MAX_AI_REVIEWS_PER_DAY candidates are kept. That is what caps
+  3. Only the top MAX_AI_REVIEWS_PER_RUN candidates are kept. That is what caps
      the calls to Gemini.
 
 Nothing here talks to Alpaca, Gemini or a file, so it can be read and tested alone.
@@ -53,7 +53,7 @@ def start_day(market, day, found, universe_rows, scanned):
     ranks = {row["symbol"]: position for position, row in enumerate(universe_rows)}
     names = {row["symbol"]: row.get("name", "") for row in universe_rows}
     ordered = sorted(found, key=lambda c: (c["action"] != SELL, ranks.get(c["symbol"], len(ranks))))
-    top = ordered[:config.MAX_AI_REVIEWS_PER_DAY[market]]
+    top = ordered[:config.MAX_AI_REVIEWS_PER_RUN[market]]
     for rank, candidate in enumerate(top, start=1):
         candidate.update(rank=rank, name=names.get(candidate["symbol"], ""), status="waiting",
                          ai_decision="", ai_reason="", note="")

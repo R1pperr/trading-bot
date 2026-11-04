@@ -455,8 +455,10 @@ def cancel_stale_buys(trading, state, open_buys, positions, today, dry_run):
 
 
 def already_vetoed(todays_log, symbol):
+    """The AI said no to this symbol today, so it isn't asked again. A failed call doesn't count."""
     return ai_analyst.mode() == "enforce" and any(
-        row["event"] == "AI_DECISION" and row["symbol"] == symbol and row["ai_decision"] == ai_analyst.VETO
+        row["event"] == "AI_DECISION" and row["symbol"] == symbol
+        and ai_analyst.is_real_veto(row["ai_decision"], row.get("ai_reason") or "")
         for row in todays_log)
 
 
@@ -622,17 +624,20 @@ def run(market, trading, equity, cash, killed, dry_run, today, todays_log, log_e
     busy = (set(positions) | sold | {name(o.symbol) for o in orders} | set(state["positions"])
             | {row["symbol"] for row in todays_log if row["event"] == "ORDER"}) - cancelled
     open_count = len(set(positions) - sold)
-    # The AI limit counts the whole day's reviews, not just this run's: a veto frees no trade slot,
-    # so a per-run count would let every 15-minute run ask Gemini again.
-    ai_left = config.MAX_AI_REVIEWS_PER_DAY[market] - sum(
-        row["event"] == "AI_DECISION" and in_market(row["symbol"], market) for row in todays_log)
+    # The day's AI answers count across runs, so 15-minute runs can't add up to hundreds of calls.
+    # A failed call is not an answer, so it doesn't use up the day: on 4 Nov 2026 five "busy"
+    # errors at Gemini blocked every buy for the rest of the day.
+    answered_today = sum(
+        row["event"] == "AI_DECISION" and in_market(row["symbol"], market)
+        and not str(row.get("ai_reason") or "").startswith(ai_analyst.ERROR_PREFIX) for row in todays_log)
+    ai_left = min(config.MAX_AI_REVIEWS_PER_RUN[market], config.MAX_AI_REVIEWS_PER_DAY[market] - answered_today)
     added, shortlist = {}, []
     skipped_why, placed_now = {}, [0]
 
     def note(candidate, why):
         if why:
             skipped_why[why] = skipped_why.get(why, 0) + 1
-        if why and len(shortlist) >= config.MAX_AI_REVIEWS_PER_DAY[market]:
+        if why and len(shortlist) >= config.MAX_AI_REVIEWS_PER_RUN[market]:
             return
         candidate.update(note=why)
         shortlist.append(candidate)

@@ -157,7 +157,7 @@ def latest_spread(data_client, symbol):
         return None
 
 
-RUN_INFO = {"market_open": False}
+RUN_INFO = {"market_open": None}   # None until Alpaca's clock answers, so a refused run isn't called "closed"
 
 
 def is_pre_open(clock):
@@ -548,8 +548,9 @@ def finish_run(args, exit_code):
             unprotected = sleeves.load_state().get("unprotected", [])
         except Exception:
             unprotected = []
-        watchdog.check(datetime.now(timezone.utc), RUN_INFO["market_open"], unprotected)
-        status = "market open" if RUN_INFO["market_open"] else "market closed"
+        watchdog.check(datetime.now(timezone.utc), bool(RUN_INFO["market_open"]), unprotected)
+        status = {True: "market open", False: "market closed"}.get(RUN_INFO["market_open"],
+                                                                   "couldn't reach Alpaca")
         activity.say(f"Run at {new_york_now():%H:%M} New York ({status}): {orders} order{'s' if orders != 1 else ''}"
                      + (f", error: {errors[-1][:100]}" if errors else ", no errors"))
         try:
@@ -577,6 +578,7 @@ def main():
         print("Watchdog test sent:" if found else "Watchdog test found nothing to send.", found)
         sys.exit(0 if found else 1)
     exit_code = 1
+    RUN_INFO["market_open"] = None
     try:
         if args.test_order and "/" in args.test_order:
             exit_code = run_crypto_test_order(args)

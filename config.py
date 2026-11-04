@@ -193,10 +193,15 @@ USE_AI_ANALYST = True
 # The daily review may switch it in docs/data/control.json if the AI's vetoes cost money.
 AI_VETO_MODE = "enforce"
 GEMINI_MODEL = "gemini-3.8-flash"
-# Only the top candidates are looked at each day, sells first and then the most
-# traded buys. That caps Gemini at 10 calls a day. Google doesn't publish the free
-# limit: check aistudio.google.com/rate-limit before raising these.
-MAX_AI_REVIEWS_PER_DAY = {"stock": 5, "crypto": 5}
+# Questions to the AI. A veto doesn't use up a trade, so after vetoes the bot keeps asking
+# about the next signals until it has made its trades for the day (MAX_TRADES_PER_DAY still
+# caps those at 5). Asked for on 4 Nov 2026: five vetoes shouldn't end the day.
+# A run asks at most PER_RUN (Gemini's free tier allows about 10 questions a minute), and a
+# day at most PER_DAY real answers (failed calls don't count). In the old crossover mode
+# (signals.py), PER_RUN is the day's shortlist. Google doesn't publish the free daily limit:
+# check aistudio.google.com/rate-limit before raising these.
+MAX_AI_REVIEWS_PER_RUN = {"stock": 5, "crypto": 5}
+MAX_AI_REVIEWS_PER_DAY = {"stock": 25, "crypto": 25}
 
 
 # ---------------------------------------------------------------------------

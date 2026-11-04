@@ -31,6 +31,7 @@ Check your Gemini key works:   python ai_analyst.py
 import json
 import os
 import sys
+import time
 
 from dotenv import load_dotenv
 
@@ -100,6 +101,32 @@ def _note_health(failed):
         pass
 
 
+BUSY_CODES = (429, 500, 503, 504)
+RETRY_WAITS = (3, 10)   # seconds before the second and third try
+
+
+def is_busy(error):
+    """True for Gemini saying it's overloaded or rate-limited, which usually passes in seconds."""
+    code = getattr(error, "code", None)
+    return code in BUSY_CODES or isinstance(error, TimeoutError) or "UNAVAILABLE" in str(error)
+
+
+def with_retries(send, sleep=time.sleep):
+    """
+    Gemini's free tier sometimes answers 503 "high demand" (4 Nov 2026: five in a row).
+    Try again after 3 and then 10 seconds before calling it an error. Any other error
+    (a bad key, a bad model name) fails straight away.
+    """
+    for wait in RETRY_WAITS:
+        try:
+            return send()
+        except Exception as error:
+            if not is_busy(error):
+                raise
+            sleep(wait)
+    return send()
+
+
 def _ask_gemini(prompt):
     """Send the prompt to Gemini and return (decision, reason). Raises on any problem."""
     from google import genai
@@ -119,7 +146,7 @@ def _ask_gemini(prompt):
         },
         required=["decision", "reason"],
     )
-    response = client.models.generate_content(
+    response = with_retries(lambda: client.models.generate_content(
         model=config.GEMINI_MODEL,
         contents=prompt,
         config=types.GenerateContentConfig(
@@ -127,7 +154,7 @@ def _ask_gemini(prompt):
             response_schema=schema,
             temperature=0,
         ),
-    )
+    ))
     answer = json.loads(response.text)
     decision = str(answer.get("decision", "")).strip().upper()
     reason = " ".join(str(answer.get("reason", "")).split())[:200] or "(no reason given)"
