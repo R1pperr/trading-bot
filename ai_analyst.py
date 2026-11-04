@@ -30,6 +30,7 @@ Check your Gemini key works:   python ai_analyst.py
 
 import json
 import os
+import re
 import sys
 import time
 
@@ -48,6 +49,7 @@ A simple rule-based strategy wants to make one trade. Decide only whether to APP
 VETO only if the recent prices give a clear reason the signal looks unreliable, for example:
 an extreme one-day move likely to reverse, or prices so choppy there is no real trend.
 Otherwise APPROVE. You cannot change the trade size, and you must not suggest one.
+Don't quote prices or other numbers in your reason; describe the move in words.
 Reply with JSON only: {"decision": "APPROVE" or "VETO", "reason": "<one sentence, at most 25 words>"}"""
 
 
@@ -179,10 +181,21 @@ def _ask_gemini(prompt, models=None):
         print(f"   {first} was busy, so the backup {model} answered")
     answer = json.loads(response.text)
     decision = str(answer.get("decision", "")).strip().upper()
-    reason = " ".join(str(answer.get("reason", "")).split())[:200] or "(no reason given)"
+    reason = mask_prices(" ".join(str(answer.get("reason", "")).split())[:200]) or "(no reason given)"
     if decision not in (APPROVE, VETO):
         return VETO, f"{UNCLEAR_PREFIX} ({decision!r}){_outcome()}"
     return decision, reason
+
+
+def mask_prices(text):
+    """
+    Blanks out prices: the reason ends up in public files (the activity feed, the trade log), and
+    Alpaca's prices can't be passed on. On 4 Nov 2026 a veto quoted two closing prices.
+    The same rule as the real-time engine's maskPrices.
+    """
+    text = re.sub(r"\$\s?\d[\d,]*(?:\.\d+)?", "…", str(text))
+    text = re.sub(r"\d+\.\d+", "…", text)
+    return re.sub(r"\b\d{3,}\b", "…", text)
 
 
 def is_real_veto(decision, reason):
