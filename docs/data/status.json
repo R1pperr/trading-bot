@@ -1,12 +1,12 @@
 {
   "last_run": {
-    "time_utc": "2026-11-04T21:05:29Z",
+    "time_utc": "2026-11-04T21:20:13Z",
     "status": "market_closed",
     "message": "The US market is closed, so there was nothing to do."
   },
   "market_open": false,
-  "equity": 99963.86,
-  "day_change_pct": 0.000961498022316265,
+  "equity": 99972.88,
+  "day_change_pct": 0.001051817390857801,
   "kill_switch": {
     "on": false,
     "reason": ""
@@ -41,10 +41,10 @@
     "kill_switch_pct": 0.03
   },
   "cash": 54201.7,
-  "buying_power": 344940.83,
-  "invested": 45762.16,
-  "open_pl": 307.63,
-  "stock_value": 45762.16,
+  "buying_power": 344966.11,
+  "invested": 45771.18,
+  "open_pl": 316.66,
+  "stock_value": 45771.18,
   "crypto_value": 0,
   "crypto_trades_today": 0
 }
