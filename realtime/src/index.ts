@@ -227,7 +227,11 @@ export async function handle(request: Request, env: Env, now: number, call: Fetc
       return new Response(JSON.stringify({ symbol, bars }), { headers });
     }
     return new Response('{"error":"not found"}', { status: 404, headers });
-  } catch {
+  } catch (error) {
+    // Only the reason is logged, for `wrangler tail`, with any key text blanked out. Visitors still see the short message.
+    let reason = String((error as Error)?.message ?? error);
+    for (const secret of [env.ALPACA_KEY, env.ALPACA_SECRET]) if (secret) reason = reason.split(secret).join("[key]");
+    console.log(`${url.pathname} failed: ${reason}`);
     return new Response('{"error":"could not reach Alpaca"}', { status: 502, headers });
   }
 }
