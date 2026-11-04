@@ -1,5 +1,10 @@
 # The real-time engine. It trades its own separate Alpaca paper account.
 # Secrets are never written here. You enter them yourself with: npx wrangler secret put NAME
+#   ALPACA_KEY, ALPACA_SECRET          this engine's own paper account (required)
+#   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
+#   VIEWER_CODE                        unlocks prices on the dashboard
+#   GEMINI_API_KEY                     the AI analyst (free tier). Without it, enforce mode blocks every buy
+#   MAIN_ALPACA_KEY, MAIN_ALPACA_SECRET  the main bot's paper account, read only, for the side-by-side dashboard
 name = "tach-realtime"
 main = "src/index.ts"
 compatibility_date = "2026-10-01"
@@ -10,7 +15,16 @@ compatibility_date = "2026-10-01"
 crons = ["* 13-20 * * MON-FRI"]
 
 [vars]
-RT_MODE = "dry"                 # "off", "dry" or "live". dry logs what it would do and places nothing
+RT_MODE = "live"                # "off", "dry" or "live" (paper orders). dry logs what it would do and places nothing
 RT_TIMEFRAME = "5Min"           # the A/B winner: "5Min" or "1Min"
 RT_EXPERIMENTAL = "true"        # the out-of-sample backtest lost money after costs, so it says so everywhere
 PAGES_ORIGIN = "https://r1pperr.github.io"
+AI_VETO_MODE = "enforce"        # the default. docs/data/control.json can switch it to "shadow"
+GEMINI_MODEL = "gemini-3.8-flash"
+
+# The saved state: activity feed, AI answers, alert times. One write per run (480 a weekday, free limit 1,000).
+# Create it with: npx wrangler kv namespace create RT_STATE, then put its id in both places below.
+[[kv_namespaces]]
+binding = "RT_STATE"
+id = "f38ebce9efd842e08a51f227d329b05b"
+preview_id = "f43062f3ec024a9889e0c3795bf09752"
