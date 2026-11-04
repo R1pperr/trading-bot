@@ -21,6 +21,7 @@ RT_EXPERIMENTAL = "true"        # the out-of-sample backtest lost money after co
 PAGES_ORIGIN = "https://r1pperr.github.io"
 AI_VETO_MODE = "enforce"        # the default. docs/data/control.json can switch it to "shadow"
 GEMINI_MODEL = "gemini-3.8-flash"
+GEMINI_BACKUP_MODEL = "gemini-3.7-flash"   # asked when the main model is busy (same key, free tier)
 
 # The saved state: activity feed, AI answers, alert times. One write per run (480 a weekday, free limit 1,000).
 # Create it with: npx wrangler kv namespace create RT_STATE, then put its id in both places below.
