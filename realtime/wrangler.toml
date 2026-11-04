@@ -3,7 +3,8 @@
 #   ALPACA_KEY, ALPACA_SECRET          this engine's own paper account (required)
 #   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID
 #   VIEWER_CODE                        unlocks prices on the dashboard
-#   GEMINI_API_KEY                     the AI analyst (free tier). Without it, enforce mode blocks every buy
+#   ANTHROPIC_API_KEY                  Claude, the AI analyst's first choice (paid, capped per month below)
+#   GEMINI_API_KEY                     the free backup AI. With neither key, enforce mode blocks every buy
 #   MAIN_ALPACA_KEY, MAIN_ALPACA_SECRET  the main bot's paper account, read only, for the side-by-side dashboard
 name = "tach-realtime"
 main = "src/index.ts"
@@ -20,6 +21,8 @@ RT_TIMEFRAME = "5Min"           # the A/B winner: "5Min" or "1Min"
 RT_EXPERIMENTAL = "true"        # the out-of-sample backtest lost money after costs, so it says so everywhere
 PAGES_ORIGIN = "https://r1pperr.github.io"
 AI_VETO_MODE = "enforce"        # the default. docs/data/control.json can switch it to "shadow"
+CLAUDE_MODEL = "claude-sonnet-5-5"           # asked first: the user chose Claude on 4 Nov 2026
+CLAUDE_MONTHLY_BUDGET_USD = "3"             # after this, Gemini only; the main bot has its own $6
 GEMINI_MODEL = "gemini-3.8-flash"
 GEMINI_BACKUP_MODEL = "gemini-3.5-flash"   # asked when the main model is busy (same key, free tier; it answered on 4 Nov when 3.8 was busy)
 
