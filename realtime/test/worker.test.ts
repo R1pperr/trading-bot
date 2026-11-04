@@ -128,7 +128,7 @@ function env(changes: Partial<Env> = {}): Env {
   };
 }
 
-const AI = { AI_VETO_MODE: "enforce", GEMINI_API_KEY: "fake-gemini-key" };
+const AI = { AI_VETO_MODE: "enforce", GEMINI_API_KEY: "fake-gemini-key", GEMINI_MODEL: "gemini-3.8-flash", GEMINI_BACKUP_MODEL: "gemini-3.7-flash" };
 const geminiCalls = (calls: { url: string }[]) => calls.filter((c) => c.url.includes("generativelanguage"));
 const telegrams = (calls: { url: string; body: string }[]) => calls.filter((c) => c.url.includes("telegram"));
 
@@ -406,6 +406,8 @@ test("a busy Gemini (503) is asked once more, and its answer counts", async () =
   const state = freshState();
   await quiet(() => runOnce(env({ RT_MODE: "live", ...AI }), signalEnd(), call, state));
   assert.equal(geminiCalls(calls).length, 2);
+  assert.ok(geminiCalls(calls)[0].url.includes("/models/gemini-3.8-flash:"));
+  assert.ok(geminiCalls(calls)[1].url.includes("/models/gemini-3.7-flash:"), "the second try uses the backup model");
   assert.equal(state.ai.decisions[0].decision, "APPROVE");
   assert.equal(state.ai.failures_in_row, 0);
   assert.equal(posted(calls).length >= 1, true);
