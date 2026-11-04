@@ -782,13 +782,20 @@ class AiShadowTests(SleeveCase):
                 raise item
             return item
 
-        self.assertEqual(ai_analyst.with_retries(send, sleep=waits.append), ("answer", config.GEMINI_BACKUP_MODEL))
-        self.assertEqual(asked, [config.GEMINI_MODEL, config.GEMINI_BACKUP_MODEL])
+        self.assertEqual(ai_analyst.with_retries(send, sleep=waits.append), ("answer", config.GEMINI_BACKUP_MODELS[0]))
+        self.assertEqual(asked, [config.GEMINI_MODEL, config.GEMINI_BACKUP_MODELS[0]])
         self.assertEqual(waits, [ai_analyst.RETRY_WAITS[0]])
 
-    def test_the_backup_is_a_different_model(self):
-        self.assertTrue(config.GEMINI_BACKUP_MODEL)
-        self.assertNotEqual(config.GEMINI_BACKUP_MODEL, config.GEMINI_MODEL)
+    def test_the_backups_are_other_models(self):
+        self.assertTrue(config.GEMINI_BACKUP_MODELS)
+        self.assertNotIn(config.GEMINI_MODEL, config.GEMINI_BACKUP_MODELS)
+        self.assertEqual(ai_analyst.models_to_try(), [config.GEMINI_MODEL, *config.GEMINI_BACKUP_MODELS][:3])
+
+    def test_three_tries_even_with_one_backup_or_none(self):
+        with mock.patch.object(config, "GEMINI_BACKUP_MODELS", ("b",)):
+            self.assertEqual(ai_analyst.models_to_try(), [config.GEMINI_MODEL, "b", "b"])
+        with mock.patch.object(config, "GEMINI_BACKUP_MODELS", ()):
+            self.assertEqual(ai_analyst.models_to_try(), [config.GEMINI_MODEL] * 3)
 
     def test_a_gemini_that_stays_busy_gives_up_after_three_tries(self):
         asked, waits = [], []
@@ -799,7 +806,7 @@ class AiShadowTests(SleeveCase):
 
         with self.assertRaises(RuntimeError):
             ai_analyst.with_retries(send, sleep=waits.append)
-        self.assertEqual(asked, [config.GEMINI_MODEL, config.GEMINI_BACKUP_MODEL, config.GEMINI_BACKUP_MODEL])
+        self.assertEqual(asked, ai_analyst.models_to_try())
         self.assertEqual(waits, list(ai_analyst.RETRY_WAITS))
 
     def test_a_bad_key_is_not_retried(self):
