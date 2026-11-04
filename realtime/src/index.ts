@@ -26,7 +26,7 @@ export type Kv = { get(key: string): Promise<string | null>; put(key: string, va
 export type Env = {
   RT_MODE?: string; RT_TIMEFRAME?: string; RT_EXPERIMENTAL?: string; PAGES_ORIGIN?: string;
   ALPACA_KEY: string; ALPACA_SECRET: string; TELEGRAM_BOT_TOKEN?: string; TELEGRAM_CHAT_ID?: string; VIEWER_CODE?: string;
-  GEMINI_API_KEY?: string; GEMINI_MODEL?: string; AI_VETO_MODE?: string;
+  GEMINI_API_KEY?: string; GEMINI_MODEL?: string; GEMINI_BACKUP_MODEL?: string; AI_VETO_MODE?: string;
   MAIN_ALPACA_KEY?: string; MAIN_ALPACA_SECRET?: string; WATCHDOG_TEST?: string; RT_STATE?: Kv;
 };
 export type Report = { mode: string; ran: boolean; reason: string; would: string[]; placed: string[]; messages: string[] };
@@ -283,27 +283,30 @@ export function aiPrompt(series: Bar[], signalIndex: number, record: string): st
   ].join("\n");
 }
 
-// Gemini's free tier sometimes answers 503 "high demand" (4 Nov 2026). One more try after a short
-// wait, then it's an error and there is no trade. A bad key or model name (4xx) is not retried.
+// Gemini's free tier sometimes answers 503 "high demand" (4 Nov 2026: gemini-3.8-flash for hours).
+// One more try after a short wait, with the backup model, then it's an error and there is no trade.
+// A bad key or model name (4xx) is not retried.
 const GEMINI_BUSY = [429, 500, 503, 504];
 export const geminiRetry = { waitMs: 2000 };
 
 export async function askGemini(call: Fetcher, env: Env, prompt: string, timeoutMs = GEMINI_TIMEOUT_MS): Promise<Verdict> {
-  const first = await askGeminiOnce(call, env, prompt, timeoutMs);
+  const main = env.GEMINI_MODEL || "gemini-3.8-flash";
+  const first = await askGeminiOnce(call, env, prompt, timeoutMs, main);
   if (!first.busy) return first.verdict;
   await new Promise((resolve) => setTimeout(resolve, geminiRetry.waitMs));
-  return (await askGeminiOnce(call, env, prompt, timeoutMs)).verdict;
+  return (await askGeminiOnce(call, env, prompt, timeoutMs, env.GEMINI_BACKUP_MODEL || main)).verdict;
 }
 
-async function askGeminiOnce(call: Fetcher, env: Env, prompt: string, timeoutMs: number): Promise<{ verdict: Verdict; busy: boolean }> {
-  const verdict = await askGeminiCall(call, env, prompt, timeoutMs);
+async function askGeminiOnce(
+  call: Fetcher, env: Env, prompt: string, timeoutMs: number, model: string,
+): Promise<{ verdict: Verdict; busy: boolean }> {
+  const verdict = await askGeminiCall(call, env, prompt, timeoutMs, model);
   const status = Number(/Gemini said (\d+)/.exec(verdict.reason)?.[1] ?? 0);
   return { verdict, busy: verdict.failed && GEMINI_BUSY.includes(status) };
 }
 
-async function askGeminiCall(call: Fetcher, env: Env, prompt: string, timeoutMs: number): Promise<Verdict> {
+async function askGeminiCall(call: Fetcher, env: Env, prompt: string, timeoutMs: number, model: string): Promise<Verdict> {
   if (!env.GEMINI_API_KEY) return { decision: "VETO", reason: "AI error: no Gemini key is set", failed: true };
-  const model = env.GEMINI_MODEL || "gemini-3.8-flash";
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
