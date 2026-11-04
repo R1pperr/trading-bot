@@ -1,0 +1,95 @@
+{
+ "ai_mode": {
+  "main": "enforce",
+  "realtime": "enforce"
+ },
+ "ai_record": {
+  "main": "",
+  "realtime": ""
+ },
+ "allocations": {},
+ "fixes": {
+  "ibs_etfs": {
+   "confirmation": false,
+   "gap_filter": false,
+   "liquidity_filter": false,
+   "tight_stop": false,
+   "time_exit": false,
+   "time_filter": 0,
+   "trailing_stop": false,
+   "trend_filter": "off",
+   "vol_filter": false,
+   "vol_sizing": false
+  },
+  "momentum_stocks": {
+   "confirmation": false,
+   "gap_filter": false,
+   "liquidity_filter": false,
+   "tight_stop": false,
+   "time_exit": false,
+   "time_filter": 0,
+   "trailing_stop": false,
+   "trend_filter": "off",
+   "vol_filter": false,
+   "vol_sizing": false
+  },
+  "realtime": {
+   "confirmation": false,
+   "gap_filter": false,
+   "liquidity_filter": false,
+   "tight_stop": false,
+   "time_exit": false,
+   "time_filter": 0,
+   "trailing_stop": false,
+   "trend_filter": "off",
+   "vol_filter": false,
+   "vol_sizing": false
+  },
+  "rotation": {
+   "confirmation": false,
+   "gap_filter": false,
+   "liquidity_filter": false,
+   "tight_stop": false,
+   "time_exit": false,
+   "time_filter": 0,
+   "trailing_stop": false,
+   "trend_filter": "off",
+   "vol_filter": false,
+   "vol_sizing": false
+  },
+  "rsi2_stocks": {
+   "confirmation": false,
+   "gap_filter": false,
+   "liquidity_filter": false,
+   "tight_stop": false,
+   "time_exit": false,
+   "time_filter": 0,
+   "trailing_stop": false,
+   "trend_filter": "off",
+   "vol_filter": false,
+   "vol_sizing": false
+  },
+  "turn_of_month": {
+   "confirmation": false,
+   "gap_filter": false,
+   "liquidity_filter": false,
+   "tight_stop": false,
+   "time_exit": false,
+   "time_filter": 0,
+   "trailing_stop": false,
+   "trend_filter": "off",
+   "vol_filter": false,
+   "vol_sizing": false
+  }
+ },
+ "paused": [],
+ "shadow": {
+  "ibs_etfs": null,
+  "momentum_stocks": null,
+  "realtime": null,
+  "rotation": null,
+  "rsi2_stocks": null,
+  "turn_of_month": null
+ },
+ "updated_utc": ""
+}
