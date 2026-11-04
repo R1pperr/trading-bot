@@ -220,16 +220,13 @@ def find_problems(strategy, trades):
 def explain(facts):
     fallback = facts["fallback"]
     try:
-        from google import genai
         from google.genai import types
-        key = os.getenv("GEMINI_API_KEY", "").strip()
-        if not key:
+        if not os.getenv("GEMINI_API_KEY", "").strip():
             return fallback
         prompt = ("You review a student's paper-trading bots. In plain English for a beginner, at most 6 short sentences, "
                   "explain where each strategy is winning and losing and what its top problems mean. Don't invent numbers; "
                   "use only these facts. Say clearly when there are too few trades to tell.\n\n" + json.dumps(facts["data"]))
-        response = genai.Client(api_key=key).models.generate_content(
-            model=config.GEMINI_MODEL, contents=prompt, config=types.GenerateContentConfig(temperature=0))
+        response, _ = ai_analyst.generate(prompt, types.GenerateContentConfig(temperature=0))
         text = " ".join((response.text or "").split())
         return text[:1500] or fallback
     except Exception as error:

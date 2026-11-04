@@ -111,33 +111,51 @@ def is_busy(error):
     return code in BUSY_CODES or isinstance(error, TimeoutError) or "UNAVAILABLE" in str(error)
 
 
-def with_retries(send, sleep=time.sleep):
+def models_to_try():
+    """The main model first, then the free backup model twice (or the main one again if there's none)."""
+    backup = getattr(config, "GEMINI_BACKUP_MODEL", "") or config.GEMINI_MODEL
+    return [config.GEMINI_MODEL, backup, backup]
+
+
+def with_retries(send, models=None, sleep=time.sleep):
     """
-    Gemini's free tier sometimes answers 503 "high demand" (4 Nov 2026: five in a row).
-    Try again after 3 and then 10 seconds before calling it an error. Any other error
-    (a bad key, a bad model name) fails straight away.
+    Gemini's free tier sometimes answers 503 "high demand": on 4 Nov 2026 gemini-3.8-flash
+    did so for hours. send(model) is tried with the main model, then after 3 and 10 seconds
+    with the backup model. Any other error (a bad key, a bad model name) fails straight away.
+    Returns (send's result, the model that answered).
     """
-    for wait in RETRY_WAITS:
+    models = models or models_to_try()
+    for attempt, model in enumerate(models):
+        if attempt:
+            sleep(RETRY_WAITS[min(attempt, len(RETRY_WAITS)) - 1])
         try:
-            return send()
+            return send(model), model
         except Exception as error:
-            if not is_busy(error):
+            if attempt == len(models) - 1 or not is_busy(error):
                 raise
-            sleep(wait)
-    return send()
 
 
-def _ask_gemini(prompt):
-    """Send the prompt to Gemini and return (decision, reason). Raises on any problem."""
+def generate(prompt, generation_config=None, models=None):
+    """
+    One Gemini question with retries and the backup model. Returns (response, model).
+    The client is kept in a variable for the whole call: a client that is only used inline
+    can be closed before its request goes out ("the client has been closed", 4 Nov 2026).
+    """
     from google import genai
-    from google.genai import types
 
     load_dotenv()
     api_key = os.getenv("GEMINI_API_KEY", "").strip()
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY is missing from .env")
-
     client = genai.Client(api_key=api_key)
+    return with_retries(lambda model: client.models.generate_content(
+        model=model, contents=prompt, config=generation_config), models)
+
+
+def _ask_gemini(prompt, models=None):
+    """Send the prompt to Gemini and return (decision, reason). Raises on any problem."""
+    from google.genai import types
+
     schema = types.Schema(
         type=types.Type.OBJECT,
         properties={
@@ -146,15 +164,13 @@ def _ask_gemini(prompt):
         },
         required=["decision", "reason"],
     )
-    response = with_retries(lambda: client.models.generate_content(
-        model=config.GEMINI_MODEL,
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            response_mime_type="application/json",
-            response_schema=schema,
-            temperature=0,
-        ),
-    ))
+    response, model = generate(prompt, types.GenerateContentConfig(
+        response_mime_type="application/json",
+        response_schema=schema,
+        temperature=0,
+    ), models)
+    if model != config.GEMINI_MODEL:
+        print(f"   {config.GEMINI_MODEL} was busy, so the backup {model} answered")
     answer = json.loads(response.text)
     decision = str(answer.get("decision", "")).strip().upper()
     reason = " ".join(str(answer.get("reason", "")).split())[:200] or "(no reason given)"
@@ -198,17 +214,21 @@ def _outcome():
 if __name__ == "__main__":
     import pandas as pd
 
-    print(f"Asking {config.GEMINI_MODEL} about a made-up example trade (nothing is traded)...")
     days = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=30)
     example = pd.DataFrame({"close": [100 + i * 0.4 for i in range(30)]}, index=days)
-    try:
-        decision, why = _ask_gemini(_build_prompt(
-            "SPY", "BUY", "20-day average crossed ABOVE the 50-day average (example)", example))
-        print(f"✅ Gemini answered: {decision} - {why}")
-    except Exception as error:
-        print("❌ Gemini call failed:", " ".join(str(error).split())[:300])
-        print("   Check GEMINI_API_KEY in .env, and GEMINI_MODEL in config.py against the")
-        print("   free models listed in Google AI Studio.")
+    example_prompt = _build_prompt("SPY", "BUY", "20-day average crossed ABOVE the 50-day average (example)", example)
+    answered = []
+    for name in dict.fromkeys(models_to_try()):     # the main model, then the backup, each checked on its own
+        print(f"Asking {name} about a made-up example trade (nothing is traded)...")
+        try:
+            decision, why = _ask_gemini(example_prompt, models=[name, name])
+            print(f"✅ {name} answered: {decision} - {why}")
+            answered.append(name)
+        except Exception as error:
+            print(f"❌ {name} failed:", " ".join(str(error).split())[:300])
+    if not answered:
+        print("   Check GEMINI_API_KEY in .env, and GEMINI_MODEL / GEMINI_BACKUP_MODEL in config.py")
+        print("   against the free models listed in Google AI Studio.")
         try:                                  # names only, to pick a model that exists
             from google import genai
             client = genai.Client(api_key=os.getenv("GEMINI_API_KEY", "").strip())

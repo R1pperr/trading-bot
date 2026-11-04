@@ -193,6 +193,9 @@ USE_AI_ANALYST = True
 # The daily review may switch it in docs/data/control.json if the AI's vetoes cost money.
 AI_VETO_MODE = "enforce"
 GEMINI_MODEL = "gemini-3.8-flash"
+# Asked when the main model is busy or rate-limited (4 Nov 2026: gemini-3.8-flash answered
+# "high demand" for hours, which blocked every buy in enforce mode). Same key, free tier.
+GEMINI_BACKUP_MODEL = "gemini-3.7-flash"
 # Questions to the AI. A veto doesn't use up a trade, so after vetoes the bot keeps asking
 # about the next signals until it has made its trades for the day (MAX_TRADES_PER_DAY still
 # caps those at 5). Asked for on 4 Nov 2026: five vetoes shouldn't end the day.
