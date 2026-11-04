@@ -102,6 +102,9 @@ def _note_health(failed):
 
 
 BUSY_CODES = (429, 500, 503, 504)
+# Only for the AI check (python ai_analyst.py): other free models to try when both configured ones fail.
+PROBE_MODELS = ("gemini-2.5-flash", "gemini-2.5-flash-lite", "gemini-3.5-flash", "gemini-3.6-flash",
+                "gemini-3.1-flash-lite", "gemini-flash-latest", "gemini-flash-lite-latest")
 RETRY_WAITS = (3, 10)   # seconds before the second and third try
 
 
@@ -227,6 +230,13 @@ if __name__ == "__main__":
         except Exception as error:
             print(f"❌ {name} failed:", " ".join(str(error).split())[:300])
     if not answered:
+        print("   Trying other free models once each, to find a backup that answers today:")
+        for name in PROBE_MODELS:
+            try:
+                decision, why = _ask_gemini(example_prompt, models=[name])
+                print(f"   ✅ {name} answered: {decision}")
+            except Exception as error:
+                print(f"   ❌ {name}:", " ".join(str(error).split())[:90])
         print("   Check GEMINI_API_KEY in .env, and GEMINI_MODEL / GEMINI_BACKUP_MODEL in config.py")
         print("   against the free models listed in Google AI Studio.")
         try:                                  # names only, to pick a model that exists
