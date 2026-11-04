@@ -27,6 +27,7 @@ import numpy as np
 import pandas as pd
 
 import config
+import fixes as fixmenu
 import risk
 import strategies
 import universe
@@ -76,6 +77,7 @@ class Options:
     stop_bars: object = None             # (symbol, date) -> that day's 15-minute bars
     ibs_at_close: bool = False           # the close-to-close IBS version, as a reference only
     params: dict = field(default_factory=dict)     # nearby values, for the robustness report only
+    fixes: dict = None                   # sleeve -> fix switches from fixes.py. None: everything off
 
 
 def build_panel(tables, etf=(), not_scanned=()):
@@ -84,13 +86,15 @@ def build_panel(tables, etf=(), not_scanned=()):
     dates = pd.DatetimeIndex(sorted(set().union(*[set(t.index) for t in tables.values()])))
     symbols = list(tables)
     computed = ("rsi", "sma_exit", "sma_trend", "atr", "trend", "momentum", "ibs", "rotation", "vol")
-    names = ("open", "high", "low", "close", "cross") + computed
+    names = ("open", "high", "low", "close", "cross", "dollar_volume") + computed
     fields = {name: np.full((len(dates), len(symbols)), np.nan) for name in names}
     for column, symbol in enumerate(symbols):
         table = tables[symbol]
         rows = dates.get_indexer(table.index)
         for name in ("open", "high", "low", "close"):
             fields[name][rows, column] = table[name].to_numpy()
+        if "volume" in table.columns:       # for the liquidity fix: average dollars traded over 20 days
+            fields["dollar_volume"][rows, column] = (table["close"] * table["volume"]).rolling(20).mean().to_numpy()
         values = strategies.indicators(table)
         for name in computed:
             fields[name][rows, column] = values[name].to_numpy()
@@ -179,6 +183,14 @@ def basket_scale(panel, columns, days_so_far):
     return strategies.vol_scale(prices.pct_change(fill_method=None).mean(axis=1))
 
 
+def rolling_vol_rank(vol):
+    """fixes.vol_rank for every day and symbol at once: the share of the last year's 20-day
+    volatilities that were lower than today's. Under three months of history gives no answer."""
+    frame = pd.DataFrame(vol)
+    rolling = frame.rolling(fixmenu.VOL_LOOKBACK, min_periods=60)
+    return ((rolling.rank(method="min") - 1) / rolling.count()).to_numpy()
+
+
 def simulate(panel, options):
     """Run the whole history day by day. Returns the daily equity and everything that happened."""
     T, N = panel["close"].shape
@@ -213,6 +225,29 @@ def simulate(panel, options):
     equity_curve[:start] = START_CASH
     old_mode = any(sleeve.startswith("crossover") for sleeve in options.sleeves)
     limits = OLD_LIMITS if old_mode else config.SLEEVE_MAX_OPEN_POSITIONS
+    # The fix switches, the same rules the live bot follows (fixes.py). All off by default.
+    fix_of = {sleeve: fixmenu.clean_fixset((options.fixes or {}).get(sleeve)) for sleeve in options.sleeves}
+    vol_rank = rolling_vol_rank(panel["vol"]) if any(f["vol_filter"] for f in fix_of.values()) else None
+    fix_skips = {sleeve: 0 for sleeve in options.sleeves}
+
+    def finite(value):
+        return float(value) if np.isfinite(value) else None
+
+    def blocked_by_fix(sleeve, column, price, t):
+        """The entry checks a fix adds, on the signal day's numbers. Missing data never blocks."""
+        fix = fix_of.get(sleeve, fixmenu.OFF)
+        if fixmenu.is_off(fix) or is_crypto[column]:
+            return False
+        spy_up = None
+        if spy is not None and np.isfinite(panel["sma_trend"][t - 1][spy]):
+            spy_up = bool(last_price[t - 1][spy] > panel["sma_trend"][t - 1][spy])
+        rank = finite(vol_rank[t - 1][column]) if vol_rank is not None else None
+        previous = last_price[t - 1][column]
+        gap = price / previous - 1 if np.isfinite(previous) and previous > 0 else None
+        if fixmenu.entry_block(fix, spy_up, rank, gap, finite(panel["dollar_volume"][t - 1][column])):
+            fix_skips[sleeve] += 1
+            return True
+        return False
 
     def enter(sleeve, column, price, t, marks, entries_today):
         """Buy if every limit allows it. marks are the prices the account is valued at."""
@@ -229,6 +264,9 @@ def simulate(panel, options):
             return
         if book.count(is_crypto, crypto) >= limits["crypto" if crypto else "stock"]:
             return
+        if not old_mode and blocked_by_fix(sleeve, column, price, t):
+            return
+        fix = fix_of.get(sleeve, fixmenu.OFF)
         equity_now = book.cash + sum(p["qty"] * marks[k[1]] for k, p in book.positions.items())
         allocation = 1.0 if old_mode else shares[sleeve]
         left = equity_now * allocation - book.sleeve_value(sleeve, marks)
@@ -242,9 +280,11 @@ def simulate(panel, options):
         elif sleeve == "crypto_hold":
             room = min(room, equity_now * allocation / len(config.CRYPTO_HOLD_SYMBOLS))
         stop = stop_for(price, last_atr[t - 1][column], options, crypto) if not old_mode else risk.stop_price(price)
+        if not old_mode and not options.atr_stops and (fix["tight_stop"] or fix["trailing_stop"]):
+            stop = fixmenu.stop_level(fix, price)
         dollars = risk.risk_sized_dollars(equity_now, price, stop, min(room, book.cash))
         rate = fee_for(panel, column, options, sleeve in ("crypto_trend", "crypto_hold"))
-        if options.vol_sizing and not old_mode and not crypto:
+        if (options.vol_sizing or fix["vol_sizing"]) and not old_mode and not crypto:
             typical = float(np.nanmedian(last_vol[t - 1][~is_crypto])) if (~is_crypto).any() else 0.0
             dollars = risk.vol_sized_dollars(dollars, last_vol[t - 1][column], typical, equity_now, min(left, book.cash))
         dollars = min(dollars, book.cash / (1 + rate))
@@ -257,7 +297,7 @@ def simulate(panel, options):
         book.fees += fee
         book.positions[(sleeve, column)] = {"qty": dollars / price, "cost": dollars + fee, "stop": stop,
                                             "entry_fee": fee, "entry_day": t, "high": price, "bars": 0,
-                                            "equity": equity_now}
+                                            "equity": equity_now, "price": price}
         book.owned[column] = sleeve
         last_trade[column] = t
         entries_today[crypto] += 1
@@ -314,6 +354,10 @@ def simulate(panel, options):
                 position["bars"] += 1
                 if is_crypto[column] and options.atr_stops and not old_mode and np.isfinite(panel["atr"][t][column]):
                     position["stop"] = max(position["stop"], closes[column] - config.ATR_STOP_MULTIPLE * panel["atr"][t][column])
+                fix = fix_of.get(key[0])
+                if fix and fix["trailing_stop"] and not options.atr_stops and not old_mode:
+                    position["high"] = max(position["high"], closes[column])     # the trailing stop only moves up
+                    position["stop"] = max(position["stop"], fixmenu.stop_level(fix, position["price"], position["high"]))
 
         market_day = spy is not None and np.isfinite(closes[spy])
         order = []
@@ -323,17 +367,21 @@ def simulate(panel, options):
 
         for sleeve in options.sleeves:
             if sleeve == "rsi2_stocks" and market_day:
+                hold_limit = fixmenu.max_hold(fix_of[sleeve], config.RSI_MAX_HOLD_DAYS)
                 for key, position in book.positions.items():
                     column = key[1]
                     if key[0] == sleeve and np.isfinite(closes[column]) and strategies.rsi2_exit(
                             closes[column], panel["sma_exit"][t][column], panel["sma_trend"][t][column], position["bars"]):
                         pending_exits[key] = "signal"
+                    elif key[0] == sleeve and np.isfinite(closes[column]) and position["bars"] >= hold_limit:
+                        pending_exits[key] = "time"          # only reachable with the earlier time exit on
                 wanted = strategies.rsi2_entry(closes, panel["sma_trend"][t], panel["rsi"][t]) & ~is_crypto & allowed
                 if options.only_symbols is not None:
                     wanted &= np.array([s in options.only_symbols for s in panel.symbols])
                 order += [(sleeve, column) for column in np.flatnonzero(wanted)]
             elif sleeve == "ibs_etfs" and market_day:
                 above, days = params.get("ibs_exit", config.IBS_EXIT_ABOVE), params.get("ibs_days", config.IBS_MAX_HOLD_DAYS)
+                days = fixmenu.max_hold(fix_of[sleeve], days)
                 for key, position in book.positions.items():
                     column = key[1]
                     if key[0] == sleeve and np.isfinite(closes[column]) and strategies.ibs_exit(
@@ -418,7 +466,7 @@ def simulate(panel, options):
                                                 "fee", "ret", "impact"])
     return {"equity": pd.Series(equity_curve, index=panel.dates), "trades": trades, "fees": book.fees,
             "skips": skips, "dates": panel.dates, "cash": pd.Series(cash_curve, index=panel.dates),
-            "exposure": pd.DataFrame(exposure, index=panel.dates)}
+            "exposure": pd.DataFrame(exposure, index=panel.dates), "fix_skips": fix_skips}
 
 
 # ---------------------------------------------------------------------------

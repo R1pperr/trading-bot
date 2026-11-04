@@ -39,10 +39,14 @@ def by_symbol(orders):
 
 
 def level_for(record, entry):
-    """Where the stop sits. Approved ATR stops use their saved level, otherwise 7% below the buy price."""
+    """Where the stop sits. Approved ATR stops use their saved level, otherwise 7% below the buy price.
+    A stop fix (tighter or trailing, see fixes.py) can only move it closer, never further away."""
     if config.USE_ATR_STOPS and record and record.get("stop"):
         return float(record["stop"])
-    return risk.stop_price(entry)
+    level = risk.stop_price(entry)
+    if record and record.get("fix_stop"):
+        level = max(level, float(record["fix_stop"]))
+    return level
 
 
 def order_id_for(sleeve):

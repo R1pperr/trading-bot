@@ -40,7 +40,7 @@ def add_fill(book, order):
     lots = book["lots"]
     if side == "buy":
         lot = lots.setdefault(symbol, {"qty": 0.0, "cost": 0.0, "sleeve": sleeve_of(order), "day": day,
-                                       "order_id": str(order.id)})
+                                       "order_id": str(order.id), "time": str(order.filled_at)[:19]})
         lot["qty"] += qty
         lot["cost"] += qty * price
         return
@@ -53,7 +53,8 @@ def add_fill(book, order):
                            "exit_day": day, "days": days_between(lot["day"], day), "qty": round(sold, 6),
                            "entry": round(entry, 4), "exit": round(price, 4), "pnl": round((price - entry) * sold, 2),
                            "ret": round(price / entry - 1, 5), "stop": "-stop-" in str(order.client_order_id or ""),
-                           "entry_order": lot["order_id"]})
+                           "entry_order": lot["order_id"], "entry_time": lot.get("time", ""),
+                           "exit_time": str(order.filled_at)[:19], "exit_order": str(order.id)})
     lot["qty"] -= sold
     lot["cost"] -= sold * entry
     if lot["qty"] <= 1e-9:
@@ -108,7 +109,8 @@ def scoreboard(trades, log_rows):
     errors = sum(1 for row in log_rows if row.get("event") == "AI_DECISION" and row.get("ai_decision") == "VETO"
                  and not is_real_veto("VETO", row.get("ai_reason", "")))
     vetoes = [row for row in log_rows if row.get("event") == "AI_DECISION" and is_real_veto(row.get("ai_decision"), row.get("ai_reason", ""))]
-    return {"mode": config.AI_VETO_MODE, "on": config.USE_AI_ANALYST, "would_veto": summary(groups["would_veto"]),
+    from ai_analyst import mode
+    return {"mode": mode(), "on": config.USE_AI_ANALYST, "would_veto": summary(groups["would_veto"]),
             "approved": summary(groups["approved"]), "ai_errors": errors,
             "latest": [{"time_utc": r.get("time_utc", ""), "symbol": r.get("symbol", ""), "reason": r.get("ai_reason", "")}
                        for r in vetoes[-10:]][::-1]}

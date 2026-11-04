@@ -189,8 +189,9 @@ PRE_OPEN_MINUTES = 30              # the day's orders queue this close to the op
 # ---------------------------------------------------------------------------
 USE_AI_ANALYST = True
 # "shadow": Gemini logs its decision and reason but can't block a trade.
-# "enforce": a veto blocks the trade.
-AI_VETO_MODE = "shadow"
+# "enforce": a veto blocks the trade, and so does any Gemini error (no trade, and it's logged).
+# The daily review may switch it in docs/data/control.json if the AI's vetoes cost money.
+AI_VETO_MODE = "enforce"
 GEMINI_MODEL = "gemini-3.8-flash"
 # Only the top candidates are looked at each day, sells first and then the most
 # traded buys. That caps Gemini at 10 calls a day. Google doesn't publish the free

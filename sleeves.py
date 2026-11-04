@@ -33,9 +33,11 @@ import pandas as pd
 from alpaca.trading.enums import OrderSide, QueryOrderStatus, TimeInForce
 from alpaca.trading.requests import GetCalendarRequest, GetOrdersRequest, LimitOrderRequest, MarketOrderRequest
 
+import activity
 import ai_analyst
 import config
 import crypto
+import fixes
 import notifier
 import risk
 import signals
@@ -66,9 +68,18 @@ def sleeves_for(market):
     return [name for name, sleeve in config.SLEEVES.items() if sleeve["market"] == market and is_enabled(name)]
 
 
-def share_of(sleeve):
-    """This sleeve's share of the account: its horizon's money over its enabled sleeves. Off means 0."""
-    return strategies.split_by_horizon([name for name in config.SLEEVES if is_enabled(name)]).get(sleeve, 0.0)
+def share_of(sleeve, control=None):
+    """This sleeve's share of the account: its horizon's money over its enabled sleeves. Off means 0.
+    The daily review may move money between one horizon's sleeves (docs/data/control.json), never
+    past the horizon's own share, and a paused sleeve gets nothing while it runs in shadow."""
+    base = strategies.split_by_horizon([name for name in config.SLEEVES if is_enabled(name)]).get(sleeve, 0.0)
+    if base <= 0:
+        return 0.0
+    control = control or fixes.load_control()
+    if sleeve in control["paused"]:
+        return 0.0
+    horizon_share = config.HORIZONS[config.SLEEVES[sleeve]["horizon"]]
+    return min(control["allocations"].get(sleeve, base), horizon_share)
 
 
 def in_market(symbol, market):
@@ -276,10 +287,60 @@ def stop_for(price, atr_value):
 
 
 def stop_hit(record, entry, price):
-    """Owned positions use their saved stop once ATR stops are approved. Otherwise the fixed stop."""
+    """Owned positions use their saved stop once ATR stops are approved. Otherwise the fixed stop,
+    or a tighter one if a stop fix (tighter or trailing) is switched on for the sleeve."""
     if config.USE_ATR_STOPS and record and record.get("stop"):
         return price <= record["stop"]
+    if record and record.get("fix_stop"):
+        return price <= max(risk.stop_price(entry), float(record["fix_stop"]))
     return risk.stop_loss_hit(entry, price)
+
+
+RULE_SHORT = {"rsi2_stocks": "RSI(2) dip", "ibs_etfs": "IBS dip", "turn_of_month": "turn of the month",
+              "rotation": "rotation pick", "momentum_stocks": "momentum pick", "crypto_trend": "crypto trend",
+              "crypto_hold": "crypto hold"}
+NORMAL_HOLD = {"rsi2_stocks": config.RSI_MAX_HOLD_DAYS, "ibs_etfs": config.IBS_MAX_HOLD_DAYS}
+WIDE_SPREAD = 0.001         # a bid-ask spread over 0.10% of the price counts as wide when grading a trade
+
+
+def entry_context(symbol, tables, latest, price, spread=None):
+    """The conditions at entry. They decide the fix filters, and the daily review grades trades by them."""
+    spy = latest.get(config.MOMENTUM_MARKET_SYMBOL)
+    table = tables.get(symbol)
+    previous = float(latest[symbol]["close"]) if symbol in latest else 0.0
+    context = {
+        "spy_above_trend": None if spy is None or pd.isna(spy["sma_trend"]) else bool(spy["close"] > spy["sma_trend"]),
+        "vol_rank": fixes.vol_rank(table["close"].to_numpy()) if table is not None else None,
+        "gap": round(price / previous - 1, 5) if previous > 0 and price > 0 else None,
+        "dollar_volume": fixes.dollar_volume(table),
+        "vol20": None if symbol not in latest or pd.isna(latest[symbol]["vol"]) else round(float(latest[symbol]["vol"]), 5),
+        "spread": None,
+    }
+    if spread is not None:
+        try:
+            value = spread(symbol)
+            context["spread"] = None if value is None else round(float(value), 6)
+        except Exception:
+            pass
+    return context
+
+
+def update_fix_stops(state, positions, tables, control):
+    """Once a day: where the tighter or trailing stop sits for each owned position. Only ever closer."""
+    for symbol, record in state["positions"].items():
+        fix = control["fixes"].get(record.get("sleeve", ""), fixes.OFF)
+        position = positions.get(symbol)
+        if position is None or not (fix["tight_stop"] or fix["trailing_stop"]):
+            record.pop("fix_stop", None)
+            continue
+        entry = float(position.avg_entry_price)
+        table = tables.get(symbol)
+        highest = None
+        if table is not None and record.get("entry_date"):
+            since = table[table.index >= pd.Timestamp(record["entry_date"])]
+            highest = float(since["close"].max()) if len(since) else None
+        level = fixes.stop_level(fix, entry, highest)
+        record["fix_stop"] = round(max(level, float(record.get("fix_stop") or 0)), 4)
 
 
 def entry_room(sleeve, equity, already_used, scale=1.0):
@@ -394,7 +455,7 @@ def cancel_stale_buys(trading, state, open_buys, positions, today, dry_run):
 
 
 def already_vetoed(todays_log, symbol):
-    return config.AI_VETO_MODE == "enforce" and any(
+    return ai_analyst.mode() == "enforce" and any(
         row["event"] == "AI_DECISION" and row["symbol"] == symbol and row["ai_decision"] == ai_analyst.VETO
         for row in todays_log)
 
@@ -430,11 +491,14 @@ def record_filled_stops(trading, state, equity, log_event):
 # One market's run
 # ---------------------------------------------------------------------------
 def run(market, trading, equity, cash, killed, dry_run, today, todays_log, log_event, download, latest_price,
-        save_plan, pre_open=False):
+        save_plan, pre_open=False, spread=None):
     """Stops on every run, then signals and orders on the first run of the day. pre_open means the
-    market opens shortly: orders queue to fill at the open, and prices are too stale to judge stops."""
+    market opens shortly: orders queue to fill at the open, and prices are too stale to judge stops.
+    spread(symbol) gives the bid-ask spread, recorded with each entry so the review can grade it."""
     print(f"\n=== Sleeves · {market} · on: {', '.join(sleeves_for(market)) or 'none'} ===")
     state = load_state()
+    control = fixes.load_control()
+    say = (lambda text: None) if dry_run else activity.say
     crypto_side = market == "crypto"
     name = crypto.normalize if crypto_side else str
     positions = {name(p.symbol): p for p in trading.get_all_positions() if crypto.is_crypto(p) == crypto_side}
@@ -468,6 +532,7 @@ def run(market, trading, equity, cash, killed, dry_run, today, todays_log, log_e
         sleeve = owner_of(state, symbol)
         if not dry_run and exit_position(trading, market, symbol, position, state, reason, equity, log_event):
             sold.add(symbol)
+            say(f"{symbol}: under its stop-loss → sold by the backup check")
             if sleeve == "momentum_stocks":
                 state["momentum"]["stopped"].append(symbol)
             elif sleeve == "rotation":
@@ -478,11 +543,19 @@ def run(market, trading, equity, cash, killed, dry_run, today, todays_log, log_e
         # A buy that's still filling gets its stop next run: Alpaca refuses a sell stop next to an open buy
         # as a possible wash trade. The 15-minute check covers it until then.
         still_buying = set(open_buys)
-        fixes, _ = stops.sync(trading, positions, working, sold | open_sells | still_buying, state["positions"], today,
-                              first_run, dry_run)
+        stop_fixes, _ = stops.sync(trading, positions, working, sold | open_sells | still_buying, state["positions"],
+                                   today, first_run, dry_run)
         working = stops.by_symbol(trading.get_orders(filter=GetOrdersRequest(status=QueryOrderStatus.OPEN, limit=500)))
-        if fixes and not dry_run:
-            log_event(event="STOP_FIXED", equity=equity, details="; ".join(fixes))
+        if stop_fixes and not dry_run:
+            log_event(event="STOP_FIXED", equity=equity, details="; ".join(stop_fixes))
+            for line in stop_fixes:
+                say(f"Stops: {line.split(' (')[0]}")
+        unprotected = [s for s in positions if s not in working and s not in sold and s not in open_sells
+                       and s not in still_buying and float(positions[s].qty) > 0]
+        if unprotected and not dry_run and not pre_open:
+            state["unprotected"] = sorted(unprotected)       # the watchdog alerts on these
+        else:
+            state.pop("unprotected", None)
 
     if state["days"].get(market) == today and not dry_run:
         save_state(state)
@@ -519,7 +592,16 @@ def run(market, trading, equity, cash, killed, dry_run, today, todays_log, log_e
     for candidate in signals.scan(legacy, set(legacy), latest_signal):
         if candidate["action"] == SELL:
             exits[candidate["symbol"]] = candidate["reason"]
+    if not crypto_side:
+        update_fix_stops(state, positions, tables, control)
+        for symbol, record in state["positions"].items():         # the earlier time exit, if switched on
+            fix = control["fixes"].get(record.get("sleeve", ""), fixes.OFF)
+            normal = NORMAL_HOLD.get(record.get("sleeve", ""))
+            if fix["time_exit"] and normal and symbol in positions and symbol not in exits \
+                    and held_days.get(symbol, 0) >= fixes.max_hold(fix, normal):
+                exits[symbol] = "earlier time exit"
     print(f"  {len(latest)} checked · {len(exits)} to sell · {len(entries)} entries wanted")
+    say(f"Daily check: {len(latest)} symbols checked, {len(exits)} to sell, {len(entries)} buy signals")
 
     cancelled = cancel_stale_buys(trading, state, open_buys, positions, today, dry_run) if crypto_side else set()
 
@@ -531,6 +613,7 @@ def run(market, trading, equity, cash, killed, dry_run, today, todays_log, log_e
         if not dry_run and exit_position(trading, market, symbol, positions[symbol], state, reason, equity, log_event,
                                          working.get(symbol, []) if alpaca_stops else ()):
             sold.add(symbol)
+            say(f"{symbol}: {reason} → sell order placed")
 
     # --- New entries, short-term sleeves first ---------------------------------------
     # Money from today's sells only counts tomorrow, so a buy can never lean on margin.
@@ -544,8 +627,11 @@ def run(market, trading, equity, cash, killed, dry_run, today, todays_log, log_e
     ai_left = config.MAX_AI_REVIEWS_PER_DAY[market] - sum(
         row["event"] == "AI_DECISION" and in_market(row["symbol"], market) for row in todays_log)
     added, shortlist = {}, []
+    skipped_why, placed_now = {}, [0]
 
     def note(candidate, why):
+        if why:
+            skipped_why[why] = skipped_why.get(why, 0) + 1
         if why and len(shortlist) >= config.MAX_AI_REVIEWS_PER_DAY[market]:
             return
         candidate.update(note=why)
@@ -569,11 +655,37 @@ def run(market, trading, equity, cash, killed, dry_run, today, todays_log, log_e
             continue
         row = latest[symbol]
         price = latest_price(symbol, float(row["close"]))
+        fix = control["fixes"].get(sleeve, fixes.OFF)
+        label = f"{symbol} ({RULE_SHORT.get(sleeve, sleeve)})"
+        if sleeve in control["paused"]:
+            note(candidate, "sleeve paused: it runs in shadow until its results recover")
+            say(f"{label}: buy signal → skipped, this sleeve is paused and runs in shadow")
+            if not dry_run:
+                log_event(event="SIGNAL_SKIPPED", symbol=symbol, signal="BUY", signal_date=today, price=price,
+                          equity=equity, details=tagged(sleeve, "paused: shadow trade"))
+            continue
+        context = entry_context(symbol, tables, latest, price) if not crypto_side else {}
+        checks = (context.get("spy_above_trend"), context.get("vol_rank"), context.get("gap"), context.get("dollar_volume"))
+        blocked = fixes.entry_block(fix, *checks) if context else ""
+        shadow = control["shadow"].get(sleeve)
+        if shadow and context:            # a fix under test: log what it would do, never trade on it
+            shadow_block = fixes.entry_block(shadow, *checks)
+            if shadow_block != blocked:
+                say(f"Shadow test ({sleeve}): {label} → would {'skip, ' + shadow_block if shadow_block else 'buy'}")
+        if blocked:
+            note(candidate, blocked)
+            say(f"{label}: buy signal → skipped by the {blocked}")
+            if not dry_run:
+                log_event(event="SIGNAL_SKIPPED", symbol=symbol, signal="BUY", signal_date=today, price=price,
+                          equity=equity, details=tagged(sleeve, f"fix: {blocked}"))
+            continue
         stop = stop_for(price, float(row["atr"]))
+        if fix["tight_stop"] or fix["trailing_stop"]:
+            stop = max(stop, fixes.stop_level(fix, price))
         used = exposure(state, positions, sleeve) + added.get(sleeve, 0.0)
         scale = state["momentum"].get("scale", 1.0) if sleeve == "momentum_stocks" and config.VOL_SCALED_MOMENTUM else 1.0
         dollars = risk.risk_sized_dollars(equity, price, stop, entry_room(sleeve, equity, used, scale))
-        if config.VOL_SIZING and not crypto_side:
+        if (config.VOL_SIZING or fix["vol_sizing"]) and not crypto_side:
             typical = float(pd.Series([r["vol"] for r in latest.values()]).median())
             dollars = risk.vol_sized_dollars(dollars, float(row["vol"]), typical, equity, equity * share_of(sleeve) - used)
         dollars = min(dollars, cash)
@@ -599,10 +711,15 @@ def run(market, trading, equity, cash, killed, dry_run, today, todays_log, log_e
         candidate.update(ai_decision=decision, ai_reason=ai_reason if decision != ai_analyst.OFF else "")
         if decision != ai_analyst.OFF:
             log_event(event="AI_DECISION", symbol=symbol, signal="BUY", signal_date=today, ai_decision=decision,
-                      ai_reason=ai_reason, equity=equity, details=tagged(sleeve, candidate["reason"]))
-        if decision == ai_analyst.VETO and config.AI_VETO_MODE == "enforce":
+                      ai_reason=ai_reason, equity=equity, price=price, qty=float(qty),
+                      details=tagged(sleeve, candidate["reason"]))
+        is_error = decision == ai_analyst.VETO and not ai_analyst.is_real_veto(decision, ai_reason)
+        ai_text = {ai_analyst.APPROVE: f"AI approved ({ai_reason})", ai_analyst.OFF: "AI not asked"}.get(
+            decision, "AI error" if is_error else f"AI vetoed ({ai_reason})")
+        if decision == ai_analyst.VETO and ai_analyst.mode() == "enforce":
             candidate["status"] = "vetoed"
             note(candidate, "")
+            say(f"{label}: buy signal → {ai_text} → no trade")
             continue
         try:
             order = buy(trading, market, symbol, qty, price, sleeve)
@@ -610,21 +727,45 @@ def run(market, trading, equity, cash, killed, dry_run, today, todays_log, log_e
             log_event(event="ERROR", symbol=symbol, equity=equity,
                       details=" ".join(notifier.redact(f"{symbol} buy failed: {error}").split())[:300])
             note(candidate, "order refused")
+            say(f"{label}: buy signal → {ai_text} → order refused by Alpaca")
             continue
         log_event(event="ORDER", symbol=symbol, signal="BUY", signal_date=today, side="buy", qty=float(qty),
                   price=price, order_id=str(order.id), order_status=crypto.text(order.status), equity=equity,
                   ai_decision=decision, ai_reason=ai_reason, details=tagged(sleeve, candidate["reason"]))
+        shadow_note = " (AI shadow mode: its veto doesn't block)" if decision == ai_analyst.VETO else ""
+        say(f"{label}: buy signal → {ai_text}{shadow_note} → order placed for {qty:g} shares")
+        spread_tag = None
+        if spread is not None and not crypto_side:      # one quote call, only for a real buy
+            try:
+                value = spread(symbol)
+                spread_tag = None if value is None else ("wide" if value > WIDE_SPREAD else "normal")
+            except Exception:
+                pass
         state["positions"][symbol] = {"sleeve": sleeve, "entry_date": today, "stop": round(stop, 9)}
+        # Kept after the position closes, for grading. This file is public, so it holds only our own
+        # numbers and a spread label: the review works the market conditions out again from prices.
+        entries_book = state.setdefault("entries", {})
+        entries_book[str(order.id)] = {"symbol": symbol, "sleeve": sleeve, "day": today, "qty": float(qty),
+                                       "equity": round(equity, 2), "ai_decision": decision, "ai_reason": ai_reason[:200],
+                                       "placed_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                                       "pre_open": bool(pre_open), "spread": spread_tag}
+        for old in list(entries_book)[:-300]:
+            del entries_book[old]
         save_state(state)
         candidate["status"] = "ordered"
         note(candidate, "")
         print(f"  {symbol}: bought {qty:g} for {sleeve}")
+        placed_now[0] += 1
         placed_today += 1
         open_count += 1
         added[sleeve] = added.get(sleeve, 0.0) + qty * price
         cash -= qty * price
 
     if not dry_run:
+        if skipped_why or placed_now[0]:
+            reasons = ", ".join(f"{count} {why}" for why, count in sorted(skipped_why.items(), key=lambda item: -item[1]))
+            say(f"Buy signals: {placed_now[0]} order{'s' if placed_now[0] != 1 else ''} placed"
+                + (f"; skipped: {reasons}" if reasons else ""))
         state["days"][market] = today
         save_state(state)
         save_plan({"day": today, "scanned": len(latest), "found": len(entries), "candidates": shortlist})

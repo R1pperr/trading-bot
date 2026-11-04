@@ -4,9 +4,14 @@ ai_analyst.py  -  optional second opinion from Google's Gemini (free tier).
 Set USE_AI_ANALYST in config.py to turn it on or off, and put your key in .env as
 GEMINI_API_KEY=... (or in GitHub Secrets for the scheduled runs).
 
-config.AI_VETO_MODE decides what its answer does. In "shadow" it only logs its
-decision and reason, and the trade goes ahead either way, so you can see how the
-trades it would have vetoed actually did. In "enforce" a VETO blocks the trade.
+The AI mode decides what its answer does (mode() below: docs/data/control.json, which the
+daily review may change, else config.AI_VETO_MODE). In "shadow" it only logs its decision
+and reason, and the trade goes ahead either way, so you can see how the trades it would
+have vetoed actually did. In "enforce" a VETO blocks the trade.
+
+Its prompt includes a short summary of its own recent record (how its last 50 calls turned
+out), written by the daily review. Gemini failures in a row are counted in
+state/ai_health.json, and the watchdog alerts at 3.
 
 Before a strategy trade, the AI sees the signal and the last 30 closing prices
 and answers APPROVE or VETO with a one-line reason. That is all it can do:
@@ -25,6 +30,7 @@ Check your Gemini key works:   python ai_analyst.py
 
 import json
 import os
+import sys
 
 from dotenv import load_dotenv
 
@@ -44,16 +50,54 @@ Otherwise APPROVE. You cannot change the trade size, and you must not suggest on
 Reply with JSON only: {"decision": "APPROVE" or "VETO", "reason": "<one sentence, at most 25 words>"}"""
 
 
-def _build_prompt(symbol, signal, reason, recent_prices, rule=None):
+HEALTH_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "state", "ai_health.json")
+
+
+def mode():
+    """'enforce' or 'shadow'. The daily review can switch it in control.json; config is the default."""
+    import fixes
+    return fixes.load_control()["ai_mode"]["main"]
+
+
+def record_summary():
+    import fixes
+    return fixes.load_control()["ai_record"]["main"]
+
+
+def _build_prompt(symbol, signal, reason, recent_prices, rule=None, record=""):
     lines = [f"{day.date().isoformat()}: {close:.2f}" for day, close in recent_prices["close"].items()]
     rule = rule or f"{config.FAST_SMA_DAYS}/{config.SLOW_SMA_DAYS}-day moving-average crossover"
+    history = f"\nYour own recent record on this bot (learn from it): {record}\n" if record else ""
     return (
-        f"{INSTRUCTIONS}\n\n"
+        f"{INSTRUCTIONS}\n{history}\n"
         f"Proposed trade: {signal} {symbol}\n"
         f"Strategy: {rule}\n"
         f"Why the strategy wants it: {reason}\n"
         f"Last {len(lines)} daily closing prices, oldest first:\n" + "\n".join(lines)
     )
+
+
+def failures_in_row():
+    try:
+        with open(HEALTH_FILE, encoding="utf-8") as handle:
+            return int(json.load(handle).get("failures_in_row", 0))
+    except (OSError, ValueError, TypeError):
+        return 0
+
+
+def _note_health(failed):
+    """Count Gemini failures in a row. A good answer resets it."""
+    from datetime import datetime, timezone
+    count = failures_in_row() + 1 if failed else 0
+    try:
+        os.makedirs(os.path.dirname(HEALTH_FILE), exist_ok=True)
+        with open(HEALTH_FILE, "w", encoding="utf-8") as handle:
+            json.dump({"failures_in_row": count,
+                       "last_error_utc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ") if failed else ""},
+                      handle)
+            handle.write("\n")
+    except OSError:
+        pass
 
 
 def _ask_gemini(prompt):
@@ -107,18 +151,21 @@ def review(symbol, signal, reason, recent_prices, rule=None):
     if not config.USE_AI_ANALYST:
         return OFF, "AI analyst is turned off in config.py"
     load_dotenv()
-    if config.AI_VETO_MODE != "enforce" and not os.getenv("GEMINI_API_KEY", "").strip():
+    if mode() != "enforce" and not os.getenv("GEMINI_API_KEY", "").strip():
         return OFF, "no Gemini key is set, so the AI wasn't asked"
     try:
-        return _ask_gemini(_build_prompt(symbol, signal, reason, recent_prices.tail(30), rule))
+        answer = _ask_gemini(_build_prompt(symbol, signal, reason, recent_prices.tail(30), rule, record_summary()))
     except Exception as error:
+        _note_health(True)
         short = " ".join(str(error).split())[:150]
         return VETO, f"{ERROR_PREFIX}{_outcome()}: {short}"
+    _note_health(answer[1].startswith(UNCLEAR_PREFIX))
+    return answer
 
 
 def _outcome():
     """Only "enforce" stops the trade, so only then does the reason say so."""
-    return ", so no trade" if config.AI_VETO_MODE == "enforce" else ", trade not blocked"
+    return ", so no trade" if mode() == "enforce" else ", trade not blocked"
 
 
 if __name__ == "__main__":
@@ -132,6 +179,15 @@ if __name__ == "__main__":
             "SPY", "BUY", "20-day average crossed ABOVE the 50-day average (example)", example))
         print(f"✅ Gemini answered: {decision} - {why}")
     except Exception as error:
-        print("❌ Gemini call failed:", error)
+        print("❌ Gemini call failed:", " ".join(str(error).split())[:300])
         print("   Check GEMINI_API_KEY in .env, and GEMINI_MODEL in config.py against the")
         print("   free models listed in Google AI Studio.")
+        try:                                  # names only, to pick a model that exists
+            from google import genai
+            client = genai.Client(api_key=os.getenv("GEMINI_API_KEY", "").strip())
+            names = sorted(m.name.replace("models/", "") for m in client.models.list()
+                           if "flash" in m.name and "generateContent" in (getattr(m, "supported_actions", None) or []))
+            print("   Flash models this key can use:", ", ".join(names) or "none found")
+        except Exception as listing:
+            print("   Could not list the models:", " ".join(str(listing).split())[:200])
+        sys.exit(1)

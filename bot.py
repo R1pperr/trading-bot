@@ -32,16 +32,18 @@ from datetime import datetime, timedelta, timezone
 
 from alpaca.data.enums import DataFeed
 from alpaca.data.historical import StockHistoricalDataClient
-from alpaca.data.requests import StockLatestTradeRequest
+from alpaca.data.requests import StockLatestQuoteRequest, StockLatestTradeRequest
 from alpaca.trading.client import TradingClient
 from alpaca.trading.enums import OrderSide, QueryOrderStatus, TimeInForce
 from alpaca.trading.requests import GetOrdersRequest, MarketOrderRequest
 
+import activity
 import ai_analyst
 import config
 import crypto
 import dashboard
 import notifier
+import watchdog
 import risk
 import signals
 import sleeves
@@ -143,6 +145,21 @@ def latest_price(data_client, symbol, fallback):
         return fallback
 
 
+def latest_spread(data_client, symbol):
+    """The bid-ask spread as a share of the price, from the free IEX feed. None if it can't be read.
+    Only recorded with each entry, so the daily review can grade trades by it."""
+    try:
+        request = StockLatestQuoteRequest(symbol_or_symbols=symbol, feed=DataFeed.IEX)
+        quote = data_client.get_stock_latest_quote(request)[symbol]
+        bid, ask = float(quote.bid_price), float(quote.ask_price)
+        return (ask - bid) / ((ask + bid) / 2) if bid > 0 and ask >= bid else None
+    except Exception:
+        return None
+
+
+RUN_INFO = {"market_open": False}
+
+
 def is_pre_open(clock):
     """True in the half hour before a trading day's open. Alpaca's clock knows the holidays."""
     opens, now = getattr(clock, "next_open", None), getattr(clock, "timestamp", None)
@@ -190,6 +207,7 @@ def run(args):
     change = risk.daily_change(equity, start_equity)
     clock = trading.get_clock()
     market_open = clock.is_open
+    RUN_INFO["market_open"] = bool(market_open)
     pre_open = config.STRATEGY_MODE == "sleeves" and is_pre_open(clock)
     dry_run = args.dry_run
 
@@ -228,7 +246,8 @@ def run(args):
         sleeves.run("stock", trading, equity, spendable, killed, dry_run,
                     new_york_now().date().isoformat(), todays_log, log_event, get_daily_bars,
                     lambda symbol, fallback: latest_price(data_client, symbol, fallback),
-                    lambda plan: dashboard.save_candidates("stock", plan), pre_open=pre_open)
+                    lambda plan: dashboard.save_candidates("stock", plan), pre_open=pre_open,
+                    spread=lambda symbol: latest_spread(data_client, symbol))
         print("\nDone.")
         return 0
 
@@ -354,7 +373,7 @@ def handle_candidate(trading, data_client, candidate, prices_for, positions, ope
         return
 
     # --- Optional AI analyst: approve or veto only -----------------------------
-    if config.AI_VETO_MODE == "enforce" and already_logged(todays_log, "AI_DECISION", symbol, date, decision=ai_analyst.VETO):
+    if ai_analyst.mode() == "enforce" and already_logged(todays_log, "AI_DECISION", symbol, date, decision=ai_analyst.VETO):
         print(f"  {symbol}: AI already vetoed this signal today, skipping")
         candidate.update(status="vetoed", ai_decision=ai_analyst.VETO)
         return
@@ -365,7 +384,7 @@ def handle_candidate(trading, data_client, candidate, prices_for, positions, ope
         log_event(event="AI_DECISION", symbol=symbol, signal=action, signal_date=date,
                   ai_decision=decision, ai_reason=ai_reason, equity=equity)
         print(f"  {symbol}: AI analyst says {decision} · {ai_reason}")
-    if decision == ai_analyst.VETO and config.AI_VETO_MODE == "enforce":
+    if decision == ai_analyst.VETO and ai_analyst.mode() == "enforce":
         candidate["status"] = "vetoed"
         return
 
@@ -524,6 +543,19 @@ def finish_run(args, exit_code):
         notifier.notify(alerts_for(RUN_EVENTS))
     errors = [row["details"] for row in RUN_EVENTS if row["event"] == "ERROR"]
     orders = sum(row["event"] == "ORDER" for row in RUN_EVENTS)
+    if not args.dry_run:
+        try:
+            unprotected = sleeves.load_state().get("unprotected", [])
+        except Exception:
+            unprotected = []
+        watchdog.check(datetime.now(timezone.utc), RUN_INFO["market_open"], unprotected)
+        status = "market open" if RUN_INFO["market_open"] else "market closed"
+        activity.say(f"Run at {new_york_now():%H:%M} New York ({status}): {orders} order{'s' if orders != 1 else ''}"
+                     + (f", error: {errors[-1][:100]}" if errors else ", no errors"))
+        try:
+            activity.flush()
+        except OSError as error:
+            print("⚠️  Activity feed not saved:", error)
     dashboard.update(LOG_FILE, start_of_today_utc(), exit_code,
                      errors[-1] if errors else "", args.dry_run, orders)
     send_daily_summary(args)
@@ -535,8 +567,15 @@ def main():
     parser.add_argument("--test-order", nargs="?", const="SPY", default=None, metavar="SYMBOL",
                         help="buy 1 share (default SPY), or about $10 of a crypto pair such as "
                              "BTC/USD, to check orders reach your dashboard")
+    parser.add_argument("--watchdog-test", action="store_true",
+                        help="send a [TEST] watchdog alert for a pretend missed run of the real-time engine, "
+                             "then stop. Talks to Telegram only: no Alpaca call, no orders")
     args = parser.parse_args()
     os.chdir(BASE_DIR)
+    if args.watchdog_test:
+        found = watchdog.simulate_missed_run(datetime.now(timezone.utc))
+        print("Watchdog test sent:" if found else "Watchdog test found nothing to send.", found)
+        sys.exit(0 if found else 1)
     exit_code = 1
     try:
         if args.test_order and "/" in args.test_order:
