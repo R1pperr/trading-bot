@@ -9,7 +9,7 @@ on:
     # next run, and a newer queued run cancels an older one, so a run started by hand would never start.
     inputs:
       ai_test:
-        description: "First ask Gemini about a made-up example trade, to check the AI works (places no order)"
+        description: "First ask Claude and Gemini about a made-up example trade, to check the AI works (places no order)"
         type: boolean
         default: false
       watchdog_test:
@@ -54,6 +54,7 @@ jobs:
         if: inputs.ai_test
         continue-on-error: true
         env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: python ai_analyst.py
 
@@ -71,6 +72,7 @@ jobs:
           ALPACA_SECRET_KEY: ${{ secrets.ALPACA_SECRET_KEY }}
           RT_ALPACA_API_KEY: ${{ secrets.RT_ALPACA_API_KEY }}
           RT_ALPACA_SECRET_KEY: ${{ secrets.RT_ALPACA_SECRET_KEY }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
