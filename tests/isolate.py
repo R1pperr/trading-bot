@@ -19,6 +19,9 @@ import watchdog      # noqa: E402
 FOLDER = tempfile.mkdtemp(prefix="tach-tests-")
 fixes.CONTROL_FILE = os.path.join(FOLDER, "control.json")
 ai_analyst.HEALTH_FILE = os.path.join(FOLDER, "ai_health.json")
+ai_analyst.CLAUDE_SPEND_FILE = os.path.join(FOLDER, "claude_spend.json")
+os.environ.pop("ANTHROPIC_API_KEY", None)        # no test may reach the real (paid) Claude
+ai_analyst.load_dotenv = lambda *args, **kwargs: None   # nor pick a key up from .env
 activity.FEED_FILE = os.path.join(FOLDER, "activity.json")
 watchdog.STATE_FILE = os.path.join(FOLDER, "watchdog.json")
 watchdog.SITE_FILE = os.path.join(FOLDER, "site.json")

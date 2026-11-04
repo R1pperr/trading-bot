@@ -1343,5 +1343,115 @@ class PublicFileTests(unittest.TestCase):
         self.assertIn("Stop orders fixed", notifier.message_for({"event": "STOP_FIXED", "details": "AAA: placed", "symbol": ""}))
 
 
+# ---------------------------------------------------------------------------
+# Claude first, Gemini as the free backup (the user's choice on 4 Nov 2026: under $10 a month)
+# ---------------------------------------------------------------------------
+class ClaudeTests(unittest.TestCase):
+    def setUp(self):
+        self.start(mock.patch.dict(os.environ, {"ANTHROPIC_API_KEY": "made-up-claude-key",
+                                                "GEMINI_API_KEY": "made-up-gemini-key"}))
+        self.start(mock.patch.object(config, "USE_AI_ANALYST", True))
+        self.start(mock.patch.object(config, "AI_VETO_MODE", "enforce"))
+        if os.path.exists(ai_analyst.CLAUDE_SPEND_FILE):
+            os.remove(ai_analyst.CLAUDE_SPEND_FILE)
+        self.requests, self.clients = [], []
+        self.reply = {"text": json.dumps({"decision": "APPROVE", "reason": "Clean pullback in an uptrend"}),
+                      "stop_reason": "end_turn", "input_tokens": 700, "output_tokens": 120}
+        self.gemini = self.start(mock.patch.object(ai_analyst, "_ask_gemini",
+                                                   return_value=(ai_analyst.VETO, "Gemini says no")))
+        import anthropic
+        self.start(mock.patch.object(anthropic, "Anthropic", self.fake_client))
+
+    def start(self, patcher):
+        started = patcher.start()
+        self.addCleanup(patcher.stop)
+        return started
+
+    def fake_client(self, **options):
+        self.clients.append(options)
+        test = self
+
+        def create(**request):
+            test.requests.append(request)
+            if isinstance(test.reply, Exception):
+                raise test.reply
+            return SimpleNamespace(
+                model=request["model"], stop_reason=test.reply["stop_reason"],
+                content=[SimpleNamespace(type="thinking", thinking=""), SimpleNamespace(type="text", text=test.reply["text"])],
+                usage=SimpleNamespace(input_tokens=test.reply["input_tokens"], output_tokens=test.reply["output_tokens"]))
+
+        return SimpleNamespace(beta=SimpleNamespace(messages=SimpleNamespace(create=create)))
+
+    def ask(self):
+        return ai_analyst.review("AAA", "BUY", "dip", stock_bars(pullback()), "RSI(2) dip")
+
+    def test_claude_answers_first_and_gemini_is_not_asked(self):
+        self.assertEqual(self.ask(), (ai_analyst.APPROVE, "Clean pullback in an uptrend"))
+        self.gemini.assert_not_called()
+        request = self.requests[0]
+        self.assertEqual(request["model"], config.CLAUDE_MODEL)
+        self.assertEqual(request["model"], "claude-sonnet-5-5")
+        self.assertEqual(request["output_config"]["effort"], "low")
+        self.assertEqual(request["output_config"]["format"]["type"], "json_schema")
+        self.assertEqual((request["fallbacks"], request["betas"]), ("default", ["server-side-fallback-2026-07-01"]))
+        self.assertNotIn("temperature", request)       # rejected by the API since 2026-10-21
+        self.assertEqual(self.clients[0]["api_key"], "made-up-claude-key")
+
+    def test_every_answer_is_added_to_this_months_spend(self):
+        self.reply.update(input_tokens=1_000_000, output_tokens=100_000)
+        self.ask()
+        self.assertAlmostEqual(ai_analyst.claude_spend(), 2.00 + 1.00)
+        self.ask()
+        self.assertAlmostEqual(ai_analyst.claude_spend(), 6.00)
+
+    def test_over_the_monthly_budget_gemini_answers_instead(self):
+        with open(ai_analyst.CLAUDE_SPEND_FILE, "w") as handle:
+            json.dump({"month": ai_analyst.this_month(), "usd": config.CLAUDE_MONTHLY_BUDGET_USD}, handle)
+        self.assertEqual(self.ask(), (ai_analyst.VETO, "Gemini says no"))
+        self.assertEqual(self.requests, [])
+
+    def test_last_months_spend_doesnt_count(self):
+        with open(ai_analyst.CLAUDE_SPEND_FILE, "w") as handle:
+            json.dump({"month": "2026-10", "usd": 99.0}, handle)
+        self.assertEqual(self.ask()[0], ai_analyst.APPROVE)
+        self.assertEqual(len(self.requests), 1)
+
+    def test_the_budget_keeps_the_month_under_ten_dollars(self):
+        self.assertLessEqual(config.CLAUDE_MONTHLY_BUDGET_USD + 3.00, 10.00)   # plus the engine's own $3
+
+    def test_a_claude_failure_falls_back_to_gemini(self):
+        self.reply = RuntimeError("529 overloaded")
+        self.assertEqual(self.ask(), (ai_analyst.VETO, "Gemini says no"))
+        self.gemini.assert_called_once()
+
+    def test_a_claude_refusal_falls_back_to_gemini(self):
+        self.reply.update(stop_reason="refusal", text="")
+        self.assertEqual(self.ask(), (ai_analyst.VETO, "Gemini says no"))
+
+    def test_without_a_claude_key_only_gemini_is_asked(self):
+        os.environ.pop("ANTHROPIC_API_KEY")
+        self.assertEqual(self.ask(), (ai_analyst.VETO, "Gemini says no"))
+        self.assertEqual(self.clients, [])
+
+    def test_both_failing_is_an_ai_error_and_no_trade(self):
+        self.reply = RuntimeError("529 overloaded")
+        self.gemini.side_effect = RuntimeError("503 UNAVAILABLE")
+        decision, reason = self.ask()
+        self.assertEqual(decision, ai_analyst.VETO)
+        self.assertFalse(ai_analyst.is_real_veto(decision, reason))
+        self.assertIn("no trade", reason)
+
+    def test_prices_in_a_claude_reason_are_blanked(self):
+        self.reply["text"] = json.dumps({"decision": "VETO", "reason": "Fell from 412.50 to 398.10 in one day"})
+        decision, reason = self.ask()
+        self.assertEqual(decision, ai_analyst.VETO)
+        self.assertNotIn("412.50", reason)
+
+    def test_the_review_explanation_asks_claude_for_plain_text(self):
+        self.reply["text"] = "Too few trades to tell yet."
+        self.assertEqual(ai_analyst.write_text("explain"), "Too few trades to tell yet.")
+        self.assertNotIn("format", self.requests[0]["output_config"])
+
+
 if __name__ == "__main__":
     unittest.main()
