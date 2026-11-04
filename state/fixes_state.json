@@ -1,0 +1,36 @@
+{
+ "turn_of_month": {
+  "stage": "idle"
+ },
+ "cooldown": {
+  "turn_of_month": {},
+  "ibs_etfs": {},
+  "rsi2_stocks": {},
+  "rotation": {},
+  "momentum_stocks": {},
+  "realtime": {}
+ },
+ "ibs_etfs": {
+  "stage": "idle"
+ },
+ "rsi2_stocks": {
+  "stage": "idle"
+ },
+ "rotation": {
+  "stage": "idle"
+ },
+ "momentum_stocks": {
+  "stage": "idle"
+ },
+ "realtime": {
+  "stage": "idle"
+ },
+ "ai": {
+  "main": {
+   "auto_shadow": false
+  },
+  "realtime": {
+   "auto_shadow": false
+  }
+ }
+}
