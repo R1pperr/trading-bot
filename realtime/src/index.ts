@@ -283,7 +283,25 @@ export function aiPrompt(series: Bar[], signalIndex: number, record: string): st
   ].join("\n");
 }
 
+// Gemini's free tier sometimes answers 503 "high demand" (4 Nov 2026). One more try after a short
+// wait, then it's an error and there is no trade. A bad key or model name (4xx) is not retried.
+const GEMINI_BUSY = [429, 500, 503, 504];
+export const geminiRetry = { waitMs: 2000 };
+
 export async function askGemini(call: Fetcher, env: Env, prompt: string, timeoutMs = GEMINI_TIMEOUT_MS): Promise<Verdict> {
+  const first = await askGeminiOnce(call, env, prompt, timeoutMs);
+  if (!first.busy) return first.verdict;
+  await new Promise((resolve) => setTimeout(resolve, geminiRetry.waitMs));
+  return (await askGeminiOnce(call, env, prompt, timeoutMs)).verdict;
+}
+
+async function askGeminiOnce(call: Fetcher, env: Env, prompt: string, timeoutMs: number): Promise<{ verdict: Verdict; busy: boolean }> {
+  const verdict = await askGeminiCall(call, env, prompt, timeoutMs);
+  const status = Number(/Gemini said (\d+)/.exec(verdict.reason)?.[1] ?? 0);
+  return { verdict, busy: verdict.failed && GEMINI_BUSY.includes(status) };
+}
+
+async function askGeminiCall(call: Fetcher, env: Env, prompt: string, timeoutMs: number): Promise<Verdict> {
   if (!env.GEMINI_API_KEY) return { decision: "VETO", reason: "AI error: no Gemini key is set", failed: true };
   const model = env.GEMINI_MODEL || "gemini-3.8-flash";
   const controller = new AbortController();
