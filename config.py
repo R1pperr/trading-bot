@@ -197,15 +197,19 @@ GEMINI_MODEL = "gemini-3.8-flash"
 # answered "high demand" for hours, which blocked every buy in enforce mode; of the free models on
 # this key only these two answered then (3.6 busy, 3.7 out of quota, 2.5 gone). Same key, free tier.
 GEMINI_BACKUP_MODELS = ("gemini-3.5-flash", "gemini-flash-lite-latest")
-# Questions to the AI. A veto doesn't use up a trade, so after vetoes the bot keeps asking
-# about the next signals until it has made its trades for the day (MAX_TRADES_PER_DAY still
-# caps those at 5). Asked for on 4 Nov 2026: five vetoes shouldn't end the day.
-# A run asks at most PER_RUN (Gemini's free tier allows about 10 questions a minute), and a
-# day at most PER_DAY real answers (failed calls don't count). In the old crossover mode
-# (signals.py), PER_RUN is the day's shortlist. Google doesn't publish the free daily limit:
-# check aistudio.google.com/rate-limit before raising these.
-MAX_AI_REVIEWS_PER_RUN = {"stock": 5, "crypto": 5}
+# Questions to the AI. The buy signals are checked once a day, in the day's first run. A veto
+# doesn't use up a trade, so after vetoes the bot asks about the next signal, until it has made
+# its trades (MAX_TRADES_PER_DAY still caps those at 5) or had PER_DAY real answers. Asked for on
+# 4 Nov 2026: five vetoes shouldn't end the day. Failed calls don't count, but after
+# AI_GIVE_UP_AFTER failures in a row the bot stops asking until the next day.
+# AI_PAUSE_SECONDS between questions keeps under Gemini's free limit of about 10 a minute.
+# Google doesn't publish the free daily limit: check aistudio.google.com/rate-limit before raising.
 MAX_AI_REVIEWS_PER_DAY = {"stock": 25, "crypto": 25}
+AI_GIVE_UP_AFTER = 3
+AI_PAUSE_SECONDS = 5
+AI_TIME_BUDGET_SECONDS = 240    # the run must finish inside GitHub's 10-minute limit
+# How many skipped candidates the dashboard lists (and the old crossover mode's daily shortlist).
+AI_SHORTLIST = {"stock": 5, "crypto": 5}
 
 
 # ---------------------------------------------------------------------------

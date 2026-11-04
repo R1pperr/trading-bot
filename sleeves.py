@@ -630,14 +630,15 @@ def run(market, trading, equity, cash, killed, dry_run, today, todays_log, log_e
     answered_today = sum(
         row["event"] == "AI_DECISION" and in_market(row["symbol"], market)
         and not str(row.get("ai_reason") or "").startswith(ai_analyst.ERROR_PREFIX) for row in todays_log)
-    ai_left = min(config.MAX_AI_REVIEWS_PER_RUN[market], config.MAX_AI_REVIEWS_PER_DAY[market] - answered_today)
+    ai_left = config.MAX_AI_REVIEWS_PER_DAY[market] - answered_today
+    ai_asked, ai_failed_in_row, ai_started = 0, 0, None
     added, shortlist = {}, []
     skipped_why, placed_now = {}, [0]
 
     def note(candidate, why):
         if why:
             skipped_why[why] = skipped_why.get(why, 0) + 1
-        if why and len(shortlist) >= config.MAX_AI_REVIEWS_PER_RUN[market]:
+        if why and len(shortlist) >= config.AI_SHORTLIST[market]:
             return
         candidate.update(note=why)
         shortlist.append(candidate)
@@ -710,7 +711,18 @@ def run(market, trading, equity, cash, killed, dry_run, today, todays_log, log_e
             continue
         if already_vetoed(todays_log, symbol):
             continue
+        if ai_failed_in_row >= config.AI_GIVE_UP_AFTER:
+            note(candidate, "Gemini not answering")
+            continue
+        if ai_started is not None and time.monotonic() - ai_started > config.AI_TIME_BUDGET_SECONDS:
+            note(candidate, "no time left in this run for AI questions")
+            continue
+        if ai_started is None:
+            ai_started = time.monotonic()
+        if ai_asked and config.USE_AI_ANALYST:
+            time.sleep(config.AI_PAUSE_SECONDS)       # stays under Gemini's free limit per minute
         ai_left -= 1
+        ai_asked += 1
         prices = tables[symbol] if config.USE_AI_ANALYST else None
         decision, ai_reason = ai_analyst.review(symbol, "BUY", candidate["reason"], prices, RULE_TEXT.get(sleeve))
         candidate.update(ai_decision=decision, ai_reason=ai_reason if decision != ai_analyst.OFF else "")
@@ -719,6 +731,7 @@ def run(market, trading, equity, cash, killed, dry_run, today, todays_log, log_e
                       ai_reason=ai_reason, equity=equity, price=price, qty=float(qty),
                       details=tagged(sleeve, candidate["reason"]))
         is_error = decision == ai_analyst.VETO and not ai_analyst.is_real_veto(decision, ai_reason)
+        ai_failed_in_row = ai_failed_in_row + 1 if is_error else 0
         ai_text = {ai_analyst.APPROVE: f"AI approved ({ai_reason})", ai_analyst.OFF: "AI not asked"}.get(
             decision, "AI error" if is_error else f"AI vetoed ({ai_reason})")
         if decision == ai_analyst.VETO and ai_analyst.mode() == "enforce":
