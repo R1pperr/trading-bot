@@ -3,7 +3,8 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import * as alpaca from "../src/alpaca.ts";
 import {
-  BOT1_STATUS_URL, CONTROL_URL, askGemini, clearStatusCache, freshState, handle, maskPrices, parseControl, runOnce, scheduledRun,
+  BOT1_STATUS_URL, CONTROL_URL, askGemini, clearStatusCache, freshState, geminiRetry, handle, maskPrices, parseControl, runOnce,
+  scheduledRun,
 } from "../src/index.ts";
 import type { Env, Kv, State } from "../src/index.ts";
 import { completedBars, crossovers, decide, warmedUp } from "../src/engine.ts";
@@ -65,6 +66,11 @@ function fakeAlpaca(world: World = {}) {
     if (url.includes("generativelanguage")) {
       const answer = world.gemini ?? { decision: "APPROVE", reason: "Looks fine" };
       if (answer === "error") return json({ error: "busy" }, 500);
+      if (answer === "bad-key") return json({ error: "API key not valid" }, 400);
+      if (answer === "busy-once" && calls.filter((c) => c.url.includes("generativelanguage")).length === 1) {
+        return json({ error: { code: 503, status: "UNAVAILABLE" } }, 503);
+      }
+      if (answer === "busy-once") return json({ candidates: [{ content: { parts: [{ text: JSON.stringify({ decision: "APPROVE", reason: "Fine" }) }] } }] });
       if (answer === "hang") {
         return new Promise((_, reject) => init.signal?.addEventListener("abort", () => {
           const error = new Error("aborted");
@@ -393,6 +399,32 @@ test("enforce: a Gemini error, an unclear answer or a missing key means no trade
     assert.equal(state.ai.failures_in_row, 1);
     assert.match(state.feed[0].text, /Gemini error .* → no trade/);
   }
+});
+
+test("a busy Gemini (503) is asked once more, and its answer counts", async () => {
+  const { call, calls } = fakeAlpaca({ gemini: "busy-once" });
+  const state = freshState();
+  await quiet(() => runOnce(env({ RT_MODE: "live", ...AI }), signalEnd(), call, state));
+  assert.equal(geminiCalls(calls).length, 2);
+  assert.equal(state.ai.decisions[0].decision, "APPROVE");
+  assert.equal(state.ai.failures_in_row, 0);
+  assert.equal(posted(calls).length >= 1, true);
+});
+
+test("a Gemini that stays busy is tried twice, then it's an error and no trade", async () => {
+  const { call, calls } = fakeAlpaca({ gemini: "error" });
+  const state = freshState();
+  await quiet(() => runOnce(env({ RT_MODE: "live", ...AI }), signalEnd(), call, state));
+  assert.equal(geminiCalls(calls).length, 2);
+  assert.equal(posted(calls).length, 0);
+  assert.equal(state.ai.failures_in_row, 1);
+});
+
+test("a bad Gemini key is not retried", async () => {
+  const { call, calls } = fakeAlpaca({ gemini: "bad-key" });
+  const verdict = await askGemini(call, env(AI), "prompt");
+  assert.deepEqual(verdict, { decision: "VETO", reason: "AI error: Gemini said 400", failed: true });
+  assert.equal(geminiCalls(calls).length, 1);
 });
 
 test("a Gemini that hangs is cut off and counts as an error", async () => {
