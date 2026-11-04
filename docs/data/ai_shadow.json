@@ -1,5 +1,5 @@
 {
-  "mode": "shadow",
+  "mode": "enforce",
   "on": true,
   "would_veto": {
     "trades": 0,
@@ -13,6 +13,6 @@
     "expectancy_pct": null,
     "pnl": 0.0
   },
-  "ai_errors": 0,
+  "ai_errors": 5,
   "latest": []
 }
