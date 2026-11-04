@@ -1,18 +1,18 @@
 {
   "last_run": {
-    "time_utc": "2026-11-03T21:53:36Z",
-    "status": "market_closed",
-    "message": "The US market is closed, so there was nothing to do."
+    "time_utc": "2026-11-04T14:19:29Z",
+    "status": "error",
+    "message": "{\"message\": \"unauthorized.\"}"
   },
-  "market_open": false,
+  "market_open": null,
   "equity": 99966.92,
-  "day_change_pct": 0.003628010688159433,
+  "day_change_pct": null,
   "kill_switch": {
     "on": false,
     "reason": ""
   },
   "ai_analyst_on": true,
-  "ai_veto_mode": "shadow",
+  "ai_veto_mode": "enforce",
   "stop_execution": "alpaca",
   "paper": true,
   "crypto_enabled": false,
@@ -29,7 +29,7 @@
       "feed": "crypto"
     }
   },
-  "trades_today": 5,
+  "trades_today": 0,
   "limits": {
     "max_trades_per_day": 5,
     "max_open_positions": {

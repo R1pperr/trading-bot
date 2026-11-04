@@ -13,3 +13,4 @@ time_utc,event,symbol,signal,signal_date,details,ai_decision,ai_reason,side,qty,
 2026-11-03 14:17:04,ORDER,MU,BUY,2026-11-03,sleeve=rsi2_stocks; short-term entry signal,OFF,"no Gemini key is set, so the AI wasn't asked",buy,5.7696,864.55,ceb18052-ba8f-4e48-ac69-6f766f3f05bd,pending_new,99761.64
 2026-11-03 14:31:57,STOP_FIXED,,,,"XLK: stop refused, the backup check stays on it ({""code"":40310000,""existing_order_id"":""591429b0-c4ef-4bf2-b625-fd05f78c1506"",""mes)",,,,,,,,99768.16
 2026-11-03 20:53:06,DAILY_SUMMARY,,,,,,,,,,,,
+2026-11-04 14:19:29,ERROR,,,,"{""message"": ""unauthorized.""}",,,,,,,,
