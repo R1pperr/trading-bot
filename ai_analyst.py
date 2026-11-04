@@ -115,16 +115,18 @@ def is_busy(error):
 
 
 def models_to_try():
-    """The main model first, then the free backup model twice (or the main one again if there's none)."""
-    backup = getattr(config, "GEMINI_BACKUP_MODEL", "") or config.GEMINI_MODEL
-    return [config.GEMINI_MODEL, backup, backup]
+    """Three tries: the main model, then the free backups in order (repeating the last if short)."""
+    tries = [config.GEMINI_MODEL] + [m for m in getattr(config, "GEMINI_BACKUP_MODELS", ()) if m]
+    while len(tries) < 3:
+        tries.append(tries[-1])
+    return tries[:3]
 
 
 def with_retries(send, models=None, sleep=time.sleep):
     """
     Gemini's free tier sometimes answers 503 "high demand": on 4 Nov 2026 gemini-3.8-flash
     did so for hours. send(model) is tried with the main model, then after 3 and 10 seconds
-    with the backup model. Any other error (a bad key, a bad model name) fails straight away.
+    with the backup models. Any other error (a bad key, a bad model name) fails straight away.
     Returns (send's result, the model that answered).
     """
     models = models or models_to_try()
@@ -172,8 +174,9 @@ def _ask_gemini(prompt, models=None):
         response_schema=schema,
         temperature=0,
     ), models)
-    if model != config.GEMINI_MODEL:
-        print(f"   {config.GEMINI_MODEL} was busy, so the backup {model} answered")
+    first = (models or models_to_try())[0]
+    if model != first:
+        print(f"   {first} was busy, so the backup {model} answered")
     answer = json.loads(response.text)
     decision = str(answer.get("decision", "")).strip().upper()
     reason = " ".join(str(answer.get("reason", "")).split())[:200] or "(no reason given)"
@@ -237,7 +240,7 @@ if __name__ == "__main__":
                 print(f"   ✅ {name} answered: {decision}")
             except Exception as error:
                 print(f"   ❌ {name}:", " ".join(str(error).split())[:90])
-        print("   Check GEMINI_API_KEY in .env, and GEMINI_MODEL / GEMINI_BACKUP_MODEL in config.py")
+        print("   Check GEMINI_API_KEY in .env, and GEMINI_MODEL / GEMINI_BACKUP_MODELS in config.py")
         print("   against the free models listed in Google AI Studio.")
         try:                                  # names only, to pick a model that exists
             from google import genai
