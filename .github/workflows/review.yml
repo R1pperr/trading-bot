@@ -5,6 +5,17 @@ on:
     # 21:35 UTC is after the US close all year: 16:35 New York in winter, 17:35 in summer.
     - cron: "35 21 * * 1-5"
   workflow_dispatch:   # a "Run workflow" button to run the review by hand
+    # The checks live here, not in the bot's workflow: there, the 15-minute chain always queues its
+    # next run, and a newer queued run cancels an older one, so a run started by hand would never start.
+    inputs:
+      ai_test:
+        description: "First ask Gemini about a made-up example trade, to check the AI works (places no order)"
+        type: boolean
+        default: false
+      watchdog_test:
+        description: "First send a [TEST] watchdog alert for a pretend missed engine run (places no order)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write      # saves the review pages, the switches and the fix pipeline's state
@@ -38,6 +49,21 @@ jobs:
           path: .cache
           key: review-prices-${{ github.run_id }}
           restore-keys: review-prices-
+
+      - name: Check the AI analyst with a made-up example
+        if: inputs.ai_test
+        continue-on-error: true
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python ai_analyst.py
+
+      - name: Test the watchdog with a pretend missed run
+        if: inputs.watchdog_test
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python bot.py --watchdog-test
 
       - name: Run the daily review (reads only, places no order)
         env:

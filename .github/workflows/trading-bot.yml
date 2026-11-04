@@ -12,14 +12,6 @@ on:
         description: "Also send one Telegram test message (places no order)"
         type: boolean
         default: false
-      watchdog_test:
-        description: "Also send a [TEST] watchdog alert for a pretend missed engine run (places no order)"
-        type: boolean
-        default: false
-      ai_test:
-        description: "Also ask Gemini about a made-up example trade, to check the AI works (places no order)"
-        type: boolean
-        default: false
 
 permissions:
   contents: write      # lets the job save the trade log and dashboard data back into the repository
@@ -70,21 +62,6 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python notifier.py
-
-      - name: Test the watchdog with a pretend missed run
-        if: inputs.watchdog_test
-        continue-on-error: true   # a test must never stop the bot
-        env:
-          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
-        run: python bot.py --watchdog-test
-
-      - name: Test the AI analyst with a made-up example
-        if: inputs.ai_test
-        continue-on-error: true
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: python ai_analyst.py
 
       - name: Run the bot (paper account)
         env:
