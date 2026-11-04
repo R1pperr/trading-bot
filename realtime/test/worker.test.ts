@@ -46,7 +46,7 @@ type Gemini = { decision: string; reason: string } | "error" | "garbage" | "hang
 type World = {
   isOpen?: boolean; position?: unknown; orders?: unknown[]; accountNumber?: string; equity?: string; lastEquity?: string;
   control?: unknown; controlFails?: boolean; bot1?: unknown; gemini?: Gemini; quote?: { ap: number; bp: number };
-  mainPositions?: unknown[];
+  mainPositions?: unknown[]; claude?: { decision: string; reason: string } | "bad" | "refusal";
 };
 
 function fakeAlpaca(world: World = {}) {
@@ -54,7 +54,8 @@ function fakeAlpaca(world: World = {}) {
   const call = (async (input: string, init: RequestInit = {}) => {
     const url = String(input);
     const method = init.method ?? "GET";
-    calls.push({ url, method, body: String(init.body ?? ""), headers: (init.headers ?? {}) as Record<string, string> });
+    const headers = init.headers instanceof Headers ? Object.fromEntries(init.headers.entries()) : (init.headers ?? {});
+    calls.push({ url, method, body: String(init.body ?? ""), headers: headers as Record<string, string> });
     const path = new URL(url).pathname;
     const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
     if (url.includes("telegram")) return json({ ok: true });
@@ -63,6 +64,18 @@ function fakeAlpaca(world: World = {}) {
       return world.control ? json(world.control) : json({ message: "404" }, 404);
     }
     if (url.startsWith(BOT1_STATUS_URL)) return world.bot1 ? json(world.bot1) : json({ message: "404" }, 404);
+    if (url.startsWith("https://api.anthropic.com/")) {
+      const reply = (body: unknown, status = 200) =>
+        new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
+      const answer = world.claude ?? { decision: "APPROVE", reason: "Clean trend" };
+      if (answer === "bad") return reply({ type: "error", error: { type: "invalid_request_error", message: "bad" } }, 400);
+      const refused = answer === "refusal";
+      return reply({
+        id: "msg_test", type: "message", role: "assistant", model: "claude-sonnet-5-5",
+        content: refused ? [] : [{ type: "text", text: JSON.stringify(answer) }],
+        stop_reason: refused ? "refusal" : "end_turn", usage: { input_tokens: 700, output_tokens: 100 },
+      });
+    }
     if (url.includes("generativelanguage")) {
       const answer = world.gemini ?? { decision: "APPROVE", reason: "Looks fine" };
       if (answer === "error") return json({ error: "busy" }, 500);
@@ -299,9 +312,9 @@ test("a wrong code is treated like no code", async () => {
 test("no secret ever appears in a response", async () => {
   clearStatusCache();
   const { call } = fakeAlpaca();
-  const keys = { ...AI, MAIN_ALPACA_KEY: "PKMAINFAKE", MAIN_ALPACA_SECRET: "main-secret-value" };
+  const keys = { ...AI, ANTHROPIC_API_KEY: "fake-claude-key", MAIN_ALPACA_KEY: "PKMAINFAKE", MAIN_ALPACA_SECRET: "main-secret-value" };
   const text = await (await handle(get("/status", CODE), env(keys), signalEnd(), call)).text();
-  for (const secret of ["PKFAKEKEY", "fake-secret-value", "fake-token", CODE, "fake-gemini-key", "PKMAINFAKE", "main-secret-value"]) {
+  for (const secret of ["PKFAKEKEY", "fake-secret-value", "fake-token", CODE, "fake-gemini-key", "fake-claude-key", "PKMAINFAKE", "main-secret-value"]) {
     assert.ok(!text.includes(secret), secret);
   }
 });
@@ -397,7 +410,7 @@ test("enforce: a Gemini error, an unclear answer or a missing key means no trade
     assert.equal(posted(calls).length, 0, String(gemini));
     assert.match(state.ai.decisions[0].reason, reason);
     assert.equal(state.ai.failures_in_row, 1);
-    assert.match(state.feed[0].text, /Gemini error .* → no trade/);
+    assert.match(state.feed[0].text, /AI error .* → no trade/);
   }
 });
 
@@ -427,6 +440,57 @@ test("a bad Gemini key is not retried", async () => {
   const verdict = await askGemini(call, env(AI), "prompt");
   assert.deepEqual(verdict, { decision: "VETO", reason: "AI error: Gemini said 400", failed: true });
   assert.equal(geminiCalls(calls).length, 1);
+});
+
+const CLAUDE = { ...AI, ANTHROPIC_API_KEY: "fake-claude-key" };
+const claudeCalls = (calls: { url: string }[]) => calls.filter((c) => c.url.startsWith("https://api.anthropic.com/"));
+
+test("Claude answers first, Gemini isn't asked, the key goes in a header and the spend is counted", async () => {
+  const { call, calls } = fakeAlpaca({ claude: { decision: "APPROVE", reason: "Clean trend" } });
+  const state = freshState();
+  await quiet(() => runOnce(env({ RT_MODE: "live", ...CLAUDE }), signalEnd(), call, state));
+  assert.equal(claudeCalls(calls).length, 1);
+  assert.equal(geminiCalls(calls).length, 0);
+  assert.ok(posted(calls).length >= 1);
+  const request = claudeCalls(calls)[0];
+  assert.equal(request.headers["authorization"], "Bearer fake-claude-key");   // how the official library sends it
+  assert.ok(!request.url.includes("fake-claude-key"));
+  assert.match(request.headers["anthropic-beta"] ?? "", /server-side-fallback-2026-07-01/);
+  const body = JSON.parse(request.body);
+  assert.equal(body.model, "claude-sonnet-5-5");
+  assert.equal(body.fallbacks, "default");
+  assert.equal(body.output_config.effort, "low");
+  assert.equal(body.temperature, undefined);
+  assert.equal(state.ai.decisions[0].decision, "APPROVE");
+  assert.ok(Math.abs(state.claude.usd - (700 * 2 + 100 * 10) / 1_000_000) < 1e-9);
+});
+
+test("a Claude failure or refusal falls back to Gemini", async () => {
+  for (const claude of ["bad", "refusal"] as const) {
+    const { call, calls } = fakeAlpaca({ claude });
+    const state = freshState();
+    await quiet(() => runOnce(env({ RT_MODE: "live", ...CLAUDE }), signalEnd(), call, state));
+    assert.equal(geminiCalls(calls).length, 1, claude);
+    assert.equal(state.ai.decisions[0].decision, "APPROVE", claude);
+  }
+});
+
+test("over this month's Claude budget only Gemini is asked", async () => {
+  const { call, calls } = fakeAlpaca();
+  const state = freshState();
+  state.claude = { month: new Date(signalEnd()).toISOString().slice(0, 7), usd: 3, calls: 900 };
+  await quiet(() => runOnce(env({ RT_MODE: "live", ...CLAUDE }), signalEnd(), call, state));
+  assert.equal(claudeCalls(calls).length, 0);
+  assert.equal(geminiCalls(calls).length, 1);
+});
+
+test("Claude and Gemini both failing is an AI error naming both, and no trade", async () => {
+  const { call, calls } = fakeAlpaca({ claude: "bad", gemini: "bad-key" });
+  const state = freshState();
+  await quiet(() => runOnce(env({ RT_MODE: "live", ...CLAUDE }), signalEnd(), call, state));
+  assert.equal(posted(calls).length, 0);
+  assert.match(state.ai.decisions[0].reason, /^AI error: Claude said 400, Gemini said 400$/);
+  assert.equal(state.ai.failures_in_row, 1);
 });
 
 test("a Gemini that hangs is cut off and counts as an error", async () => {
@@ -585,7 +649,10 @@ test("AI test mode asks the main and backup model and touches no order, no Alpac
   const { kv, counts } = fakeKv();
   const { call, calls } = fakeAlpaca({ gemini: "busy-once" });
   const result = await quiet(() => scheduledRun(env({ RT_MODE: "live", ...AI, AI_TEST: "example", RT_STATE: kv }), signalEnd(), call));
-  assert.deepEqual(result.report?.messages, ["gemini-3.8-flash: AI error: Gemini said 503", "gemini-3.5-flash: answered APPROVE"]);
+  assert.deepEqual(result.report?.messages, [
+    "Claude: not asked (no ANTHROPIC_API_KEY, or this month's budget is used up)",
+    "gemini-3.8-flash: AI error: Gemini said 503", "gemini-3.5-flash: answered APPROVE",
+  ]);
   assert.equal(calls.filter((c) => !c.url.includes("generativelanguage")).length, 0);
   assert.equal(counts.puts + counts.gets, 0);
   assert.equal(result.report?.reason, "AI test");
