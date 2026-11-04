@@ -192,6 +192,14 @@ USE_AI_ANALYST = True
 # "enforce": a veto blocks the trade, and so does any Gemini error (no trade, and it's logged).
 # The daily review may switch it in docs/data/control.json if the AI's vetoes cost money.
 AI_VETO_MODE = "enforce"
+# The AI analyst asks Claude first: the user chose it on 4 Nov 2026, with $100 of credit and a
+# limit of $10 a month. Claude Sonnet 5.5 costs about $2 to $6 a month here ($2 / $10 per million
+# tokens in / out). Each bot has its own monthly cap, and after it, or if Claude fails or has no
+# key, the free Gemini models below answer instead.
+CLAUDE_MODEL = "claude-sonnet-5-5"
+CLAUDE_EFFORT = "low"                       # short approve/veto answers don't need long thinking
+CLAUDE_MONTHLY_BUDGET_USD = 6.00            # the main bot and the daily review; the engine has its own $3
+CLAUDE_PRICE_PER_MILLION = {"input": 2.00, "output": 10.00}
 GEMINI_MODEL = "gemini-3.8-flash"
 # Asked in this order when the main model is busy or rate-limited. On 4 Nov 2026 gemini-3.8-flash
 # answered "high demand" for hours, which blocked every buy in enforce mode; of the free models on

@@ -3,3 +3,4 @@ python-dotenv>=1.0
 pandas>=2.2
 matplotlib>=3.8
 google-genai>=1.0
+anthropic==2.3.0

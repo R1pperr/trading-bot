@@ -220,14 +220,12 @@ def find_problems(strategy, trades):
 def explain(facts):
     fallback = facts["fallback"]
     try:
-        from google.genai import types
-        if not os.getenv("GEMINI_API_KEY", "").strip():
+        if not any(os.getenv(name, "").strip() for name in ("ANTHROPIC_API_KEY", "GEMINI_API_KEY")):
             return fallback
         prompt = ("You review a student's paper-trading bots. In plain English for a beginner, at most 6 short sentences, "
                   "explain where each strategy is winning and losing and what its top problems mean. Don't invent numbers; "
                   "use only these facts. Say clearly when there are too few trades to tell.\n\n" + json.dumps(facts["data"]))
-        response, _ = ai_analyst.generate(prompt, types.GenerateContentConfig(temperature=0))
-        text = " ".join((response.text or "").split())
+        text = " ".join(ai_analyst.write_text(prompt).split())
         return text[:1500] or fallback
     except Exception as error:
         print("Gemini explanation not available:", notifier.redact(error))

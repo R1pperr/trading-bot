@@ -1,8 +1,10 @@
 """
-ai_analyst.py  -  optional second opinion from Google's Gemini (free tier).
+ai_analyst.py  -  a second opinion from Claude (paid, first choice) or Google's Gemini (free).
 
-Set USE_AI_ANALYST in config.py to turn it on or off, and put your key in .env as
-GEMINI_API_KEY=... (or in GitHub Secrets for the scheduled runs).
+Set USE_AI_ANALYST in config.py to turn it on or off. Keys go in .env or GitHub Secrets:
+ANTHROPIC_API_KEY for Claude, GEMINI_API_KEY for Gemini. Claude is asked first while this
+month's spend is under config.CLAUDE_MONTHLY_BUDGET_USD (counted in state/claude_spend.json);
+without a key, over the budget, or if Claude fails, the free Gemini models answer.
 
 The AI mode decides what its answer does (mode() below: docs/data/control.json, which the
 daily review may change, else config.AI_VETO_MODE). In "shadow" it only logs its decision
@@ -10,8 +12,8 @@ and reason, and the trade goes ahead either way, so you can see how the trades i
 have vetoed actually did. In "enforce" a VETO blocks the trade.
 
 Its prompt includes a short summary of its own recent record (how its last 50 calls turned
-out), written by the daily review. Gemini failures in a row are counted in
-state/ai_health.json, and the watchdog alerts at 3.
+out), written by the daily review. AI failures in a row (Claude and Gemini both failing) are
+counted in state/ai_health.json, and the watchdog alerts at 3.
 
 Before a strategy trade, the AI sees the signal and the last 30 closing prices
 and answers APPROVE or VETO with a one-line reason. That is all it can do:
@@ -25,7 +27,7 @@ and answers APPROVE or VETO with a one-line reason. That is all it can do:
 The AI only sees prices, not news, and has no proven ability to pick trades.
 Treat it as a learning experiment, not an edge.
 
-Check your Gemini key works:   python ai_analyst.py
+Check the keys work:   python ai_analyst.py
 """
 
 import json
@@ -33,6 +35,7 @@ import os
 import re
 import sys
 import time
+from datetime import datetime, timezone
 
 from dotenv import load_dotenv
 
@@ -54,6 +57,13 @@ Reply with JSON only: {"decision": "APPROVE" or "VETO", "reason": "<one sentence
 
 
 HEALTH_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "state", "ai_health.json")
+CLAUDE_SPEND_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "state", "claude_spend.json")
+DECISION_SCHEMA = {
+    "type": "object",
+    "properties": {"decision": {"type": "string"}, "reason": {"type": "string"}},
+    "required": ["decision", "reason"],
+    "additionalProperties": False,
+}
 
 
 def mode():
@@ -159,6 +169,123 @@ def generate(prompt, generation_config=None, models=None):
         model=model, contents=prompt, config=generation_config), models)
 
 
+# ---------------------------------------------------------------------------
+# Claude (paid, asked first)
+# ---------------------------------------------------------------------------
+class ClaudeSkipped(Exception):
+    """Claude isn't asked: there's no key, or this month's budget is used up."""
+
+
+def this_month():
+    return datetime.now(timezone.utc).strftime("%Y-%m")
+
+
+def claude_spend():
+    """Dollars spent on Claude this month, from the token counts of every answer."""
+    try:
+        with open(CLAUDE_SPEND_FILE, encoding="utf-8") as handle:
+            data = json.load(handle)
+        return float(data.get("usd", 0.0)) if data.get("month") == this_month() else 0.0
+    except (OSError, ValueError, TypeError):
+        return 0.0
+
+
+def _add_claude_spend(usage):
+    price = config.CLAUDE_PRICE_PER_MILLION
+    tokens_in = int(getattr(usage, "input_tokens", 0) or 0)
+    tokens_out = int(getattr(usage, "output_tokens", 0) or 0)
+    cost = (tokens_in * price["input"] + tokens_out * price["output"]) / 1_000_000
+    try:
+        with open(CLAUDE_SPEND_FILE, encoding="utf-8") as handle:
+            data = json.load(handle)
+        if data.get("month") != this_month():
+            data = {}
+    except (OSError, ValueError, TypeError):
+        data = {}
+    data = {"month": this_month(), "usd": round(float(data.get("usd", 0.0)) + cost, 6),
+            "calls": int(data.get("calls", 0)) + 1}
+    try:
+        os.makedirs(os.path.dirname(CLAUDE_SPEND_FILE), exist_ok=True)
+        with open(CLAUDE_SPEND_FILE, "w", encoding="utf-8") as handle:
+            json.dump(data, handle)
+            handle.write("\n")
+    except OSError:
+        pass
+    return cost
+
+
+def ask_claude(prompt, json_answer=True, max_tokens=4000):
+    """
+    One question to Claude. Returns (text, model). Raises ClaudeSkipped when it isn't asked,
+    and any other error when the call fails. The SDK itself retries busy answers (429, 5xx).
+    """
+    load_dotenv()
+    api_key = os.getenv("ANTHROPIC_API_KEY", "").strip()
+    if not api_key:
+        raise ClaudeSkipped("no ANTHROPIC_API_KEY is set")
+    if claude_spend() >= config.CLAUDE_MONTHLY_BUDGET_USD:
+        raise ClaudeSkipped(f"this month's Claude budget (${config.CLAUDE_MONTHLY_BUDGET_USD:.2f}) is used up")
+    import anthropic
+
+    client = anthropic.Anthropic(api_key=api_key, max_retries=2, timeout=60)
+    output_config = {"effort": config.CLAUDE_EFFORT}
+    if json_answer:
+        output_config["format"] = {"type": "json_schema", "schema": DECISION_SCHEMA}
+    response = client.beta.messages.create(
+        model=config.CLAUDE_MODEL,
+        max_tokens=max_tokens,
+        betas=["server-side-fallback-2026-07-01"],
+        fallbacks="default",          # a safety decline is retried on Anthropic's recommended model
+        output_config=output_config,
+        messages=[{"role": "user", "content": prompt}],
+    )
+    _add_claude_spend(response.usage)
+    if response.stop_reason == "refusal":
+        raise RuntimeError("Claude declined to answer")
+    if response.stop_reason == "max_tokens":
+        raise RuntimeError("Claude's answer was cut off")
+    text = "".join(block.text for block in response.content if block.type == "text")
+    return text, response.model
+
+
+def _parse_decision(text):
+    answer = json.loads(text)
+    decision = str(answer.get("decision", "")).strip().upper()
+    reason = mask_prices(" ".join(str(answer.get("reason", "")).split())[:200]) or "(no reason given)"
+    if decision not in (APPROVE, VETO):
+        return VETO, f"{UNCLEAR_PREFIX} ({decision!r}){_outcome()}"
+    return decision, reason
+
+
+def _ask_ai(prompt):
+    """Claude first; the free Gemini models if Claude has no key, is over budget, or fails."""
+    try:
+        text, _ = ask_claude(prompt)
+        return _parse_decision(text)
+    except ClaudeSkipped:
+        pass
+    except Exception as error:
+        print("   Claude failed, so Gemini was asked:", " ".join(str(error).split())[:150])
+    return _ask_gemini(prompt)
+
+
+def write_text(prompt):
+    """A plain-text answer (the daily review's explanation): Claude first, then Gemini."""
+    try:
+        text, _ = ask_claude(prompt, json_answer=False)
+        return text
+    except ClaudeSkipped:
+        pass
+    except Exception as error:
+        print("   Claude failed, so Gemini was asked:", " ".join(str(error).split())[:150])
+    from google.genai import types
+    response, _ = generate(prompt, types.GenerateContentConfig(temperature=0))
+    return response.text or ""
+
+
+# ---------------------------------------------------------------------------
+# Gemini (free, the backup)
+# ---------------------------------------------------------------------------
 def _ask_gemini(prompt, models=None):
     """Send the prompt to Gemini and return (decision, reason). Raises on any problem."""
     from google.genai import types
@@ -179,12 +306,7 @@ def _ask_gemini(prompt, models=None):
     first = (models or models_to_try())[0]
     if model != first:
         print(f"   {first} was busy, so the backup {model} answered")
-    answer = json.loads(response.text)
-    decision = str(answer.get("decision", "")).strip().upper()
-    reason = mask_prices(" ".join(str(answer.get("reason", "")).split())[:200]) or "(no reason given)"
-    if decision not in (APPROVE, VETO):
-        return VETO, f"{UNCLEAR_PREFIX} ({decision!r}){_outcome()}"
-    return decision, reason
+    return _parse_decision(response.text)
 
 
 def mask_prices(text):
@@ -213,10 +335,11 @@ def review(symbol, signal, reason, recent_prices, rule=None):
     if not config.USE_AI_ANALYST:
         return OFF, "AI analyst is turned off in config.py"
     load_dotenv()
-    if mode() != "enforce" and not os.getenv("GEMINI_API_KEY", "").strip():
-        return OFF, "no Gemini key is set, so the AI wasn't asked"
+    keys = [os.getenv(name, "").strip() for name in ("ANTHROPIC_API_KEY", "GEMINI_API_KEY")]
+    if mode() != "enforce" and not any(keys):
+        return OFF, "no AI key is set, so the AI wasn't asked"
     try:
-        answer = _ask_gemini(_build_prompt(symbol, signal, reason, recent_prices.tail(30), rule, record_summary()))
+        answer = _ask_ai(_build_prompt(symbol, signal, reason, recent_prices.tail(30), rule, record_summary()))
     except Exception as error:
         _note_health(True)
         short = " ".join(str(error).split())[:150]
@@ -237,6 +360,17 @@ if __name__ == "__main__":
     example = pd.DataFrame({"close": [100 + i * 0.4 for i in range(30)]}, index=days)
     example_prompt = _build_prompt("SPY", "BUY", "20-day average crossed ABOVE the 50-day average (example)", example)
     answered = []
+    print(f"Asking {config.CLAUDE_MODEL} (Claude) about a made-up example trade (nothing is traded)...")
+    try:
+        text, served_by = ask_claude(example_prompt)
+        decision, why = _parse_decision(text)
+        print(f"✅ Claude ({served_by}) answered: {decision} - {why}")
+        answered.append(served_by)
+    except ClaudeSkipped as skipped:
+        print(f"⏭️  Claude not asked: {skipped}")
+    except Exception as error:
+        print("❌ Claude failed:", " ".join(str(error).split())[:300])
+    print(f"   Claude spend this month: ${claude_spend():.4f} of ${config.CLAUDE_MONTHLY_BUDGET_USD:.2f}")
     for name in dict.fromkeys(models_to_try()):     # the main model, then the backup, each checked on its own
         print(f"Asking {name} about a made-up example trade (nothing is traded)...")
         try:
