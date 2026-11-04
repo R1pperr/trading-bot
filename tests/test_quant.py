@@ -22,6 +22,7 @@ from alpaca.trading.enums import OrderSide, OrderType, TimeInForce
 
 import ai_analyst
 import bot
+import activity
 import config
 import dashboard
 import drift
@@ -724,23 +725,57 @@ class AiShadowTests(SleeveCase):
         asked.assert_called_once()
         self.assertEqual(len(self.trading.buys()), 1)
 
-    def test_one_run_still_asks_at_most_five_times(self):
+    def test_three_failures_in_a_row_stop_the_asking(self):
         config.AI_VETO_MODE = "enforce"
         calls = self.start(mock.patch.object(ai_analyst, "_ask_gemini", side_effect=RuntimeError("503 UNAVAILABLE")))
-        tables = {f"A{i}": stock_bars(pullback()) for i in range(config.MAX_AI_REVIEWS_PER_RUN["stock"] + 3)}
+        tables = {f"A{i}": stock_bars(pullback()) for i in range(8)}
         self.go("stock", tables)
-        self.assertEqual(calls.call_count, config.MAX_AI_REVIEWS_PER_RUN["stock"])
+        self.assertEqual(calls.call_count, config.AI_GIVE_UP_AFTER)
         self.assertEqual(self.trading.buys(), [])
+        self.assertTrue(any("Gemini not answering" in line["text"] for line in activity.pending()))
 
     def test_five_vetoes_dont_end_the_day(self):
         # Asked for on 4 Nov 2026: if the AI says no to the first five, keep asking about the next signals.
         config.AI_VETO_MODE = "enforce"
-        asked = self.ask(ai_analyst.APPROVE, "Fine")
-        vetoed = [{"event": "AI_DECISION", "symbol": f"X{i}", "side": "", "ai_decision": "VETO", "ai_reason": "Too choppy"}
-                  for i in range(5)]
-        self.go("stock", self.tables(), log=vetoed)
-        asked.assert_called_once()
+        answers = [(ai_analyst.VETO, "Too choppy")] * 5 + [(ai_analyst.APPROVE, "Fine")] * 3
+        calls = self.start(mock.patch.object(ai_analyst, "_ask_gemini", side_effect=answers))
+        tables = {f"A{i}": stock_bars(pullback()) for i in range(8)}
+        self.go("stock", tables)
+        self.assertEqual(calls.call_count, 8)
+        self.assertEqual(len(self.trading.buys()), 3)
+
+    def test_a_veto_after_failures_resets_the_count(self):
+        config.AI_VETO_MODE = "enforce"
+        answers = [RuntimeError("503"), RuntimeError("503"), (ai_analyst.VETO, "No"), RuntimeError("503"),
+                   RuntimeError("503"), (ai_analyst.APPROVE, "Fine")]
+        calls = self.start(mock.patch.object(ai_analyst, "_ask_gemini", side_effect=answers))
+        tables = {f"A{i}": stock_bars(pullback()) for i in range(6)}
+        self.go("stock", tables)
+        self.assertEqual(calls.call_count, 6)
         self.assertEqual(len(self.trading.buys()), 1)
+
+    def test_the_day_asks_the_ai_at_most_the_daily_number(self):
+        config.AI_VETO_MODE = "enforce"
+        calls = self.ask(ai_analyst.VETO, "No")
+        tables = {f"A{i}": stock_bars(pullback()) for i in range(config.MAX_AI_REVIEWS_PER_DAY["stock"] + 4)}
+        with mock.patch.object(config, "SLEEVE_MAX_OPEN_POSITIONS", {"stock": 100, "crypto": 10}):
+            self.go("stock", tables)
+        self.assertEqual(calls.call_count, config.MAX_AI_REVIEWS_PER_DAY["stock"])
+
+    def test_the_ai_questions_stop_when_the_run_is_out_of_time(self):
+        config.AI_VETO_MODE = "enforce"
+        calls = self.ask(ai_analyst.VETO, "No")
+        self.start(mock.patch.object(config, "AI_TIME_BUDGET_SECONDS", -1))
+        self.go("stock", {f"A{i}": stock_bars(pullback()) for i in range(4)})
+        self.assertEqual(calls.call_count, 1)
+
+    def test_questions_are_spaced_out(self):
+        config.AI_VETO_MODE = "enforce"
+        self.ask(ai_analyst.VETO, "No")
+        self.start(mock.patch.object(config, "AI_PAUSE_SECONDS", 5))
+        pauses = self.start(mock.patch.object(sleeves.time, "sleep"))
+        self.go("stock", {f"A{i}": stock_bars(pullback()) for i in range(3)})
+        self.assertEqual([c.args[0] for c in pauses.call_args_list], [5, 5])
 
     def test_the_trade_cap_still_holds_after_vetoes(self):
         config.AI_VETO_MODE = "enforce"

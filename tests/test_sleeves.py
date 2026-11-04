@@ -645,7 +645,7 @@ class RunRhythmTests(SleeveCase):
         tables = {f"S{n}": stock_bars(pullback()) for n in range(12)}
         with mock.patch.object(ai_analyst, "review", return_value=(ai_analyst.VETO, "no")) as review:
             self.go("stock", tables)
-        self.assertEqual(review.call_count, config.MAX_AI_REVIEWS_PER_RUN["stock"])
+        self.assertEqual(review.call_count, min(12, config.MAX_AI_REVIEWS_PER_DAY["stock"]))
 
     def test_exits_never_ask_the_ai(self):
         self.own(OLD="rsi2_stocks")

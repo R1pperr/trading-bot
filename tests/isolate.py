@@ -12,6 +12,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import activity      # noqa: E402
 import ai_analyst    # noqa: E402
+import config        # noqa: E402
 import fixes         # noqa: E402
 import watchdog      # noqa: E402
 
@@ -21,3 +22,4 @@ ai_analyst.HEALTH_FILE = os.path.join(FOLDER, "ai_health.json")
 activity.FEED_FILE = os.path.join(FOLDER, "activity.json")
 watchdog.STATE_FILE = os.path.join(FOLDER, "watchdog.json")
 watchdog.SITE_FILE = os.path.join(FOLDER, "site.json")
+config.AI_PAUSE_SECONDS = 0     # the real pause between AI questions is 5 seconds
