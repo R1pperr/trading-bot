@@ -238,7 +238,9 @@ export async function handle(request: Request, env: Env, now: number, call: Fetc
 
 export default {
   async scheduled(event: { scheduledTime: number }, env: Env, context: { waitUntil(work: Promise<unknown>): void }) {
-    context.waitUntil(runOnce(env, event.scheduledTime, fetch).catch((error) => console.log(`Run failed: ${error.message}`)));
+    context.waitUntil(runOnce(env, event.scheduledTime, fetch)
+      .then((report) => { if (!report.ran) console.log(`Nothing to do: ${report.reason}`); })
+      .catch((error) => console.log(`Run failed: ${error.message}`)));
   },
   fetch(request: Request, env: Env) {
     return handle(request, env, Date.now(), fetch);
