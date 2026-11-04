@@ -453,6 +453,17 @@ class AlpacaStopTests(SleeveCase):
         self.assertEqual(len(reports), 1)
         self.assertIn("AAA", reports[0]["details"])
 
+    def test_no_stop_while_the_buy_is_still_filling(self):
+        # Alpaca refused XLK's stop on 2026-11-03 (code 40310000, possible wash trade) because its buy was still open.
+        self.own(AAA="rsi2_stocks")
+        self.done_today()
+        still_open = SimpleNamespace(id="buy-AAA", symbol="AAA", side="buy", client_order_id="tach-rsi2_stocks-buy-aaa",
+                                     created_at=f"{TODAY}T14:17:00Z", filled_at=None, filled_qty="4", status="partially_filled",
+                                     asset_class="us_equity", order_type="market", qty="10")
+        self.go("stock", self.flat(), Broker([fake_position("AAA", qty=4, entry=100, price=100)], [still_open]))
+        self.assertEqual(self.trading.stop_orders(), [])
+        self.assertFalse(any(e.get("event") == "STOP_FIXED" for e in self.events))
+
     def test_a_right_stop_is_left_alone(self):
         self.own(AAA="rsi2_stocks")
         self.done_today()
@@ -688,6 +699,16 @@ class AiShadowTests(SleeveCase):
         config.AI_VETO_MODE = "enforce"
         self.start(mock.patch.object(ai_analyst, "_ask_gemini", side_effect=RuntimeError("quota")))
         self.go("stock", self.tables())
+        self.assertEqual(self.trading.buys(), [])
+
+    def test_the_ai_limit_counts_the_whole_day_not_one_run(self):
+        # Before the fix every 15-minute run started again at 5 reviews, so vetoes could add up to ~130 calls a day.
+        config.AI_VETO_MODE = "enforce"
+        asked = self.ask(ai_analyst.APPROVE, "Fine")
+        earlier = [{"event": "AI_DECISION", "symbol": f"X{i}", "side": "", "ai_decision": "VETO"}
+                   for i in range(config.MAX_AI_REVIEWS_PER_DAY["stock"])]
+        self.go("stock", self.tables(), log=earlier)
+        asked.assert_not_called()
         self.assertEqual(self.trading.buys(), [])
 
     def test_a_shadow_error_never_says_the_trade_was_stopped(self):

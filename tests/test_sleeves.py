@@ -945,9 +945,9 @@ class MarketHoursTests(unittest.TestCase):
         self.assertFalse(self.decide("2026-06-15T21:00:00"))
 
     def test_the_market_open_and_the_daily_summary_are_inside_the_window_all_year(self):
-        summary = config.DAILY_SUMMARY_UTC
         for day in ("2026-01-05", "2026-07-06"):
-            self.assertTrue(self.decide(f"{day}T{summary}:00"), day)
+            local = datetime.fromisoformat(f"{day}T{config.DAILY_SUMMARY_NY}:00").replace(tzinfo=market_hours.NEW_YORK)
+            self.assertTrue(self.decide(local.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")), day)
         self.assertTrue(self.decide("2026-01-05T14:30:00"))     # 09:30 in New York, winter
         self.assertTrue(self.decide("2026-07-06T13:30:00"))     # 09:30 in New York, summer
 

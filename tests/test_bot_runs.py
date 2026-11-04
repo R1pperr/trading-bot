@@ -286,10 +286,18 @@ class BotRunTests(unittest.TestCase):
     def test_summary_is_due_only_on_weekdays_from_the_set_time(self):
         self.start(mock.patch.object(bot, "summary_due", wraps=REAL_SUMMARY_DUE))
         at = lambda *when: datetime(*when, tzinfo=timezone.utc)
-        self.assertFalse(bot.summary_due(at(2026, 11, 2, 20, 37)))   # Monday, too early
-        self.assertTrue(bot.summary_due(at(2026, 11, 2, 20, 52)))    # Monday, last run
-        self.assertTrue(bot.summary_due(at(2026, 11, 2, 21, 10)))    # Monday, last run was late
-        self.assertFalse(bot.summary_due(at(2026, 11, 7, 20, 52)))   # Saturday
+        self.assertFalse(bot.summary_due(at(2026, 11, 2, 20, 52)))   # Monday 15:52 in New York, market still open
+        self.assertTrue(bot.summary_due(at(2026, 11, 2, 21, 6)))     # Monday 16:06 in New York, after the close
+        self.assertTrue(bot.summary_due(at(2026, 11, 2, 21, 40)))    # Monday, last run was late
+        self.assertFalse(bot.summary_due(at(2026, 11, 7, 21, 6)))    # Saturday
+
+    def test_the_summary_comes_after_the_close_in_summer_and_winter(self):
+        self.start(mock.patch.object(bot, "summary_due", wraps=REAL_SUMMARY_DUE))
+        at = lambda *when: datetime(*when, tzinfo=timezone.utc)
+        self.assertFalse(bot.summary_due(at(2026, 7, 6, 19, 55)))    # 15:55 in New York, summer
+        self.assertTrue(bot.summary_due(at(2026, 7, 6, 20, 6)))      # 16:06 in New York, summer
+        self.assertFalse(bot.summary_due(at(2026, 1, 5, 20, 45)))    # 15:45 in New York, winter: the old bug
+        self.assertTrue(bot.summary_due(at(2026, 1, 5, 21, 6)))      # 16:06 in New York, winter
 
     # --- Dry run -----------------------------------------------------------------
     def test_dry_run_sends_no_summary(self):
