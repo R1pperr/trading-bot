@@ -19,9 +19,9 @@
         "trend": "",
         "signal_date": "2026-11-04",
         "name": "",
-        "status": "vetoed",
-        "ai_decision": "VETO",
-        "ai_reason": "AI error, so no trade: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please ",
+        "status": "ordered",
+        "ai_decision": "APPROVE",
+        "ai_reason": "The trade buys a minor pullback within a clear, strong uptrend over the past month.",
         "note": ""
       },
       {
@@ -33,10 +33,10 @@
         "trend": "",
         "signal_date": "2026-11-04",
         "name": "",
-        "status": "vetoed",
-        "ai_decision": "VETO",
-        "ai_reason": "AI error, so no trade: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please ",
-        "note": ""
+        "status": "skipped",
+        "ai_decision": "",
+        "ai_reason": "",
+        "note": "no room left in this sleeve, or not enough cash"
       },
       {
         "rank": 3,
@@ -47,9 +47,9 @@
         "trend": "",
         "signal_date": "2026-11-04",
         "name": "",
-        "status": "vetoed",
-        "ai_decision": "VETO",
-        "ai_reason": "AI error, so no trade: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please ",
+        "status": "ordered",
+        "ai_decision": "APPROVE",
+        "ai_reason": "The stock is pulling back steadily within an overall uptrend, providing a valid setup for a short-term mean-reversion strategy.",
         "note": ""
       },
       {
@@ -61,9 +61,9 @@
         "trend": "",
         "signal_date": "2026-11-04",
         "name": "",
-        "status": "vetoed",
-        "ai_decision": "VETO",
-        "ai_reason": "AI error, so no trade: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please ",
+        "status": "ordered",
+        "ai_decision": "APPROVE",
+        "ai_reason": "The recent multi-day pullback fits the strategy's mean-reversion entry criteria without exhibiting extreme single-day spikes or severe market noise.",
         "note": ""
       },
       {
@@ -75,9 +75,37 @@
         "trend": "",
         "signal_date": "2026-11-04",
         "name": "",
+        "status": "ordered",
+        "ai_decision": "APPROVE",
+        "ai_reason": "Recent prices show a steady short-term pullback following prior gains without extreme choppy reversal patterns, making the oversold entry reasonable.",
+        "note": ""
+      },
+      {
+        "rank": 6,
+        "symbol": "DBC",
+        "sleeve": "rotation",
+        "action": "BUY",
+        "reason": "medium-term entry signal",
+        "trend": "",
+        "signal_date": "2026-11-04",
+        "name": "",
         "status": "vetoed",
         "ai_decision": "VETO",
-        "ai_reason": "AI error, so no trade: 503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please ",
+        "ai_reason": "The sharp single-day drop from 33.61 to 32.46 right before the trade indicates severe sudden selling pressure, making the buy signal unreliable.",
+        "note": ""
+      },
+      {
+        "rank": 7,
+        "symbol": "VNQ",
+        "sleeve": "rotation",
+        "action": "BUY",
+        "reason": "medium-term entry signal",
+        "trend": "",
+        "signal_date": "2026-11-04",
+        "name": "",
+        "status": "ordered",
+        "ai_decision": "APPROVE",
+        "ai_reason": "The price action shows a steady upward trend without extreme spikes, supporting a reliable medium-term entry signal.",
         "note": ""
       }
     ]

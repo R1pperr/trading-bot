@@ -1,10 +1,72 @@
 {
   "closed_pl": {
-    "rsi2_stocks": -13.62
+    "rsi2_stocks": -365.07
   },
   "days": {
     "crypto": "2026-11-02",
-    "stock": "2026-11-03"
+    "stock": "2026-11-04"
+  },
+  "entries": {
+    "11ee5671-d61d-4874-a4bd-a435f711dbd8": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "The price action shows a steady upward trend without extreme spikes, supporting a reliable medium-term entry signal.",
+      "day": "2026-11-04",
+      "equity": 99945.77,
+      "placed_utc": "2026-11-04T18:21:28Z",
+      "pre_open": false,
+      "qty": 51.288433,
+      "sleeve": "rotation",
+      "spread": "normal",
+      "symbol": "VNQ"
+    },
+    "2aab6f80-a394-4f3e-bbdf-aad3af9e4bc5": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Recent prices show a steady short-term pullback following prior gains without extreme choppy reversal patterns, making the oversold entry reasonable.",
+      "day": "2026-11-04",
+      "equity": 99945.77,
+      "placed_utc": "2026-11-04T18:20:40Z",
+      "pre_open": false,
+      "qty": 0.347345,
+      "sleeve": "rsi2_stocks",
+      "spread": "wide",
+      "symbol": "PANW"
+    },
+    "9494b5cb-8baf-4455-8be1-dc77c60cb943": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "The recent multi-day pullback fits the strategy's mean-reversion entry criteria without exhibiting extreme single-day spikes or severe market noise.",
+      "day": "2026-11-04",
+      "equity": 99945.77,
+      "placed_utc": "2026-11-04T18:20:07Z",
+      "pre_open": false,
+      "qty": 29.169323,
+      "sleeve": "rsi2_stocks",
+      "spread": "wide",
+      "symbol": "PLTR"
+    },
+    "df9b7f57-0faf-4702-badc-f4acd794a9a5": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "The stock is pulling back steadily within an overall uptrend, providing a valid setup for a short-term mean-reversion strategy.",
+      "day": "2026-11-04",
+      "equity": 99945.77,
+      "placed_utc": "2026-11-04T18:19:52Z",
+      "pre_open": false,
+      "qty": 14.122618,
+      "sleeve": "rsi2_stocks",
+      "spread": "normal",
+      "symbol": "AAPL"
+    },
+    "fbe2b62c-87b3-46dd-b8d0-8f8a4897a470": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "The trade buys a minor pullback within a clear, strong uptrend over the past month.",
+      "day": "2026-11-04",
+      "equity": 99945.77,
+      "placed_utc": "2026-11-04T18:19:12Z",
+      "pre_open": false,
+      "qty": 0.099203,
+      "sleeve": "ibs_etfs",
+      "spread": "normal",
+      "symbol": "XLP"
+    }
   },
   "momentum": {
     "month": "2026-11",
@@ -23,6 +85,11 @@
     ]
   },
   "positions": {
+    "AAPL": {
+      "entry_date": "2026-11-04",
+      "sleeve": "rsi2_stocks",
+      "stop": 329.0805
+    },
     "DIA": {
       "entry_date": "2026-11-03",
       "sleeve": "ibs_etfs",
@@ -38,15 +105,25 @@
       "sleeve": "rsi2_stocks",
       "stop": 487.9152
     },
-    "MU": {
-      "entry_date": "2026-11-03",
+    "PANW": {
+      "entry_date": "2026-11-04",
       "sleeve": "rsi2_stocks",
-      "stop": 804.0315
+      "stop": 325.3698
+    },
+    "PLTR": {
+      "entry_date": "2026-11-04",
+      "sleeve": "rsi2_stocks",
+      "stop": 159.3276
     },
     "QQQ": {
       "entry_date": "2026-11-02",
       "sleeve": "rsi2_stocks",
       "stop": 645.5409
+    },
+    "VNQ": {
+      "entry_date": "2026-11-04",
+      "sleeve": "rotation",
+      "stop": 90.61455
     },
     "XLE": {
       "entry_date": "2026-11-03",
@@ -57,6 +134,11 @@
       "entry_date": "2026-11-03",
       "sleeve": "ibs_etfs",
       "stop": 162.0618
+    },
+    "XLP": {
+      "entry_date": "2026-11-04",
+      "sleeve": "ibs_etfs",
+      "stop": 85.5693
     }
   },
   "rotation": {
@@ -67,5 +149,8 @@
       "VNQ",
       "EFA"
     ]
-  }
+  },
+  "stop_fills": [
+    "2274f216-ba42-494c-9ecf-359bb7401b43"
+  ]
 }

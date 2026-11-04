@@ -28,13 +28,6 @@
       "day": "2026-11-03",
       "order_id": "60ce0eb0-4388-4302-859b-d6e2940cb830"
     },
-    "MU": {
-      "qty": 5.76957,
-      "cost": 4994.17157656113,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-03",
-      "order_id": "ceb18052-ba8f-4e48-ac69-6f766f3f05bd"
-    },
     "XLK": {
       "qty": 28.624365,
       "cost": 5019.359659911135,
@@ -55,6 +48,46 @@
       "sleeve": "ibs_etfs",
       "day": "2026-11-03",
       "order_id": "4253ae0c-45b2-4b40-b8bc-b27065389dc9"
+    },
+    "XLP": {
+      "qty": 0.099203,
+      "cost": 9.129453684000001,
+      "sleeve": "ibs_etfs",
+      "day": "2026-11-04",
+      "order_id": "fbe2b62c-87b3-46dd-b8d0-8f8a4897a470",
+      "time": "2026-11-04 18:19:12"
+    },
+    "AAPL": {
+      "qty": 14.122618,
+      "cost": 4996.733473393543,
+      "sleeve": "rsi2_stocks",
+      "day": "2026-11-04",
+      "order_id": "df9b7f57-0faf-4702-badc-f4acd794a9a5",
+      "time": "2026-11-04 18:19:56"
+    },
+    "PLTR": {
+      "qty": 29.169323,
+      "cost": 4996.573330406655,
+      "sleeve": "rsi2_stocks",
+      "day": "2026-11-04",
+      "order_id": "9494b5cb-8baf-4455-8be1-dc77c60cb943",
+      "time": "2026-11-04 18:20:10"
+    },
+    "PANW": {
+      "qty": 0.347345,
+      "cost": 121.52559515,
+      "sleeve": "rsi2_stocks",
+      "day": "2026-11-04",
+      "order_id": "2aab6f80-a394-4f3e-bbdf-aad3af9e4bc5",
+      "time": "2026-11-04 18:20:40"
+    },
+    "VNQ": {
+      "qty": 51.288433,
+      "cost": 4998.57068018,
+      "sleeve": "rotation",
+      "day": "2026-11-04",
+      "order_id": "11ee5671-d61d-4874-a4bd-a435f711dbd8",
+      "time": "2026-11-04 18:21:31"
     }
   },
   "seen": [
@@ -67,7 +100,13 @@
     "591429b0-c4ef-4bf2-b625-fd05f78c1506",
     "eeabcf27-b7fd-40e7-be37-67ad7d2ace09",
     "4253ae0c-45b2-4b40-b8bc-b27065389dc9",
-    "8d1ef485-890a-4d66-a926-408094b5be73"
+    "8d1ef485-890a-4d66-a926-408094b5be73",
+    "2274f216-ba42-494c-9ecf-359bb7401b43",
+    "fbe2b62c-87b3-46dd-b8d0-8f8a4897a470",
+    "df9b7f57-0faf-4702-badc-f4acd794a9a5",
+    "9494b5cb-8baf-4455-8be1-dc77c60cb943",
+    "2aab6f80-a394-4f3e-bbdf-aad3af9e4bc5",
+    "11ee5671-d61d-4874-a4bd-a435f711dbd8"
   ],
   "trades": [
     {
@@ -83,6 +122,23 @@
       "ret": 0.00157,
       "stop": false,
       "entry_order": "80c07080-87e5-4da9-b4f3-e91883cfc002"
+    },
+    {
+      "symbol": "MU",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-03",
+      "exit_day": "2026-11-04",
+      "days": 1,
+      "qty": 5.76957,
+      "entry": 865.6055,
+      "exit": 804.6876,
+      "pnl": -351.47,
+      "ret": -0.07038,
+      "stop": true,
+      "entry_order": "ceb18052-ba8f-4e48-ac69-6f766f3f05bd",
+      "entry_time": "",
+      "exit_time": "2026-11-04 18:16:07",
+      "exit_order": "2274f216-ba42-494c-9ecf-359bb7401b43"
     }
   ]
 }
