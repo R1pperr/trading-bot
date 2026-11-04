@@ -769,44 +769,76 @@ class AiShadowTests(SleeveCase):
         asked.assert_called_once()
         self.assertEqual(len(self.trading.buys()), 1)
 
-    def test_a_busy_gemini_is_asked_again_before_it_counts_as_an_error(self):
+    def test_a_busy_gemini_is_asked_again_with_the_backup_model(self):
         class Busy(Exception):
             code = 503
-        answers = [Busy("503 UNAVAILABLE high demand"), Busy("503 UNAVAILABLE"), "answer"]
-        waits = []
+        answers = [Busy("503 UNAVAILABLE high demand"), "answer"]
+        asked, waits = [], []
 
-        def send():
+        def send(model):
+            asked.append(model)
             item = answers.pop(0)
             if isinstance(item, Exception):
                 raise item
             return item
 
-        self.assertEqual(ai_analyst.with_retries(send, sleep=waits.append), "answer")
-        self.assertEqual(waits, list(ai_analyst.RETRY_WAITS))
+        self.assertEqual(ai_analyst.with_retries(send, sleep=waits.append), ("answer", config.GEMINI_BACKUP_MODEL))
+        self.assertEqual(asked, [config.GEMINI_MODEL, config.GEMINI_BACKUP_MODEL])
+        self.assertEqual(waits, [ai_analyst.RETRY_WAITS[0]])
+
+    def test_the_backup_is_a_different_model(self):
+        self.assertTrue(config.GEMINI_BACKUP_MODEL)
+        self.assertNotEqual(config.GEMINI_BACKUP_MODEL, config.GEMINI_MODEL)
 
     def test_a_gemini_that_stays_busy_gives_up_after_three_tries(self):
-        calls, waits = [], []
+        asked, waits = [], []
 
-        def send():
-            calls.append(1)
+        def send(model):
+            asked.append(model)
             raise RuntimeError("503 UNAVAILABLE")
 
         with self.assertRaises(RuntimeError):
             ai_analyst.with_retries(send, sleep=waits.append)
-        self.assertEqual(len(calls), 3)
+        self.assertEqual(asked, [config.GEMINI_MODEL, config.GEMINI_BACKUP_MODEL, config.GEMINI_BACKUP_MODEL])
+        self.assertEqual(waits, list(ai_analyst.RETRY_WAITS))
 
     def test_a_bad_key_is_not_retried(self):
         class BadKey(Exception):
             code = 400
-        calls, waits = [], []
+        asked, waits = [], []
 
-        def send():
-            calls.append(1)
+        def send(model):
+            asked.append(model)
             raise BadKey("API key not valid")
 
         with self.assertRaises(BadKey):
             ai_analyst.with_retries(send, sleep=waits.append)
-        self.assertEqual((len(calls), waits), (1, []))
+        self.assertEqual((asked, waits), ([config.GEMINI_MODEL], []))
+
+    def test_the_client_stays_open_for_the_whole_call(self):
+        # 4 Nov 2026: the review built the client inline, and it was closed before its request went out.
+        from google import genai
+        live = {"open": True}
+
+        class Models:
+            def generate_content(self, model, contents, config):
+                if not live["open"]:
+                    raise RuntimeError("Cannot send a request, as the client has been closed.")
+                return SimpleNamespace(text="fine")
+
+        class Client:
+            def __init__(self, api_key):
+                self.models = Models()
+
+            def __del__(self):
+                live["open"] = False
+
+        self.start(mock.patch.object(genai, "Client", Client))
+        response, model = ai_analyst.generate("hello")
+        self.assertEqual((response.text, model), ("fine", config.GEMINI_MODEL))
+        live["open"] = True
+        import review
+        self.assertEqual(review.explain({"fallback": "numbers only", "data": {}}), "fine")
 
     def test_a_shadow_error_never_says_the_trade_was_stopped(self):
         config.AI_VETO_MODE = "shadow"
