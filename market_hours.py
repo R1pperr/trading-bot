@@ -21,7 +21,7 @@ from zoneinfo import ZoneInfo
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 NEW_YORK = ZoneInfo("America/New_York")
 FIRST_TICK = (9, 5)      # New York time, so one tick lands before the 09:30 open and orders fill at it
-LAST_TICK = (17, 0)      # an hour past the close, late enough for the 20:45 UTC daily summary
+LAST_TICK = (17, 0)      # an hour past the close, late enough for the 16:05 daily summary
 BOT_ACCOUNT = "github-actions[bot]"
 
 

@@ -491,11 +491,13 @@ def alerts_for(rows):
 
 def summary_due(now):
     """
-    True from config.DAILY_SUMMARY_UTC onwards. With crypto on that's every day,
-    because AI vetoes are only reported here and crypto never stops.
+    True from config.DAILY_SUMMARY_NY onwards, in New York time, so it always comes after
+    the close: a fixed UTC time drifts by an hour when the clocks change. With crypto on
+    that's every day, because crypto never stops.
     """
-    trading_day = config.CRYPTO_ENABLED or now.weekday() < 5
-    return trading_day and now.astimezone(timezone.utc).strftime("%H:%M") >= config.DAILY_SUMMARY_UTC
+    local = now.astimezone(NEW_YORK)
+    trading_day = config.CRYPTO_ENABLED or local.weekday() < 5
+    return trading_day and local.strftime("%H:%M") >= config.DAILY_SUMMARY_NY
 
 
 def send_daily_summary(args):

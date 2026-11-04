@@ -475,7 +475,11 @@ def run(market, trading, equity, cash, killed, dry_run, today, todays_log, log_e
 
     first_run = state["days"].get(market) != today
     if alpaca_stops:
-        fixes, _ = stops.sync(trading, positions, working, sold | open_sells, state["positions"], today, first_run, dry_run)
+        # A buy that's still filling gets its stop next run: Alpaca refuses a sell stop next to an open buy
+        # as a possible wash trade. The 15-minute check covers it until then.
+        still_buying = set(open_buys)
+        fixes, _ = stops.sync(trading, positions, working, sold | open_sells | still_buying, state["positions"], today,
+                              first_run, dry_run)
         working = stops.by_symbol(trading.get_orders(filter=GetOrdersRequest(status=QueryOrderStatus.OPEN, limit=500)))
         if fixes and not dry_run:
             log_event(event="STOP_FIXED", equity=equity, details="; ".join(fixes))
@@ -535,7 +539,10 @@ def run(market, trading, equity, cash, killed, dry_run, today, todays_log, log_e
     busy = (set(positions) | sold | {name(o.symbol) for o in orders} | set(state["positions"])
             | {row["symbol"] for row in todays_log if row["event"] == "ORDER"}) - cancelled
     open_count = len(set(positions) - sold)
-    ai_left = config.MAX_AI_REVIEWS_PER_DAY[market]
+    # The AI limit counts the whole day's reviews, not just this run's: a veto frees no trade slot,
+    # so a per-run count would let every 15-minute run ask Gemini again.
+    ai_left = config.MAX_AI_REVIEWS_PER_DAY[market] - sum(
+        row["event"] == "AI_DECISION" and in_market(row["symbol"], market) for row in todays_log)
     added, shortlist = {}, []
 
     def note(candidate, why):

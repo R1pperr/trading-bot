@@ -201,7 +201,7 @@ MAX_AI_REVIEWS_PER_DAY = {"stock": 5, "crypto": 5}
 # ---------------------------------------------------------------------------
 # Phone alerts (see notifier.py)
 # ---------------------------------------------------------------------------
-DAILY_SUMMARY_UTC = "20:45"   # the first weekday run from this time on sends the day's summary
+DAILY_SUMMARY_NY = "16:05"    # New York time, after the 16:00 close all year. The first weekday run from then sends it
 
 
 # ---------------------------------------------------------------------------
