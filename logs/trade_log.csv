@@ -43,3 +43,4 @@ time_utc,event,symbol,signal,signal_date,details,ai_decision,ai_reason,side,qty,
 2026-11-04 18:20:56,AI_DECISION,DBC,BUY,2026-11-04,sleeve=rotation; medium-term entry signal,VETO,"The sharp single-day drop from 33.61 to 32.46 right before the trade indicates severe sudden selling pressure, making the buy signal unreliable.",,159.811,31.27,,,99945.77
 2026-11-04 18:21:28,AI_DECISION,VNQ,BUY,2026-11-04,sleeve=rotation; medium-term entry signal,APPROVE,"The price action shows a steady upward trend without extreme spikes, supporting a reliable medium-term entry signal.",,51.2884,97.435,,,99945.77
 2026-11-04 18:21:28,ORDER,VNQ,BUY,2026-11-04,sleeve=rotation; medium-term entry signal,APPROVE,"The price action shows a steady upward trend without extreme spikes, supporting a reliable medium-term entry signal.",buy,51.2884,97.435,11ee5671-d61d-4874-a4bd-a435f711dbd8,pending_new,99945.77
+2026-11-04 21:05:30,DAILY_SUMMARY,,,,,,,,,,,,
