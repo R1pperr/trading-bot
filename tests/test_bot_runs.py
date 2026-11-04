@@ -13,6 +13,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+import isolate  # noqa: F401  (keeps tests away from the real control, feed and watchdog files)
 import urllib.error
 import urllib.parse
 from datetime import datetime, timezone

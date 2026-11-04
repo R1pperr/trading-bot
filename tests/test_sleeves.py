@@ -12,6 +12,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+import isolate  # noqa: F401  (keeps tests away from the real control, feed and watchdog files)
 from datetime import datetime, timezone
 from types import SimpleNamespace
 from unittest import mock
@@ -442,8 +443,12 @@ class OwnershipTests(SleeveCase):
         self.go("stock", {"AAA": stock_bars(pullback())})
         with open(sleeves.STATE_FILE, encoding="utf-8") as handle:
             saved = json.load(handle)
-        self.assertEqual(set(saved), {"positions", "days", "momentum", "closed_pl"})
+        self.assertEqual(set(saved), {"positions", "days", "momentum", "closed_pl", "entries"})
         self.assertEqual(set(saved["positions"]["AAA"]), {"sleeve", "entry_date", "stop"})
+        # The record kept for grading holds our own numbers and a spread label, never a market price.
+        entry = next(iter(saved["entries"].values()))
+        self.assertEqual(set(entry), {"symbol", "sleeve", "day", "qty", "equity", "ai_decision", "ai_reason",
+                                      "placed_utc", "pre_open", "spread"})
 
 
 class AllocationTests(SleeveCase):

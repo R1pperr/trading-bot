@@ -11,6 +11,7 @@ import shutil
 import sys
 import tempfile
 import unittest
+import isolate  # noqa: F401  (keeps tests away from the real control, feed and watchdog files)
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock

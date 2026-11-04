@@ -11,6 +11,7 @@ import io
 import json
 import os
 import unittest
+import isolate  # noqa: F401  (keeps tests away from the real control, feed and watchdog files)
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 from unittest import mock
@@ -670,9 +671,10 @@ class AiShadowTests(SleeveCase):
     def ask(self, decision, reason):
         return self.start(mock.patch.object(ai_analyst, "_ask_gemini", return_value=(decision, reason)))
 
-    def test_shadow_is_the_default(self):
+    def test_enforce_is_the_default(self):
+        # The brief of 2026-11-04: the AI analyst on, in enforce mode. The daily review may still switch it to shadow.
         with open(os.path.join(sleeves.BASE_DIR, "config.py"), encoding="utf-8") as handle:
-            self.assertRegex(handle.read(), r'(?m)^AI_VETO_MODE = "shadow"')
+            self.assertRegex(handle.read(), r'(?m)^AI_VETO_MODE = "enforce"')
 
     def test_in_shadow_a_veto_is_logged_but_the_trade_goes_ahead(self):
         config.AI_VETO_MODE = "shadow"
