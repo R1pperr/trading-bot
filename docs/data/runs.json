@@ -453,5 +453,10 @@
     "time_utc": "2026-11-04T17:03:25Z",
     "status": "error",
     "orders": 0
+  },
+  {
+    "time_utc": "2026-11-04T17:18:11Z",
+    "status": "error",
+    "orders": 0
   }
 ]
