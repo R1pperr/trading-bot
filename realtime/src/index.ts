@@ -27,7 +27,7 @@ export type Env = {
   RT_MODE?: string; RT_TIMEFRAME?: string; RT_EXPERIMENTAL?: string; PAGES_ORIGIN?: string;
   ALPACA_KEY: string; ALPACA_SECRET: string; TELEGRAM_BOT_TOKEN?: string; TELEGRAM_CHAT_ID?: string; VIEWER_CODE?: string;
   GEMINI_API_KEY?: string; GEMINI_MODEL?: string; GEMINI_BACKUP_MODEL?: string; AI_VETO_MODE?: string;
-  MAIN_ALPACA_KEY?: string; MAIN_ALPACA_SECRET?: string; WATCHDOG_TEST?: string; RT_STATE?: Kv;
+  MAIN_ALPACA_KEY?: string; MAIN_ALPACA_SECRET?: string; WATCHDOG_TEST?: string; AI_TEST?: string; RT_STATE?: Kv;
 };
 export type Report = { mode: string; ran: boolean; reason: string; would: string[]; placed: string[]; messages: string[] };
 
@@ -437,6 +437,22 @@ export async function runOnce(env: Env, now: number, call: Fetcher, state: State
     await telegram(call, env, text);
     return { ...report, reason: "watchdog test" };
   }
+  if (env.AI_TEST === "example") {
+    // Test mode: asks the main and the backup model about a made-up rising series. No Alpaca call,
+    // no order, no saved state. Run with: npx wrangler dev --remote --test-scheduled --var AI_TEST:example
+    const start = Date.parse("2026-11-04T14:30:00Z");
+    const series: Bar[] = Array.from({ length: 30 }, (_, i) => {
+      const c = 100 + i * 0.1;
+      return { t: start + i * 5 * MINUTE, o: c, h: c, l: c, c };
+    });
+    const prompt = aiPrompt(series, series.length - 1, "");
+    for (const model of [...new Set([env.GEMINI_MODEL || "gemini-3.8-flash", env.GEMINI_BACKUP_MODEL || ""])].filter(Boolean)) {
+      const { verdict } = await askGeminiOnce(call, env, prompt, GEMINI_TIMEOUT_MS, model);
+      report.messages.push(`${model}: ${verdict.failed ? verdict.reason : `answered ${verdict.decision}`}`);
+    }
+    console.log(JSON.stringify({ ai_test: report.messages }));
+    return { ...report, reason: "AI test" };
+  }
   if (mode === "off") return { ...report, reason: "RT_MODE is off" };
   alpaca.requirePaperKey(env.ALPACA_KEY);
   const keys = { key: env.ALPACA_KEY, secret: env.ALPACA_SECRET };
@@ -563,7 +579,7 @@ export async function runOnce(env: Env, now: number, call: Fetcher, state: State
 
 // The cron entry: one state read, one run, one state write. Errors are logged, fed and alerted.
 export async function scheduledRun(env: Env, now: number, call: Fetcher): Promise<{ report: Report | null; error: string; state: State; saved: boolean }> {
-  const testing = env.WATCHDOG_TEST === "missed_bot1";
+  const testing = env.WATCHDOG_TEST === "missed_bot1" || env.AI_TEST === "example";
   const state = testing ? freshState() : await loadState(env);
   const mode = modeOf(env);
   let report: Report | null = null;
