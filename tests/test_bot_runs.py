@@ -22,6 +22,7 @@ from unittest import mock
 
 import pandas as pd
 
+import activity
 import ai_analyst
 import bot
 import config
@@ -184,6 +185,23 @@ class BotRunTests(unittest.TestCase):
         self.assertEqual(len(self.messages()), 1)
         self.assertIn("Alpaca fell over", self.messages()[0])
         self.assertEqual(self.status()["last_run"]["status"], "error")
+
+    def test_refused_keys_are_not_called_market_closed(self):
+        # 4 Nov 2026: Alpaca refused the keys all day, and the feed said "market closed".
+        feed_file = os.path.join(self.folder, "activity.json")
+        self.start(mock.patch.object(activity, "FEED_FILE", feed_file))
+
+        def newest_line():
+            with open(feed_file) as handle:
+                return json.load(handle)[0]["text"]
+
+        self.run_bot()
+        self.assertIn("(market open)", newest_line())
+        self.trading.get_account.side_effect = RuntimeError('{"message": "unauthorized."}')
+        self.assertEqual(self.run_bot(), 1)
+        self.assertIn("(couldn't reach Alpaca)", newest_line())
+        self.assertIn("unauthorized", newest_line())
+        self.assertNotIn("market closed", newest_line())
 
     def test_missing_keys_count_as_a_crash(self):
         config.get_alpaca_keys.side_effect = SystemExit(1)

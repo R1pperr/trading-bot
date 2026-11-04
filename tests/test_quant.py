@@ -713,6 +713,101 @@ class AiShadowTests(SleeveCase):
         asked.assert_not_called()
         self.assertEqual(self.trading.buys(), [])
 
+    def test_failed_ai_calls_dont_use_up_the_day(self):
+        # 4 Nov 2026: five 503 "high demand" errors used up the day's 5 reviews, so no buy could happen all day.
+        config.AI_VETO_MODE = "enforce"
+        asked = self.ask(ai_analyst.APPROVE, "Fine")
+        failed = [{"event": "AI_DECISION", "symbol": f"X{i}", "side": "", "ai_decision": "VETO",
+                   "ai_reason": "AI error, so no trade: 503 UNAVAILABLE. This model is currently experiencing high demand."}
+                  for i in range(config.MAX_AI_REVIEWS_PER_DAY["stock"])]
+        self.go("stock", self.tables(), log=failed)
+        asked.assert_called_once()
+        self.assertEqual(len(self.trading.buys()), 1)
+
+    def test_one_run_still_asks_at_most_five_times(self):
+        config.AI_VETO_MODE = "enforce"
+        calls = self.start(mock.patch.object(ai_analyst, "_ask_gemini", side_effect=RuntimeError("503 UNAVAILABLE")))
+        tables = {f"A{i}": stock_bars(pullback()) for i in range(config.MAX_AI_REVIEWS_PER_RUN["stock"] + 3)}
+        self.go("stock", tables)
+        self.assertEqual(calls.call_count, config.MAX_AI_REVIEWS_PER_RUN["stock"])
+        self.assertEqual(self.trading.buys(), [])
+
+    def test_five_vetoes_dont_end_the_day(self):
+        # Asked for on 4 Nov 2026: if the AI says no to the first five, keep asking about the next signals.
+        config.AI_VETO_MODE = "enforce"
+        asked = self.ask(ai_analyst.APPROVE, "Fine")
+        vetoed = [{"event": "AI_DECISION", "symbol": f"X{i}", "side": "", "ai_decision": "VETO", "ai_reason": "Too choppy"}
+                  for i in range(5)]
+        self.go("stock", self.tables(), log=vetoed)
+        asked.assert_called_once()
+        self.assertEqual(len(self.trading.buys()), 1)
+
+    def test_the_trade_cap_still_holds_after_vetoes(self):
+        config.AI_VETO_MODE = "enforce"
+        asked = self.ask(ai_analyst.APPROVE, "Fine")
+        earlier = [{"event": "ORDER", "symbol": f"B{i}", "side": "buy"} for i in range(config.MAX_TRADES_PER_DAY)]
+        earlier += [{"event": "AI_DECISION", "symbol": f"X{i}", "side": "", "ai_decision": "VETO", "ai_reason": "No"}
+                    for i in range(5)]
+        self.go("stock", self.tables(), log=earlier)
+        asked.assert_not_called()
+        self.assertEqual(self.trading.buys(), [])
+
+    def test_a_symbol_the_ai_said_no_to_is_not_asked_again_today(self):
+        config.AI_VETO_MODE = "enforce"
+        asked = self.ask(ai_analyst.APPROVE, "Fine")
+        vetoed = [{"event": "AI_DECISION", "symbol": "AAA", "side": "", "ai_decision": "VETO", "ai_reason": "Too choppy"}]
+        self.go("stock", self.tables(), log=vetoed)
+        asked.assert_not_called()
+        self.assertEqual(self.trading.buys(), [])
+
+    def test_a_symbol_whose_ai_call_failed_is_asked_again(self):
+        config.AI_VETO_MODE = "enforce"
+        asked = self.ask(ai_analyst.APPROVE, "Fine")
+        failed = [{"event": "AI_DECISION", "symbol": "AAA", "side": "", "ai_decision": "VETO",
+                   "ai_reason": "AI error, so no trade: 503 UNAVAILABLE"}]
+        self.go("stock", self.tables(), log=failed)
+        asked.assert_called_once()
+        self.assertEqual(len(self.trading.buys()), 1)
+
+    def test_a_busy_gemini_is_asked_again_before_it_counts_as_an_error(self):
+        class Busy(Exception):
+            code = 503
+        answers = [Busy("503 UNAVAILABLE high demand"), Busy("503 UNAVAILABLE"), "answer"]
+        waits = []
+
+        def send():
+            item = answers.pop(0)
+            if isinstance(item, Exception):
+                raise item
+            return item
+
+        self.assertEqual(ai_analyst.with_retries(send, sleep=waits.append), "answer")
+        self.assertEqual(waits, list(ai_analyst.RETRY_WAITS))
+
+    def test_a_gemini_that_stays_busy_gives_up_after_three_tries(self):
+        calls, waits = [], []
+
+        def send():
+            calls.append(1)
+            raise RuntimeError("503 UNAVAILABLE")
+
+        with self.assertRaises(RuntimeError):
+            ai_analyst.with_retries(send, sleep=waits.append)
+        self.assertEqual(len(calls), 3)
+
+    def test_a_bad_key_is_not_retried(self):
+        class BadKey(Exception):
+            code = 400
+        calls, waits = [], []
+
+        def send():
+            calls.append(1)
+            raise BadKey("API key not valid")
+
+        with self.assertRaises(BadKey):
+            ai_analyst.with_retries(send, sleep=waits.append)
+        self.assertEqual((len(calls), waits), (1, []))
+
     def test_a_shadow_error_never_says_the_trade_was_stopped(self):
         config.AI_VETO_MODE = "shadow"
         self.start(mock.patch.object(ai_analyst, "_ask_gemini", side_effect=RuntimeError("quota")))

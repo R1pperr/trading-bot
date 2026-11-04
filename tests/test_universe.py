@@ -103,7 +103,7 @@ class RankingTests(unittest.TestCase):
     def test_only_the_top_candidates_are_kept(self):
         found = [{"symbol": f"S{i}", "action": "BUY"} for i in range(40)]
         plan = signals.start_day("stock", "2026-11-02", found, [], 40)
-        self.assertEqual(len(plan["candidates"]), config.MAX_AI_REVIEWS_PER_DAY["stock"])
+        self.assertEqual(len(plan["candidates"]), config.MAX_AI_REVIEWS_PER_RUN["stock"])
         self.assertEqual(plan["found"], 40)
 
     def test_scan_uses_the_same_rules_and_publishes_no_price_figures(self):
@@ -314,7 +314,7 @@ class CachedRunTests(unittest.TestCase):
         with mock.patch.object(config, "MAX_TRADES_PER_DAY", 100):
             for _ in range(96):
                 self.run_bot()
-        self.assertLessEqual(self.gemini.call_count, sum(config.MAX_AI_REVIEWS_PER_DAY.values()))
+        self.assertLessEqual(self.gemini.call_count, sum(config.MAX_AI_REVIEWS_PER_RUN.values()))
         self.assertEqual(self.gemini.call_count, 10)
 
     def test_daily_trade_limit_still_holds(self):
