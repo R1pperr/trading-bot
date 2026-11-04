@@ -69,7 +69,34 @@ export async function bars(call: Fetcher, keys: Keys, symbol: string, timeframe:
   const url = `${DATA_URL}/v2/stocks/${symbol}/bars?timeframe=${timeframe}&feed=iex&sort=desc`
     + `&limit=${BAR_LIMIT[timeframe] ?? 300}&start=${encodeURIComponent(start)}`;
   const body = await read(call, url, keys);
-  return ((body?.bars ?? []) as any[]).reverse().map((bar) => ({ t: Date.parse(bar.t), o: bar.o, h: bar.h, l: bar.l, c: bar.c }));
+  return ((body?.bars ?? []) as any[]).reverse().map((bar) => ({ t: Date.parse(bar.t), o: bar.o, h: bar.h, l: bar.l, c: bar.c, v: bar.v }));
+}
+
+// The latest bid and ask on the free feed. Only asked for when the liquidity fix is on and a buy is about to happen.
+export async function latestQuote(call: Fetcher, keys: Keys, symbol: string): Promise<{ bid: number; ask: number }> {
+  const body = await read(call, `${DATA_URL}/v2/stocks/${symbol}/quotes/latest?feed=iex`, keys);
+  return { bid: Number(body?.quote?.bp ?? 0), ask: Number(body?.quote?.ap ?? 0) };
+}
+
+export type HeldPosition = { symbol: string; qty: number; market_value: number; unrealized_pl: number; unrealized_plpc: number };
+
+// The main bot's positions, for the side-by-side dashboard. Read only.
+export async function positions(call: Fetcher, keys: Keys): Promise<HeldPosition[]> {
+  const body = await read(call, `${PAPER_URL}/v2/positions`, keys);
+  return ((body ?? []) as any[]).map((item) => ({
+    symbol: String(item.symbol), qty: Number(item.qty), market_value: Number(item.market_value),
+    unrealized_pl: Number(item.unrealized_pl), unrealized_plpc: Number(item.unrealized_plpc),
+  }));
+}
+
+// Moves a working stop to a new price in one step, so the shares are never left without a stop.
+export async function replaceStop(call: Fetcher, keys: Keys, id: string, stopPrice: number): Promise<Order | null> {
+  const response = await call(`${PAPER_URL}/v2/orders/${id}`, {
+    method: "PATCH", headers: headers(keys, true), body: JSON.stringify({ stop_price: String(stopPrice) }),
+  });
+  if (response.status === 404 || response.status === 422) return null;      // filled or gone meanwhile
+  if (!response.ok) throw new Error(`Alpaca said ${response.status} to a stop change`);
+  return toOrder(await response.json());
 }
 
 // Daily bars for the dashboard's charts. Full-market history, leaving out the last 20 minutes.
