@@ -23,10 +23,10 @@
       "market": "stock",
       "allocation": 0.2,
       "enabled": true,
-      "positions": 5,
-      "value": 20042.16,
-      "open_pl": 43.51,
-      "closed_pl": 0.0
+      "positions": 4,
+      "value": 14833.4,
+      "open_pl": -185.17,
+      "closed_pl": 182.88
     },
     {
       "name": "rsi2_stocks",
@@ -34,10 +34,10 @@
       "market": "stock",
       "allocation": 0.2,
       "enabled": true,
-      "positions": 5,
-      "value": 19934.95,
-      "open_pl": 237.25,
-      "closed_pl": -365.07
+      "positions": 3,
+      "value": 9763.96,
+      "open_pl": -215.11,
+      "closed_pl": -84.69
     },
     {
       "name": "rotation",
@@ -46,8 +46,8 @@
       "allocation": 0.2,
       "enabled": true,
       "positions": 1,
-      "value": 5022.16,
-      "open_pl": 23.59,
+      "value": 5054.81,
+      "open_pl": 56.24,
       "closed_pl": 0.0
     },
     {

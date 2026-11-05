@@ -16,6 +16,51 @@
   "ai_errors": 5,
   "latest": [
     {
+      "time_utc": "2026-11-05 14:18:41",
+      "symbol": "DELL",
+      "reason": "The stock has fallen sharply and erratically from its recent highs, with several large down days and wild swings, so the long-term strength signal looks unreliable."
+    },
+    {
+      "time_utc": "2026-11-05 14:18:35",
+      "symbol": "MU",
+      "reason": "Prices have fallen sharply over the past month with large, erratic daily swings and a steep final-day drop, which contradicts a strong-momentum entry signal and looks unreliable."
+    },
+    {
+      "time_utc": "2026-11-05 14:18:28",
+      "symbol": "LITE",
+      "reason": "Prices have been extremely volatile with wild swings and a steep, sharp decline recently, including a huge one-day drop, so the long-term signal looks unreliable right now."
+    },
+    {
+      "time_utc": "2026-11-05 14:18:22",
+      "symbol": "TWST",
+      "reason": "Prices have been extremely volatile, with a sharp spike, a steep crash, and repeated large swings in both directions, so there is no stable trend to trust."
+    },
+    {
+      "time_utc": "2026-11-05 14:18:15",
+      "symbol": "MRNA",
+      "reason": "The latest day shows an extreme surge after a volatile, choppy month with sharp swings both ways, so the move looks likely to reverse and the signal unreliable."
+    },
+    {
+      "time_utc": "2026-11-05 14:18:09",
+      "symbol": "TXG",
+      "reason": "Prices have been very choppy with a sharp one-day plunge and further steep swings, so there is no clear trend and the signal looks unreliable."
+    },
+    {
+      "time_utc": "2026-11-05 14:18:02",
+      "symbol": "SNDK",
+      "reason": "The stock has fallen steeply and almost continuously over the past month, with several sharp drops, so a momentum-based buy signal looks unreliable against this sustained, volatile decline."
+    },
+    {
+      "time_utc": "2026-11-05 14:17:55",
+      "symbol": "AXTI",
+      "reason": "Prices have been extremely choppy with sharp swings and a steep slide from the recent peak, so there is no steady trend and the long-term signal looks unreliable."
+    },
+    {
+      "time_utc": "2026-11-05 14:17:40",
+      "symbol": "DBC",
+      "reason": "After a steady climb, prices dropped sharply in a few sessions, including a large one-day fall at the end, so the upward signal looks unreliable."
+    },
+    {
       "time_utc": "2026-11-04 18:20:56",
       "symbol": "DBC",
       "reason": "The sharp single-day drop from 33.61 to 32.46 right before the trade indicates severe sudden selling pressure, making the buy signal unreliable."
