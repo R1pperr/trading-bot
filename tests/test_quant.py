@@ -1293,7 +1293,7 @@ class RealtimeBacktestTests(unittest.TestCase):
         result = rt_backtest.simulate([self.flat(), self.day("2026-11-03", closes, opens=opens)])
         trade = result["trades"].iloc[0]
         self.assertEqual(trade["why"], "close")
-        qty = int(100_000 * 0.25 // opens[6])
+        qty = int(100_000 * 4 * 0.95 // opens[6])      # 4x leverage, held to 95% of Alpaca's 4x buying power
         expected = qty * (opens[77] - opens[6]) - qty * (opens[6] + opens[77]) * rt_backtest.COST_PER_SIDE    # bar 77 opens at 15:55
         self.assertAlmostEqual(trade["pnl"], expected, places=6)
 

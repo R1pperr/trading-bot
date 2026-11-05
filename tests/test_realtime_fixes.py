@@ -189,7 +189,8 @@ class ExitAndSizeTests(unittest.TestCase):
         normal = run({"vol_sizing": True})["trades"].iloc[0]
         half = run({"vol_sizing": True}, context={**CONTEXT, "vol_scale": 0.5})["trades"].iloc[0]
         double = run({"vol_sizing": True}, context={**CONTEXT, "vol_scale": 2.0})["trades"].iloc[0]
-        self.assertAlmostEqual(half["fee"] / normal["fee"], 0.5, delta=0.02)
+        # Half of 4x is 2x, while a normal trade is held to 95% of the 4x buying power (3.8x).
+        self.assertAlmostEqual(half["fee"] / normal["fee"], 2.0 / 3.8, delta=0.02)
         self.assertAlmostEqual(double["fee"], normal["fee"])
 
 
