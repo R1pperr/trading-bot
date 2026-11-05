@@ -21,13 +21,6 @@
       "day": "2026-11-03",
       "order_id": "60ce0eb0-4388-4302-859b-d6e2940cb830"
     },
-    "XLK": {
-      "qty": 28.624365,
-      "cost": 5019.359659911135,
-      "sleeve": "ibs_etfs",
-      "day": "2026-11-03",
-      "order_id": "591429b0-c4ef-4bf2-b625-fd05f78c1506"
-    },
     "IWM": {
       "qty": 17.84134,
       "cost": 4987.668524717559,
@@ -67,14 +60,6 @@
       "order_id": "337c70c5-66a9-47b5-9235-ce0d42f94487",
       "time": "2026-11-05 14:31:54"
     },
-    "TSLA": {
-      "qty": 13.30435,
-      "cost": 4897.1981915,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-05",
-      "order_id": "f5429913-8c72-44c5-a8ec-17aee340dfc6",
-      "time": "2026-11-05 14:32:46"
-    },
     "EFA": {
       "qty": 47.187472,
       "cost": 4957.27703971168,
@@ -111,7 +96,9 @@
     "26b80852-b9d8-496b-a45a-c7bca94044eb",
     "25a41c39-e981-4728-a55f-adf0049b65a6",
     "2efac264-0e48-43a0-b5a7-08c650885a6d",
-    "17c1d00e-9dbc-49f8-97d4-36b98118cbe0"
+    "17c1d00e-9dbc-49f8-97d4-36b98118cbe0",
+    "e48e40ab-c6c0-424e-853d-e250cdf4e819",
+    "c3c670ea-7860-4bf8-b425-12176598f7c4"
   ],
   "trades": [
     {
@@ -246,6 +233,40 @@
       "entry_time": "2026-11-04 18:20:10",
       "exit_time": "2026-11-05 14:41:08",
       "exit_order": "17c1d00e-9dbc-49f8-97d4-36b98118cbe0"
+    },
+    {
+      "symbol": "TSLA",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-05",
+      "exit_day": "2026-11-05",
+      "days": 0,
+      "qty": 13.30435,
+      "entry": 368.09,
+      "exit": 342.125,
+      "pnl": -345.45,
+      "ret": -0.07054,
+      "stop": true,
+      "entry_order": "f5429913-8c72-44c5-a8ec-17aee340dfc6",
+      "entry_time": "2026-11-05 14:32:46",
+      "exit_time": "2026-11-05 15:52:36",
+      "exit_order": "e48e40ab-c6c0-424e-853d-e250cdf4e819"
+    },
+    {
+      "symbol": "XLK",
+      "sleeve": "ibs_etfs",
+      "entry_day": "2026-11-03",
+      "exit_day": "2026-11-05",
+      "days": 2,
+      "qty": 28.624365,
+      "entry": 175.3527,
+      "exit": 163.0343,
+      "pnl": -352.61,
+      "ret": -0.07025,
+      "stop": true,
+      "entry_order": "591429b0-c4ef-4bf2-b625-fd05f78c1506",
+      "entry_time": "",
+      "exit_time": "2026-11-05 15:52:44",
+      "exit_order": "c3c670ea-7860-4bf8-b425-12176598f7c4"
     }
   ]
 }

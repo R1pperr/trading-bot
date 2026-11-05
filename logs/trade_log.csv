@@ -69,3 +69,5 @@ time_utc,event,symbol,signal,signal_date,details,ai_decision,ai_reason,side,qty,
 2026-11-05 14:33:45,ORDER,PANW,,,"sleeve=rsi2_stocks; stop-loss: filled at Alpaca, -6.8% from buy price 349.87",,,sell,0.3473,326.202,c14245fb-9f98-43eb-b973-f662ae946208,filled,99376.74
 2026-11-05 14:33:45,ORDER,RVMD,,,sleeve=momentum_stocks; stop-loss: -7.7% from buy price 208.74,,,sell,10.0025,192.59,2efac264-0e48-43a0-b5a7-08c650885a6d,pending_new,99376.74
 2026-11-05 14:48:46,ORDER,PLTR,,,"sleeve=rsi2_stocks; stop-loss: filled at Alpaca, -7.1% from buy price 171.29",,,sell,29.1693,159.2,17c1d00e-9dbc-49f8-97d4-36b98118cbe0,filled,98864.31
+2026-11-05 16:04:08,ORDER,TSLA,,,"sleeve=rsi2_stocks; stop-loss: filled at Alpaca, -7.1% from buy price 368.09",,,sell,13.3043,342.125,e48e40ab-c6c0-424e-853d-e250cdf4e819,filled,98277.1
+2026-11-05 16:04:08,ORDER,XLK,,,"sleeve=ibs_etfs; stop-loss: filled at Alpaca, -7.0% from buy price 175.35",,,sell,28.6244,163.0343,c3c670ea-7860-4bf8-b425-12176598f7c4,filled,98277.1
