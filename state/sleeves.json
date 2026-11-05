@@ -2,7 +2,7 @@
   "closed_pl": {
     "ibs_etfs": 182.88,
     "momentum_stocks": -161.54,
-    "rsi2_stocks": -92.91
+    "rsi2_stocks": -445.58
   },
   "days": {
     "crypto": "2026-11-02",
@@ -164,15 +164,6 @@
       "sleeve": "ibs_etfs",
       "stop": 260.0094
     },
-    "MSFT": {
-      "entry_date": "2026-11-02",
-      "sleeve": "rsi2_stocks"
-    },
-    "PLTR": {
-      "entry_date": "2026-11-04",
-      "sleeve": "rsi2_stocks",
-      "stop": 159.3276
-    },
     "QQQ": {
       "entry_date": "2026-11-02",
       "sleeve": "rsi2_stocks",
@@ -220,6 +211,7 @@
   },
   "stop_fills": [
     "2274f216-ba42-494c-9ecf-359bb7401b43",
-    "c14245fb-9f98-43eb-b973-f662ae946208"
+    "c14245fb-9f98-43eb-b973-f662ae946208",
+    "17c1d00e-9dbc-49f8-97d4-36b98118cbe0"
   ]
 }

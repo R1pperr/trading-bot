@@ -1,5 +1,19 @@
 [
   {
+    "time_utc": "2026-11-05 14:48:46",
+    "event": "ORDER",
+    "symbol": "PLTR",
+    "asset_class": "stock",
+    "sleeve": "rsi2_stocks",
+    "side": "sell",
+    "qty": 29.1693,
+    "price": 159.2,
+    "order_status": "filled",
+    "reason": "stop-loss: filled at Alpaca, -7.1% from buy price 171.29",
+    "ai_decision": "",
+    "ai_reason": ""
+  },
+  {
     "time_utc": "2026-11-05 14:33:45",
     "event": "ORDER",
     "symbol": "RVMD",

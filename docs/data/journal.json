@@ -7,13 +7,6 @@
       "day": "2026-11-02",
       "order_id": "c867d4b3-c87f-4d15-be97-745db56ed27c"
     },
-    "MSFT": {
-      "qty": 9.0,
-      "cost": 4721.899995000001,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-02",
-      "order_id": "6da36f10-1a02-42f6-937d-280b6153c0f6"
-    },
     "QQQ": {
       "qty": 7.0,
       "cost": 4860.970002,
@@ -50,14 +43,6 @@
       "order_id": "fbe2b62c-87b3-46dd-b8d0-8f8a4897a470",
       "time": "2026-11-04 18:19:12"
     },
-    "PLTR": {
-      "qty": 29.169323,
-      "cost": 4996.573330406655,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-04",
-      "order_id": "9494b5cb-8baf-4455-8be1-dc77c60cb943",
-      "time": "2026-11-04 18:20:10"
-    },
     "VNQ": {
       "qty": 51.288433,
       "cost": 4998.57068018,
@@ -65,14 +50,6 @@
       "day": "2026-11-04",
       "order_id": "11ee5671-d61d-4874-a4bd-a435f711dbd8",
       "time": "2026-11-04 18:21:31"
-    },
-    "RVMD": {
-      "qty": 10.002519,
-      "cost": 2087.9258160599998,
-      "sleeve": "momentum_stocks",
-      "day": "2026-11-05",
-      "order_id": "a794ba71-5e71-42cd-833a-a3b59b9b6463",
-      "time": "2026-11-05 14:30:08"
     },
     "CVX": {
       "qty": 0.982188,
@@ -97,6 +74,14 @@
       "day": "2026-11-05",
       "order_id": "f5429913-8c72-44c5-a8ec-17aee340dfc6",
       "time": "2026-11-05 14:32:46"
+    },
+    "EFA": {
+      "qty": 47.187472,
+      "cost": 4957.27703971168,
+      "sleeve": "rotation",
+      "day": "2026-11-05",
+      "order_id": "25a41c39-e981-4728-a55f-adf0049b65a6",
+      "time": "2026-11-05 14:36:24"
     }
   },
   "seen": [
@@ -122,7 +107,11 @@
     "32a33e99-679f-4ec6-8a7f-a45f24e7fe0e",
     "c14245fb-9f98-43eb-b973-f662ae946208",
     "337c70c5-66a9-47b5-9235-ce0d42f94487",
-    "f5429913-8c72-44c5-a8ec-17aee340dfc6"
+    "f5429913-8c72-44c5-a8ec-17aee340dfc6",
+    "26b80852-b9d8-496b-a45a-c7bca94044eb",
+    "25a41c39-e981-4728-a55f-adf0049b65a6",
+    "2efac264-0e48-43a0-b5a7-08c650885a6d",
+    "17c1d00e-9dbc-49f8-97d4-36b98118cbe0"
   ],
   "trades": [
     {
@@ -206,6 +195,57 @@
       "entry_time": "2026-11-04 18:20:40",
       "exit_time": "2026-11-05 14:31:50",
       "exit_order": "c14245fb-9f98-43eb-b973-f662ae946208"
+    },
+    {
+      "symbol": "MSFT",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-02",
+      "exit_day": "2026-11-05",
+      "days": 3,
+      "qty": 9.0,
+      "entry": 524.6556,
+      "exit": 553.5033,
+      "pnl": 259.63,
+      "ret": 0.05498,
+      "stop": false,
+      "entry_order": "6da36f10-1a02-42f6-937d-280b6153c0f6",
+      "entry_time": "",
+      "exit_time": "2026-11-05 14:35:49",
+      "exit_order": "26b80852-b9d8-496b-a45a-c7bca94044eb"
+    },
+    {
+      "symbol": "RVMD",
+      "sleeve": "momentum_stocks",
+      "entry_day": "2026-11-05",
+      "exit_day": "2026-11-05",
+      "days": 0,
+      "qty": 10.002519,
+      "entry": 208.74,
+      "exit": 195.2,
+      "pnl": -135.43,
+      "ret": -0.06487,
+      "stop": false,
+      "entry_order": "a794ba71-5e71-42cd-833a-a3b59b9b6463",
+      "entry_time": "2026-11-05 14:30:08",
+      "exit_time": "2026-11-05 14:36:38",
+      "exit_order": "2efac264-0e48-43a0-b5a7-08c650885a6d"
+    },
+    {
+      "symbol": "PLTR",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-04",
+      "exit_day": "2026-11-05",
+      "days": 1,
+      "qty": 29.169323,
+      "entry": 171.2955,
+      "exit": 159.2,
+      "pnl": -352.82,
+      "ret": -0.07061,
+      "stop": true,
+      "entry_order": "9494b5cb-8baf-4455-8be1-dc77c60cb943",
+      "entry_time": "2026-11-04 18:20:10",
+      "exit_time": "2026-11-05 14:41:08",
+      "exit_order": "17c1d00e-9dbc-49f8-97d4-36b98118cbe0"
     }
   ]
 }
