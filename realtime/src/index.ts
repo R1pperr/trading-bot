@@ -546,7 +546,9 @@ export async function runOnce(env: Env, now: number, call: Fetcher, state: State
     alpaca.ordersSince(call, keys, newYorkMidnight(now)),
   ]);
   const daily = needsDaily(control.fixes) || (control.shadow && needsDaily(control.shadow)) ? await dailyFor(call, keys, state, now) : null;
-  const base = { now, bars, minutes, position, orders, equity: account.equity, lastEquity: account.lastEquity, daily };
+  const base = {
+    now, bars, minutes, position, orders, equity: account.equity, lastEquity: account.lastEquity, buyingPower: account.buyingPower, daily,
+  };
   const plan = decide({ ...base, fixes: control.fixes });
   report.reason = plan.notes.join("; ");
   const series = warmedUp(completedBars(bars, now, minutes), now).bars;
@@ -737,7 +739,8 @@ export async function buildStatus(env: Env, now: number, call: Fetcher, unlocked
     experimental: env.RT_EXPERIMENTAL === "true", locked: !unlocked,
     position, pl_today: account.equity - account.lastEquity, pl_today_pct: account.lastEquity ? account.equity / account.lastEquity - 1 : 0,
     pl_total: account.equity - START_CASH,
-    equity: account.equity, signals: signals.map((signal) => ({ t: signal.t, side: signal.side })),
+    equity: account.equity, buying_power: Number.isFinite(account.buyingPower) ? account.buyingPower : null,
+    signals: signals.map((signal) => ({ t: signal.t, side: signal.side })),
     fills: orders.filter((order) => order.filledAt).map(publicFill),
     rules: {
       position_pct: RT_POSITION_PCT, stop_pct: RT_STOP_PCT, max_entries: RT_MAX_ENTRIES, daily_loss_pct: RT_DAILY_LOSS_PCT,

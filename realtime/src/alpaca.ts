@@ -9,7 +9,9 @@ const BAR_LIMIT = { "1Min": 1400, "5Min": 300 } as Record<string, number>;
 
 export type Keys = { key: string; secret: string };
 export type Fetcher = typeof fetch;
-export type Account = { equity: number; lastEquity: number; number: string };
+// buyingPower is what Alpaca will lend against for a trade right now (4x equity for day trades on a
+// margin account over $25,000). NaN if Alpaca didn't say, which the sizing treats as no borrowing.
+export type Account = { equity: number; lastEquity: number; number: string; buyingPower: number };
 
 // Alpaca's live keys start with AK, and its paper accounts have numbers starting with PA.
 export function requirePaperKey(key: string): void {
@@ -41,7 +43,10 @@ export async function clock(call: Fetcher, keys: Keys): Promise<{ isOpen: boolea
 export async function account(call: Fetcher, keys: Keys): Promise<Account> {
   const body = await read(call, `${PAPER_URL}/v2/account`, keys);
   requirePaperAccount(String(body.account_number));
-  return { equity: Number(body.equity), lastEquity: Number(body.last_equity), number: String(body.account_number) };
+  return {
+    equity: Number(body.equity), lastEquity: Number(body.last_equity), number: String(body.account_number),
+    buyingPower: body.buying_power == null ? NaN : Number(body.buying_power),
+  };
 }
 
 export async function position(call: Fetcher, keys: Keys, symbol: string): Promise<Position> {

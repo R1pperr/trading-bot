@@ -9,7 +9,13 @@ export const SYMBOL = "SPY";
 export const EMA_FAST = 9;
 export const EMA_SLOW = 21;
 // The locked rules. A fix from the menu below can make each one tighter, never looser.
-export const RT_POSITION_PCT = 0.25;       // share of this account's equity per trade, in whole shares
+// Each trade is 4x this account's equity (borrowed on margin), in whole shares. The user chose 4x
+// leverage on 5 Nov 2026, loosening the old 25%. It is Alpaca's most for day trades, and the engine
+// is always flat by 15:55, so it never holds borrowed shares overnight.
+export const RT_POSITION_PCT = 4;
+// Never more than 95% of the buying power Alpaca reports, so a price tick before the fill can't get
+// the order refused for being too big.
+export const RT_BUYING_POWER_USE = 0.95;
 export const RT_STOP_PCT = 0.02;           // protective stop this far below the entry
 export const RT_MAX_ENTRIES = 20;          // entries per day
 export const RT_DAILY_LOSS_PCT = 0.02;     // no new entries once the account is down this much today
@@ -66,7 +72,7 @@ export type Limits = {
 };
 export type Input = {
   now: number; bars: Bar[]; minutes: number; position: Position; orders: Order[];
-  equity: number; lastEquity: number; fixes?: FixSet; daily?: Daily | null;
+  equity: number; lastEquity: number; buyingPower?: number; fixes?: FixSet; daily?: Daily | null;
 };
 
 // Anything strange in the control file counts as off: only the menu's own values get through.
@@ -271,9 +277,13 @@ export function crossovers(bars: Bar[], firstToday: number, minutes: number): Si
 // ---------------------------------------------------------------------------
 // Sizing and ids
 // ---------------------------------------------------------------------------
-export function sharesFor(equity: number, price: number, pct = RT_POSITION_PCT): number {
+// The trade is the smaller of pct x equity and 95% of Alpaca's buying power. Unknown buying power
+// counts as the account's own equity, so nothing is borrowed on a guess.
+export function sharesFor(equity: number, price: number, pct = RT_POSITION_PCT, buyingPower?: number): number {
   const share = Math.min(RT_POSITION_PCT, pct);
-  return price > 0 ? Math.max(0, Math.floor((equity * share) / price)) : 0;
+  const power = typeof buyingPower === "number" && Number.isFinite(buyingPower) ? Math.max(0, buyingPower) : equity;
+  const budget = Math.min(equity * share, power * RT_BUYING_POWER_USE);
+  return price > 0 && budget > 0 ? Math.floor(budget / price) : 0;
 }
 
 export function stopPriceFor(entry: number, pct = RT_STOP_PCT): number {
@@ -417,7 +427,7 @@ export function decide(input: Input): Plan {
   }
   const blocked = entryBlock(fixes, daily, bars, firstToday, signalIndex, minute);
   if (blocked) return plan([blocked], signalIndex);
-  const qty = sharesFor(input.equity, latest.c, limits.positionPct);
+  const qty = sharesFor(input.equity, latest.c, limits.positionPct, input.buyingPower);
   if (qty < 1) return plan(["not enough equity for one share"]);
   actions.push({ kind: "buy", qty, clientId: id, why: "EMA(9) crossed above EMA(21)" });
   return plan([], signalIndex);
