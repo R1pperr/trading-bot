@@ -44,7 +44,7 @@ function signalEnd(): number {
 
 type Gemini = { decision: string; reason: string } | "error" | "garbage" | "hang";
 type World = {
-  isOpen?: boolean; position?: unknown; orders?: unknown[]; accountNumber?: string; equity?: string; lastEquity?: string;
+  isOpen?: boolean; position?: unknown; orders?: unknown[]; accountNumber?: string; equity?: string; lastEquity?: string; buyingPower?: string;
   control?: unknown; controlFails?: boolean; bot1?: unknown; gemini?: Gemini; quote?: { ap: number; bp: number };
   mainPositions?: unknown[]; claude?: { decision: string; reason: string } | "bad" | "refusal";
 };
@@ -97,7 +97,10 @@ function fakeAlpaca(world: World = {}) {
     if (path.includes("/quotes/latest")) return json({ quote: world.quote ?? { ap: 100.01, bp: 100 } });
     if (path === "/v2/clock") return json({ is_open: world.isOpen ?? true, next_open: "2026-11-04T14:30:00Z" });
     if (path === "/v2/account") {
-      return json({ account_number: world.accountNumber ?? "PA123", equity: world.equity ?? "100000", last_equity: world.lastEquity ?? "100000" });
+      return json({
+        account_number: world.accountNumber ?? "PA123", equity: world.equity ?? "100000", last_equity: world.lastEquity ?? "100000",
+        buying_power: world.buyingPower ?? "400000",
+      });
     }
     if (path === "/v2/positions") return json(world.mainPositions ?? []);
     if (path.startsWith("/v2/positions")) return world.position ? json(world.position) : json({ message: "none" }, 404);

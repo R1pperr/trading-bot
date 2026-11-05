@@ -30,7 +30,9 @@ function firstBuy(bars: Bar[]) {
 }
 
 function input(now: number, changes: Partial<Input> = {}): Input {
-  return { now, bars: dipThenRise(), minutes: 5, position: null, orders: [], equity: 100000, lastEquity: 100000, ...changes };
+  return {
+    now, bars: dipThenRise(), minutes: 5, position: null, orders: [], equity: 100000, lastEquity: 100000, buyingPower: 1e9, ...changes,
+  };
 }
 
 function order(changes: Partial<Order>): Order {
@@ -127,17 +129,32 @@ test("a flat account does nothing at the close", () => {
   assert.equal(decide(input(open("2026-11-03") + (FLAT_FROM - 570 + 2) * MINUTE)).actions.length, 0);
 });
 
-test("the position is 25% of equity in whole shares", () => {
-  assert.equal(sharesFor(100000, 700), 35);
-  assert.equal(sharesFor(100000, 703.5), 35);
-  assert.equal(sharesFor(100, 700), 0);
+test("the position is 4x equity in whole shares, within 95% of Alpaca's buying power", () => {
+  assert.equal(RT_POSITION_PCT, 4);                               // Alpaca's most for day trades, never more
+  assert.equal(sharesFor(100000, 700, RT_POSITION_PCT, 1e9), 571);   // 4 x 100,000 / 700
+  assert.equal(sharesFor(100000, 700, RT_POSITION_PCT, 400000), 542); // 95% of 400,000 / 700
+  assert.equal(sharesFor(100000, 703.5, RT_POSITION_PCT, 400000), 540);
+  assert.equal(sharesFor(100000, 700, RT_POSITION_PCT, 200000), 271); // a 2x account gets 2x, not a refused order
+  assert.equal(sharesFor(100, 700, RT_POSITION_PCT, 400), 0);
+});
+
+test("unknown or missing buying power borrows nothing", () => {
+  assert.equal(sharesFor(100000, 700), 135);                       // 95% of the equity itself
+  assert.equal(sharesFor(100000, 700, RT_POSITION_PCT, NaN), 135);
+  assert.equal(sharesFor(100000, 700, RT_POSITION_PCT, 0), 0);
+  assert.equal(sharesFor(100000, 700, RT_POSITION_PCT, -5000), 0);
+  assert.equal(sharesFor(100000, 0, RT_POSITION_PCT, 400000), 0);
 });
 
 test("the entry uses that size", () => {
   const signal = firstBuy(dipThenRise());
   const action = decide(input(signal.end)).actions[0];
   assert.equal(action.kind, "buy");
-  if (action.kind === "buy") assert.equal(action.qty, Math.floor(25000 / signal.close));
+  if (action.kind === "buy") assert.equal(action.qty, Math.floor(400000 / signal.close));
+  const real = decide(input(signal.end, { buyingPower: 400000 })).actions[0];   // what Alpaca gives a $100,000 account
+  assert.equal(real.kind === "buy" ? real.qty : 0, Math.floor(380000 / signal.close));
+  const unknown = decide(input(signal.end, { buyingPower: undefined })).actions[0];
+  assert.equal(unknown.kind === "buy" ? unknown.qty : 0, Math.floor(95000 / signal.close));
 });
 
 test("the stop sits 2% below the entry", () => {
@@ -275,7 +292,7 @@ test("no fix can loosen a locked rule", () => {
       }
     }
   }
-  assert.equal(sharesFor(100000, 100, 0.9), 250);          // asking for more than 25% still gets 25%
+  assert.equal(sharesFor(100000, 100, 10, 1e9), 4000);     // asking for more than 4x still gets 4x
   assert.equal(stopPriceFor(100, 0.07), 98);               // asking for a looser stop still gets 2%
 });
 
@@ -369,12 +386,12 @@ test("tighter stop: 1% below the entry, and a 2% stop is moved up to it", () => 
     [{ kind: "move_stop", id: "s", stopPrice: 99, why: "tighter stop" }]);
 });
 
-test("volatility sizing: smaller when volatility is high, never above 25%", () => {
+test("volatility sizing: smaller when volatility is high, never above 4x", () => {
   const signal = firstBuy(dipThenRise());
   const go = (volScale: number | null) => decide(input(signal.end, { fixes: fix({ vol_sizing: true }), daily: { ...DAILY, volScale } }));
-  const full = Math.floor(25000 / signal.close);
+  const full = Math.floor(400000 / signal.close);
   const half = go(0.5).actions[0];
-  assert.equal(half.kind === "buy" ? half.qty : 0, Math.floor(12500 / signal.close));
+  assert.equal(half.kind === "buy" ? half.qty : 0, Math.floor(200000 / signal.close));
   const capped = go(2).actions[0];
   assert.equal(capped.kind === "buy" ? capped.qty : 0, full);
   assert.deepEqual(go(null).notes, ["Fix filter: no volatility history yet → no entry"]);
