@@ -35,13 +35,6 @@
       "day": "2026-11-03",
       "order_id": "591429b0-c4ef-4bf2-b625-fd05f78c1506"
     },
-    "DIA": {
-      "qty": 9.634523,
-      "cost": 4980.071681596352,
-      "sleeve": "ibs_etfs",
-      "day": "2026-11-03",
-      "order_id": "eeabcf27-b7fd-40e7-be37-67ad7d2ace09"
-    },
     "IWM": {
       "qty": 17.84134,
       "cost": 4987.668524717559,
@@ -57,14 +50,6 @@
       "order_id": "fbe2b62c-87b3-46dd-b8d0-8f8a4897a470",
       "time": "2026-11-04 18:19:12"
     },
-    "AAPL": {
-      "qty": 14.122618,
-      "cost": 4996.733473393543,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-04",
-      "order_id": "df9b7f57-0faf-4702-badc-f4acd794a9a5",
-      "time": "2026-11-04 18:19:56"
-    },
     "PLTR": {
       "qty": 29.169323,
       "cost": 4996.573330406655,
@@ -73,14 +58,6 @@
       "order_id": "9494b5cb-8baf-4455-8be1-dc77c60cb943",
       "time": "2026-11-04 18:20:10"
     },
-    "PANW": {
-      "qty": 0.347345,
-      "cost": 121.52559515,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-04",
-      "order_id": "2aab6f80-a394-4f3e-bbdf-aad3af9e4bc5",
-      "time": "2026-11-04 18:20:40"
-    },
     "VNQ": {
       "qty": 51.288433,
       "cost": 4998.57068018,
@@ -88,6 +65,38 @@
       "day": "2026-11-04",
       "order_id": "11ee5671-d61d-4874-a4bd-a435f711dbd8",
       "time": "2026-11-04 18:21:31"
+    },
+    "RVMD": {
+      "qty": 10.002519,
+      "cost": 2087.9258160599998,
+      "sleeve": "momentum_stocks",
+      "day": "2026-11-05",
+      "order_id": "a794ba71-5e71-42cd-833a-a3b59b9b6463",
+      "time": "2026-11-05 14:30:08"
+    },
+    "CVX": {
+      "qty": 0.982188,
+      "cost": 216.61174151999998,
+      "sleeve": "rsi2_stocks",
+      "day": "2026-11-05",
+      "order_id": "d0fedaaa-44fb-442b-b0e1-39aa38d41f09",
+      "time": "2026-11-05 14:30:35"
+    },
+    "XOM": {
+      "qty": 29.441351,
+      "cost": 5034.471021,
+      "sleeve": "rsi2_stocks",
+      "day": "2026-11-05",
+      "order_id": "337c70c5-66a9-47b5-9235-ce0d42f94487",
+      "time": "2026-11-05 14:31:54"
+    },
+    "TSLA": {
+      "qty": 13.30435,
+      "cost": 4897.1981915,
+      "sleeve": "rsi2_stocks",
+      "day": "2026-11-05",
+      "order_id": "f5429913-8c72-44c5-a8ec-17aee340dfc6",
+      "time": "2026-11-05 14:32:46"
     }
   },
   "seen": [
@@ -106,7 +115,14 @@
     "df9b7f57-0faf-4702-badc-f4acd794a9a5",
     "9494b5cb-8baf-4455-8be1-dc77c60cb943",
     "2aab6f80-a394-4f3e-bbdf-aad3af9e4bc5",
-    "11ee5671-d61d-4874-a4bd-a435f711dbd8"
+    "11ee5671-d61d-4874-a4bd-a435f711dbd8",
+    "a794ba71-5e71-42cd-833a-a3b59b9b6463",
+    "81443bae-4d27-45d0-b382-5b6f0a924623",
+    "d0fedaaa-44fb-442b-b0e1-39aa38d41f09",
+    "32a33e99-679f-4ec6-8a7f-a45f24e7fe0e",
+    "c14245fb-9f98-43eb-b973-f662ae946208",
+    "337c70c5-66a9-47b5-9235-ce0d42f94487",
+    "f5429913-8c72-44c5-a8ec-17aee340dfc6"
   ],
   "trades": [
     {
@@ -139,6 +155,57 @@
       "entry_time": "",
       "exit_time": "2026-11-04 18:16:07",
       "exit_order": "2274f216-ba42-494c-9ecf-359bb7401b43"
+    },
+    {
+      "symbol": "DIA",
+      "sleeve": "ibs_etfs",
+      "entry_day": "2026-11-03",
+      "exit_day": "2026-11-05",
+      "days": 2,
+      "qty": 9.634523,
+      "entry": 516.8986,
+      "exit": 536.24,
+      "pnl": 186.34,
+      "ret": 0.03742,
+      "stop": false,
+      "entry_order": "eeabcf27-b7fd-40e7-be37-67ad7d2ace09",
+      "entry_time": "",
+      "exit_time": "2026-11-05 14:30:32",
+      "exit_order": "81443bae-4d27-45d0-b382-5b6f0a924623"
+    },
+    {
+      "symbol": "AAPL",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-04",
+      "exit_day": "2026-11-05",
+      "days": 1,
+      "qty": 14.122618,
+      "entry": 353.8107,
+      "exit": 353.42,
+      "pnl": -5.52,
+      "ret": -0.0011,
+      "stop": false,
+      "entry_order": "df9b7f57-0faf-4702-badc-f4acd794a9a5",
+      "entry_time": "2026-11-04 18:19:56",
+      "exit_time": "2026-11-05 14:31:15",
+      "exit_order": "32a33e99-679f-4ec6-8a7f-a45f24e7fe0e"
+    },
+    {
+      "symbol": "PANW",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-04",
+      "exit_day": "2026-11-05",
+      "days": 1,
+      "qty": 0.347345,
+      "entry": 349.87,
+      "exit": 326.202,
+      "pnl": -8.22,
+      "ret": -0.06765,
+      "stop": true,
+      "entry_order": "2aab6f80-a394-4f3e-bbdf-aad3af9e4bc5",
+      "entry_time": "2026-11-04 18:20:40",
+      "exit_time": "2026-11-05 14:31:50",
+      "exit_order": "c14245fb-9f98-43eb-b973-f662ae946208"
     }
   ]
 }
