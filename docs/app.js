@@ -118,7 +118,7 @@
   const ENGINE_RULES = [
     "Trades SPY in its own separate paper account, so it never touches the main bot.",
     "Buys when EMA(9) crosses above EMA(21), and sells when it crosses back below. Long only.",
-    "Each trade is 25% of the account, in whole shares.",
+    "Each trade uses 4x leverage: about 3.8 times the account's paper money (borrowed from Alpaca, within its buying power), in whole shares.",
     "A protective stop waits at Alpaca, 2% below the entry.",
     "At most 20 entries a day, and none once the account is down 2% on the day.",
     "No new entries after 15:45 New York time, and flat by 15:55.",
