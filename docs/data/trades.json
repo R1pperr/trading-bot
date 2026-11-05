@@ -1,5 +1,19 @@
 [
   {
+    "time_utc": "2026-11-05 20:48:40",
+    "event": "ORDER",
+    "symbol": "XLE",
+    "asset_class": "stock",
+    "sleeve": "ibs_etfs",
+    "side": "sell",
+    "qty": 74.7838,
+    "price": 62.21,
+    "order_status": "filled",
+    "reason": "stop-loss: filled at Alpaca, -7.0% from buy price 66.89",
+    "ai_decision": "",
+    "ai_reason": ""
+  },
+  {
     "time_utc": "2026-11-05 16:04:08",
     "event": "ORDER",
     "symbol": "XLK",

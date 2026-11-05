@@ -14,13 +14,6 @@
       "day": "2026-11-02",
       "order_id": "644c2bff-9814-4bfe-97e0-c67731fd2b13"
     },
-    "XLE": {
-      "qty": 74.783838,
-      "cost": 5002.420150292064,
-      "sleeve": "ibs_etfs",
-      "day": "2026-11-03",
-      "order_id": "60ce0eb0-4388-4302-859b-d6e2940cb830"
-    },
     "IWM": {
       "qty": 17.84134,
       "cost": 4987.668524717559,
@@ -98,7 +91,8 @@
     "2efac264-0e48-43a0-b5a7-08c650885a6d",
     "17c1d00e-9dbc-49f8-97d4-36b98118cbe0",
     "e48e40ab-c6c0-424e-853d-e250cdf4e819",
-    "c3c670ea-7860-4bf8-b425-12176598f7c4"
+    "c3c670ea-7860-4bf8-b425-12176598f7c4",
+    "79263ed7-d59a-4abe-b5e2-1aad0b46dfc5"
   ],
   "trades": [
     {
@@ -267,6 +261,23 @@
       "entry_time": "",
       "exit_time": "2026-11-05 15:52:44",
       "exit_order": "c3c670ea-7860-4bf8-b425-12176598f7c4"
+    },
+    {
+      "symbol": "XLE",
+      "sleeve": "ibs_etfs",
+      "entry_day": "2026-11-03",
+      "exit_day": "2026-11-05",
+      "days": 2,
+      "qty": 74.783838,
+      "entry": 66.8917,
+      "exit": 62.21,
+      "pnl": -350.12,
+      "ret": -0.06999,
+      "stop": true,
+      "entry_order": "60ce0eb0-4388-4302-859b-d6e2940cb830",
+      "entry_time": "",
+      "exit_time": "2026-11-05 20:35:39",
+      "exit_order": "79263ed7-d59a-4abe-b5e2-1aad0b46dfc5"
     }
   ]
 }
