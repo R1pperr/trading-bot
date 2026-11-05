@@ -5,7 +5,8 @@ rt_backtest.py  -  the A/B test for the real-time engine: 5-minute bars against 
 
 It follows the rules in realtime/src/engine.ts: EMA(9) and EMA(21) on completed SPY bars,
 warmed up with the previous session. A signal on a bar's close fills at the next bar's open.
-Long only, 25% of equity in whole shares, a stop 2% below the entry, at most 20 entries a day,
+Long only, 4x equity on margin in whole shares (within 95% of Alpaca's 4x day-trade buying
+power), a stop 2% below the entry, at most 20 entries a day,
 no new entries after 15:45 or once the account is down 2% on the day, and flat by 15:55.
 
 It uses the same free feed the engine sees live (IEX, one exchange). The oldest 70% is
@@ -34,7 +35,9 @@ FIRST_DAY, LAST_DAY = "2024-11-01", "2026-10-31"     # the last 2 years
 START_CASH = 100_000.0
 COST_PER_SIDE = backtest.STOCK_FEE
 EMA_FAST, EMA_SLOW = 9, 21
-POSITION_PCT = 0.25
+POSITION_PCT = 4.0            # 4x equity per trade on margin (the user chose 4x leverage on 5 Nov 2026)
+DAY_TRADE_MARGIN = 4          # Alpaca's buying power for day trades: 4x equity
+BUYING_POWER_USE = 0.95       # the engine uses at most 95% of that buying power
 STOP_PCT = 0.02
 MAX_ENTRIES = 20
 DAILY_LOSS_PCT = 0.02
@@ -85,6 +88,12 @@ def limits_for(fixes, context=None):
             "max_entries": MAX_ENTRIES, "daily_loss_pct": DAILY_LOSS_PCT,
             "no_entries_from": min(NO_ENTRIES_FROM, TIME_EXIT_NO_ENTRIES_FROM if fixes["time_exit"] else NO_ENTRIES_FROM),
             "flat_from": min(FLAT_FROM, TIME_EXIT_FLAT_FROM if fixes["time_exit"] else FLAT_FROM)}
+
+
+def shares_for(cash, price, pct=POSITION_PCT):
+    """Like the engine's sharesFor: the smaller of pct x equity and 95% of Alpaca's 4x buying power."""
+    budget = min(cash * min(POSITION_PCT, pct), cash * DAY_TRADE_MARGIN * BUYING_POWER_USE)
+    return int(budget // price) if price > 0 and budget > 0 else 0
 
 
 def daily_contexts(closes):
@@ -233,7 +242,7 @@ def _simulate_fixed(days, fixes, daily):
             elif not position and pending > 0 and minute < limits["no_entries_from"] and entries < limits["max_entries"] \
                     and cash / start_equity - 1 > -limits["daily_loss_pct"]:
                 if entry_block(fixes, context, minute, opens[0], volumes, pending_from) is None:
-                    qty = int(cash * limits["position_pct"] // opens[i])
+                    qty = shares_for(cash, opens[i], limits["position_pct"])
                     if qty >= 1:
                         fee = qty * opens[i] * COST_PER_SIDE
                         cash -= qty * opens[i] + fee
@@ -288,7 +297,7 @@ def _simulate_plain(days):
                 sell(opens[i], minute, "signal")
             elif not position and pending > 0 and minute < NO_ENTRIES_FROM and entries < MAX_ENTRIES \
                     and cash / start_equity - 1 > -DAILY_LOSS_PCT:
-                qty = int(cash * POSITION_PCT // opens[i])
+                qty = shares_for(cash, opens[i])
                 if qty >= 1:
                     fee = qty * opens[i] * COST_PER_SIDE
                     cash -= qty * opens[i] + fee
