@@ -7,13 +7,6 @@
       "day": "2026-11-02",
       "order_id": "c867d4b3-c87f-4d15-be97-745db56ed27c"
     },
-    "QQQ": {
-      "qty": 7.0,
-      "cost": 4860.970002,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-02",
-      "order_id": "644c2bff-9814-4bfe-97e0-c67731fd2b13"
-    },
     "IWM": {
       "qty": 17.84134,
       "cost": 4987.668524717559,
@@ -60,6 +53,14 @@
       "day": "2026-11-05",
       "order_id": "25a41c39-e981-4728-a55f-adf0049b65a6",
       "time": "2026-11-05 14:36:24"
+    },
+    "LMT": {
+      "qty": 8.470419,
+      "cost": 4834.15282749,
+      "sleeve": "rsi2_stocks",
+      "day": "2026-11-06",
+      "order_id": "1707201c-d9e0-44ba-bb95-8a9f02278b5e",
+      "time": "2026-11-06 14:32:15"
     }
   },
   "seen": [
@@ -92,7 +93,9 @@
     "17c1d00e-9dbc-49f8-97d4-36b98118cbe0",
     "e48e40ab-c6c0-424e-853d-e250cdf4e819",
     "c3c670ea-7860-4bf8-b425-12176598f7c4",
-    "79263ed7-d59a-4abe-b5e2-1aad0b46dfc5"
+    "79263ed7-d59a-4abe-b5e2-1aad0b46dfc5",
+    "34c70e9c-6c08-465f-8bfc-c07ab1aaa022",
+    "1707201c-d9e0-44ba-bb95-8a9f02278b5e"
   ],
   "trades": [
     {
@@ -278,6 +281,23 @@
       "entry_time": "",
       "exit_time": "2026-11-05 20:35:39",
       "exit_order": "79263ed7-d59a-4abe-b5e2-1aad0b46dfc5"
+    },
+    {
+      "symbol": "QQQ",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-02",
+      "exit_day": "2026-11-06",
+      "days": 4,
+      "qty": 7.0,
+      "entry": 694.4243,
+      "exit": 657.34,
+      "pnl": -259.59,
+      "ret": -0.0534,
+      "stop": false,
+      "entry_order": "644c2bff-9814-4bfe-97e0-c67731fd2b13",
+      "entry_time": "",
+      "exit_time": "2026-11-06 14:30:25",
+      "exit_order": "34c70e9c-6c08-465f-8bfc-c07ab1aaa022"
     }
   ]
 }
