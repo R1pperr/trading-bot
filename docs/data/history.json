@@ -46,16 +46,16 @@
   },
   {
     "date": "2026-11-06",
-    "equity": 97873.77,
+    "equity": 97876.75,
     "cash": 58901.81,
-    "short": 29252.29,
-    "medium": 9719.67,
+    "short": 29257.17,
+    "medium": 9717.77,
     "long": 0.0,
     "sleeves": {
       "turn_of_month": 0.0,
-      "ibs_etfs": -556.73,
-      "rsi2_stocks": -1168.91,
-      "rotation": -236.18,
+      "ibs_etfs": -569.64,
+      "rsi2_stocks": -1151.12,
+      "rotation": -238.07,
       "momentum_stocks": -161.54
     }
   }
