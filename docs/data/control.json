@@ -4,7 +4,7 @@
   "realtime": "enforce"
  },
  "ai_record": {
-  "main": "",
+  "main": "of your last 20 calls, 5 have results; 5 approvals averaged -5.50% a trade (0% won).",
   "realtime": ""
  },
  "allocations": {
@@ -95,5 +95,5 @@
   "rsi2_stocks": null,
   "turn_of_month": null
  },
- "updated_utc": "2026-11-05T01:44:20Z"
+ "updated_utc": "2026-11-06T01:45:41Z"
 }
