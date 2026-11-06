@@ -2,11 +2,11 @@
   "closed_pl": {
     "ibs_etfs": -519.96,
     "momentum_stocks": -161.54,
-    "rsi2_stocks": -790.97
+    "rsi2_stocks": -1048.48
   },
   "days": {
     "crypto": "2026-11-02",
-    "stock": "2026-11-05"
+    "stock": "2026-11-06"
   },
   "entries": {
     "11ee5671-d61d-4874-a4bd-a435f711dbd8": {
@@ -20,6 +20,30 @@
       "sleeve": "rotation",
       "spread": "normal",
       "symbol": "VNQ"
+    },
+    "1707201c-d9e0-44ba-bb95-8a9f02278b5e": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Pullback follows a strong uptrend and the dip fits the strategy's oversold signal; nothing here shows a clearly unreliable or directionless pattern.",
+      "day": "2026-11-06",
+      "equity": 97636.83,
+      "placed_utc": "2026-11-06T14:16:37Z",
+      "pre_open": true,
+      "qty": 8.470419,
+      "sleeve": "rsi2_stocks",
+      "spread": "wide",
+      "symbol": "LMT"
+    },
+    "1c15a051-f525-47b7-bd6b-f7f194890207": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "The stock climbed steadily and then pulled back sharply over several days, consistent with an oversold dip within an uptrend, with no extreme single-day spike or choppiness.",
+      "day": "2026-11-06",
+      "equity": 97636.83,
+      "placed_utc": "2026-11-06T14:16:44Z",
+      "pre_open": true,
+      "qty": 36.025691,
+      "sleeve": "rsi2_stocks",
+      "spread": "wide",
+      "symbol": "COP"
     },
     "25a41c39-e981-4728-a55f-adf0049b65a6": {
       "ai_decision": "APPROVE",
@@ -69,6 +93,18 @@
       "spread": "wide",
       "symbol": "PLTR"
     },
+    "94d8e6ec-7b78-4e9d-b206-eb19882d2bf2": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Prices show a clear prior uptrend followed by a steady multi-day pullback, consistent with an oversold dip; no extreme single-day move or choppiness is evident.",
+      "day": "2026-11-06",
+      "equity": 97636.83,
+      "placed_utc": "2026-11-06T14:17:17Z",
+      "pre_open": true,
+      "qty": 47.205885,
+      "sleeve": "rsi2_stocks",
+      "spread": "wide",
+      "symbol": "SHEL"
+    },
     "a794ba71-5e71-42cd-833a-a3b59b9b6463": {
       "ai_decision": "APPROVE",
       "ai_reason": "Prices dipped and swung for a few weeks but have recovered most of the drop recently, with no single extreme one-day move, so the long-term signal looks acceptable.",
@@ -92,6 +128,18 @@
       "sleeve": "rsi2_stocks",
       "spread": "wide",
       "symbol": "CVX"
+    },
+    "d37731a1-7168-4f3b-b4e3-877af6c011e4": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Prices show a steady uptrend with a modest pullback on the last day; no extreme move or choppiness makes the dip-buy signal clearly unreliable.",
+      "day": "2026-11-06",
+      "equity": 97636.83,
+      "placed_utc": "2026-11-06T14:15:13Z",
+      "pre_open": true,
+      "qty": 26.389758,
+      "sleeve": "ibs_etfs",
+      "spread": null,
+      "symbol": "XLV"
     },
     "df9b7f57-0faf-4702-badc-f4acd794a9a5": {
       "ai_decision": "APPROVE",
@@ -149,6 +197,11 @@
     ]
   },
   "positions": {
+    "COP": {
+      "entry_date": "2026-11-06",
+      "sleeve": "rsi2_stocks",
+      "stop": 126.0243
+    },
     "CVX": {
       "entry_date": "2026-11-05",
       "sleeve": "rsi2_stocks",
@@ -164,10 +217,15 @@
       "sleeve": "ibs_etfs",
       "stop": 260.0094
     },
-    "QQQ": {
-      "entry_date": "2026-11-02",
+    "LMT": {
+      "entry_date": "2026-11-06",
       "sleeve": "rsi2_stocks",
-      "stop": 645.5409
+      "stop": 535.9962
+    },
+    "SHEL": {
+      "entry_date": "2026-11-06",
+      "sleeve": "rsi2_stocks",
+      "stop": 93.1209
     },
     "VNQ": {
       "entry_date": "2026-11-04",
@@ -178,6 +236,11 @@
       "entry_date": "2026-11-04",
       "sleeve": "ibs_etfs",
       "stop": 85.5693
+    },
+    "XLV": {
+      "entry_date": "2026-11-06",
+      "sleeve": "ibs_etfs",
+      "stop": 172.0407
     },
     "XOM": {
       "entry_date": "2026-11-05",
