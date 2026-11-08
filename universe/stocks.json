@@ -1,27 +1,37 @@
 {
- "refreshed": "2026-11-01",
+ "refreshed": "2026-11-08",
  "feed": "sip",
  "ranked_by": "average daily dollar volume, last 20 days",
  "symbols": [
   {
    "symbol": "SPY",
    "name": "State Street SPDR S&P 500 ETF Trust",
-   "avg_dollar_volume": 30000000000.0
+   "avg_dollar_volume": 36000000000.0
   },
   {
    "symbol": "QQQ",
    "name": "Invesco QQQ Trust, Series 1",
-   "avg_dollar_volume": 29000000000.0
+   "avg_dollar_volume": 35000000000.0
   },
   {
    "symbol": "MU",
    "name": "Micron Technology, Inc. Common Stock",
-   "avg_dollar_volume": 25000000000.0
+   "avg_dollar_volume": 26000000000.0
   },
   {
    "symbol": "NVDA",
    "name": "NVIDIA Corporation Common Stock",
-   "avg_dollar_volume": 22000000000.0
+   "avg_dollar_volume": 25000000000.0
+  },
+  {
+   "symbol": "AAPL",
+   "name": "Apple Inc. Common Stock",
+   "avg_dollar_volume": 17000000000.0
+  },
+  {
+   "symbol": "META",
+   "name": "Meta Platforms, Inc. Class A Common Stock",
+   "avg_dollar_volume": 17000000000.0
   },
   {
    "symbol": "SPCX",
@@ -29,39 +39,34 @@
    "avg_dollar_volume": 16000000000.0
   },
   {
-   "symbol": "META",
-   "name": "Meta Platforms, Inc. Class A Common Stock",
-   "avg_dollar_volume": 16000000000.0
-  },
-  {
    "symbol": "TSLA",
    "name": "Tesla, Inc. Common Stock",
+   "avg_dollar_volume": 15000000000.0
+  },
+  {
+   "symbol": "AMD",
+   "name": "Advanced Micro Devices, Inc. Common Stock",
    "avg_dollar_volume": 14000000000.0
   },
   {
-   "symbol": "AAPL",
-   "name": "Apple Inc. Common Stock",
+   "symbol": "MSFT",
+   "name": "Microsoft Corporation Common Stock",
    "avg_dollar_volume": 14000000000.0
   },
   {
    "symbol": "SNDK",
    "name": "Sandisk Corporation Common Stock",
-   "avg_dollar_volume": 12000000000.0
+   "avg_dollar_volume": 13000000000.0
   },
   {
-   "symbol": "MSFT",
-   "name": "Microsoft Corporation Common Stock",
-   "avg_dollar_volume": 12000000000.0
-  },
-  {
-   "symbol": "AMD",
-   "name": "Advanced Micro Devices, Inc. Common Stock",
+   "symbol": "AMZN",
+   "name": "Amazon.com, Inc. Common Stock",
    "avg_dollar_volume": 12000000000.0
   },
   {
    "symbol": "GOOGL",
    "name": "Alphabet Inc. Class A Common Stock",
-   "avg_dollar_volume": 11000000000.0
+   "avg_dollar_volume": 12000000000.0
   },
   {
    "symbol": "INTC",
@@ -69,24 +74,34 @@
    "avg_dollar_volume": 11000000000.0
   },
   {
-   "symbol": "AMZN",
-   "name": "Amazon.com, Inc. Common Stock",
-   "avg_dollar_volume": 11000000000.0
+   "symbol": "GOOG",
+   "name": "Alphabet Inc. Class C Capital Stock",
+   "avg_dollar_volume": 7900000000.0
   },
   {
    "symbol": "AVGO",
    "name": "Broadcom Inc. Common Stock",
-   "avg_dollar_volume": 7700000000.0
-  },
-  {
-   "symbol": "GOOG",
-   "name": "Alphabet Inc. Class C Capital Stock",
-   "avg_dollar_volume": 6800000000.0
+   "avg_dollar_volume": 7800000000.0
   },
   {
    "symbol": "IWM",
    "name": "iShares Russell 2000 ETF",
-   "avg_dollar_volume": 6700000000.0
+   "avg_dollar_volume": 7000000000.0
+  },
+  {
+   "symbol": "SMH",
+   "name": "VanEck Semiconductor ETF",
+   "avg_dollar_volume": 6100000000.0
+  },
+  {
+   "symbol": "TSM",
+   "name": "Taiwan Semiconductor Manufacturing Company Ltd.",
+   "avg_dollar_volume": 6000000000.0
+  },
+  {
+   "symbol": "SOXX",
+   "name": "iShares Semiconductor ETF",
+   "avg_dollar_volume": 5900000000.0
   },
   {
    "symbol": "MRVL",
@@ -94,109 +109,104 @@
    "avg_dollar_volume": 5700000000.0
   },
   {
-   "symbol": "SMH",
-   "name": "VanEck Semiconductor ETF",
-   "avg_dollar_volume": 5200000000.0
-  },
-  {
-   "symbol": "TSM",
-   "name": "Taiwan Semiconductor Manufacturing Company Ltd.",
-   "avg_dollar_volume": 5200000000.0
-  },
-  {
-   "symbol": "SOXX",
-   "name": "iShares Semiconductor ETF",
-   "avg_dollar_volume": 4900000000.0
+   "symbol": "ORCL",
+   "name": "Oracle Corp",
+   "avg_dollar_volume": 5600000000.0
   },
   {
    "symbol": "LITE",
    "name": "Lumentum Holdings Inc. Common Stock",
-   "avg_dollar_volume": 4800000000.0
+   "avg_dollar_volume": 5100000000.0
   },
   {
    "symbol": "PLTR",
    "name": "Palantir Technologies Inc. Class A Common Stock",
-   "avg_dollar_volume": 4600000000.0
-  },
-  {
-   "symbol": "ORCL",
-   "name": "Oracle Corp",
-   "avg_dollar_volume": 4300000000.0
-  },
-  {
-   "symbol": "NBIS",
-   "name": "Nebius Group N.V. Class A Ordinary Shares",
-   "avg_dollar_volume": 4300000000.0
-  },
-  {
-   "symbol": "MRNA",
-   "name": "Moderna, Inc. Common Stock",
-   "avg_dollar_volume": 4200000000.0
-  },
-  {
-   "symbol": "STX",
-   "name": "Seagate Technology Holdings PLC Ordinary Shares (Ireland)",
-   "avg_dollar_volume": 4000000000.0
+   "avg_dollar_volume": 4900000000.0
   },
   {
    "symbol": "VOO",
    "name": "Vanguard S&P 500 ETF",
+   "avg_dollar_volume": 4900000000.0
+  },
+  {
+   "symbol": "NBIS",
+   "name": "Nebius Group N.V. Class A Ordinary Shares",
+   "avg_dollar_volume": 4100000000.0
+  },
+  {
+   "symbol": "CRWV",
+   "name": "CoreWeave, Inc. Class A Common Stock",
+   "avg_dollar_volume": 4100000000.0
+  },
+  {
+   "symbol": "IVV",
+   "name": "iShares Core S&P 500 ETF",
    "avg_dollar_volume": 4000000000.0
   },
   {
    "symbol": "HYG",
    "name": "iShares iBoxx $ High Yield Corporate Bond ETF",
+   "avg_dollar_volume": 4000000000.0
+  },
+  {
+   "symbol": "LLY",
+   "name": "Eli Lilly & Co.",
    "avg_dollar_volume": 3900000000.0
   },
   {
-   "symbol": "CRWV",
-   "name": "CoreWeave, Inc. Class A Common Stock",
+   "symbol": "STX",
+   "name": "Seagate Technology Holdings PLC Ordinary Shares (Ireland)",
    "avg_dollar_volume": 3900000000.0
-  },
-  {
-   "symbol": "IVV",
-   "name": "iShares Core S&P 500 ETF",
-   "avg_dollar_volume": 3600000000.0
-  },
-  {
-   "symbol": "WDC",
-   "name": "Western Digital Corporation Common Stock",
-   "avg_dollar_volume": 3500000000.0
   },
   {
    "symbol": "BE",
    "name": "Bloom Energy Corporation",
-   "avg_dollar_volume": 3500000000.0
+   "avg_dollar_volume": 3800000000.0
+  },
+  {
+   "symbol": "MRNA",
+   "name": "Moderna, Inc. Common Stock",
+   "avg_dollar_volume": 3700000000.0
   },
   {
    "symbol": "SKHY",
    "name": "SK hynix Inc. American Depositary Shares",
-   "avg_dollar_volume": 3500000000.0
+   "avg_dollar_volume": 3600000000.0
   },
   {
    "symbol": "LQD",
    "name": "iShares iBoxx $ Investment Grade Corporate Bond ETF",
+   "avg_dollar_volume": 3600000000.0
+  },
+  {
+   "symbol": "GEV",
+   "name": "GE Vernova Inc.",
    "avg_dollar_volume": 3400000000.0
   },
   {
    "symbol": "DELL",
    "name": "Dell Technologies Inc.",
-   "avg_dollar_volume": 3300000000.0
-  },
-  {
-   "symbol": "LLY",
-   "name": "Eli Lilly & Co.",
-   "avg_dollar_volume": 3200000000.0
-  },
-  {
-   "symbol": "GLD",
-   "name": "SPDR Gold Trust, SPDR Gold Shares",
-   "avg_dollar_volume": 3100000000.0
+   "avg_dollar_volume": 3400000000.0
   },
   {
    "symbol": "AMAT",
    "name": "Applied Materials, Inc. Common Stock",
-   "avg_dollar_volume": 3100000000.0
+   "avg_dollar_volume": 3300000000.0
+  },
+  {
+   "symbol": "GLD",
+   "name": "SPDR Gold Trust, SPDR Gold Shares",
+   "avg_dollar_volume": 3300000000.0
+  },
+  {
+   "symbol": "WDC",
+   "name": "Western Digital Corporation Common Stock",
+   "avg_dollar_volume": 3300000000.0
+  },
+  {
+   "symbol": "LRCX",
+   "name": "Lam Research Corporation Common Stock",
+   "avg_dollar_volume": 3200000000.0
   },
   {
    "symbol": "TLT",
@@ -206,142 +216,157 @@
   {
    "symbol": "NFLX",
    "name": "Netflix, Inc. Common Stock",
-   "avg_dollar_volume": 3000000000.0
-  },
-  {
-   "symbol": "EWZ",
-   "name": "iShares MSCI Brazil ETF",
-   "avg_dollar_volume": 3000000000.0
-  },
-  {
-   "symbol": "LRCX",
-   "name": "Lam Research Corporation Common Stock",
-   "avg_dollar_volume": 2900000000.0
-  },
-  {
-   "symbol": "MSTR",
-   "name": "Strategy Inc Common Stock Class A",
-   "avg_dollar_volume": 2800000000.0
-  },
-  {
-   "symbol": "GEV",
-   "name": "GE Vernova Inc.",
-   "avg_dollar_volume": 2800000000.0
-  },
-  {
-   "symbol": "MDT",
-   "name": "Medtronic plc",
-   "avg_dollar_volume": 2700000000.0
-  },
-  {
-   "symbol": "ASML",
-   "name": "ASML Holding N.V. New York Registry Shares",
-   "avg_dollar_volume": 2700000000.0
-  },
-  {
-   "symbol": "EWY",
-   "name": "iShares MSCI South Korea ETF",
-   "avg_dollar_volume": 2600000000.0
+   "avg_dollar_volume": 3100000000.0
   },
   {
    "symbol": "V",
    "name": "VISA Inc.",
+   "avg_dollar_volume": 3000000000.0
+  },
+  {
+   "symbol": "EWY",
+   "name": "iShares MSCI South Korea ETF",
+   "avg_dollar_volume": 2900000000.0
+  },
+  {
+   "symbol": "ASML",
+   "name": "ASML Holding N.V. New York Registry Shares",
+   "avg_dollar_volume": 2800000000.0
+  },
+  {
+   "symbol": "BRK.B",
+   "name": "BERKSHIRE HATHAWAY Class B",
+   "avg_dollar_volume": 2700000000.0
+  },
+  {
+   "symbol": "WMT",
+   "name": "Walmart Inc. Common Stock",
+   "avg_dollar_volume": 2700000000.0
+  },
+  {
+   "symbol": "TXN",
+   "name": "Texas Instruments Incorporated Common Stock",
+   "avg_dollar_volume": 2600000000.0
+  },
+  {
+   "symbol": "MSTR",
+   "name": "Strategy Inc Common Stock Class A",
+   "avg_dollar_volume": 2600000000.0
+  },
+  {
+   "symbol": "JPM",
+   "name": "JPMorgan Chase & Co.",
+   "avg_dollar_volume": 2500000000.0
+  },
+  {
+   "symbol": "NOW",
+   "name": "SERVICENOW, INC.",
+   "avg_dollar_volume": 2500000000.0
+  },
+  {
+   "symbol": "CAT",
+   "name": "Caterpillar Inc.",
    "avg_dollar_volume": 2500000000.0
   },
   {
    "symbol": "UNH",
    "name": "UNITEDHEALTH GROUP INCORPORATED (Delaware)",
+   "avg_dollar_volume": 2500000000.0
+  },
+  {
+   "symbol": "COST",
+   "name": "Costco Wholesale Corporation Common Stock",
+   "avg_dollar_volume": 2500000000.0
+  },
+  {
+   "symbol": "XOM",
+   "name": "ExxonMobil Holdings Corporation",
    "avg_dollar_volume": 2400000000.0
   },
   {
-   "symbol": "CAT",
-   "name": "Caterpillar Inc.",
-   "avg_dollar_volume": 2300000000.0
+   "symbol": "EWZ",
+   "name": "iShares MSCI Brazil ETF",
+   "avg_dollar_volume": 2400000000.0
   },
   {
-   "symbol": "WMT",
-   "name": "Walmart Inc. Common Stock",
-   "avg_dollar_volume": 2300000000.0
-  },
-  {
-   "symbol": "JPM",
-   "name": "JPMorgan Chase & Co.",
-   "avg_dollar_volume": 2300000000.0
-  },
-  {
-   "symbol": "NOW",
-   "name": "SERVICENOW, INC.",
-   "avg_dollar_volume": 2300000000.0
-  },
-  {
-   "symbol": "BRK.B",
-   "name": "BERKSHIRE HATHAWAY Class B",
-   "avg_dollar_volume": 2300000000.0
+   "symbol": "XLE",
+   "name": "State Street Energy Select Sector SPDR ETF",
+   "avg_dollar_volume": 2400000000.0
   },
   {
    "symbol": "CRWD",
    "name": "CrowdStrike Holdings, Inc. Class A Common Stock",
+   "avg_dollar_volume": 2400000000.0
+  },
+  {
+   "symbol": "SGOV",
+   "name": "iShares 0-3 Month Treasury Bond ETF",
+   "avg_dollar_volume": 2400000000.0
+  },
+  {
+   "symbol": "QCOM",
+   "name": "QUALCOMM Incorporated Common Stock",
+   "avg_dollar_volume": 2300000000.0
+  },
+  {
+   "symbol": "RSP",
+   "name": "Invesco S&P 500 Equal Weight ETF",
    "avg_dollar_volume": 2300000000.0
   },
   {
    "symbol": "BAC",
    "name": "Bank of America Corporation",
-   "avg_dollar_volume": 2100000000.0
-  },
-  {
-   "symbol": "SGOV",
-   "name": "iShares 0-3 Month Treasury Bond ETF",
-   "avg_dollar_volume": 2100000000.0
-  },
-  {
-   "symbol": "XOM",
-   "name": "ExxonMobil Holdings Corporation",
-   "avg_dollar_volume": 2100000000.0
-  },
-  {
-   "symbol": "COST",
-   "name": "Costco Wholesale Corporation Common Stock",
-   "avg_dollar_volume": 2100000000.0
-  },
-  {
-   "symbol": "XLE",
-   "name": "State Street Energy Select Sector SPDR ETF",
-   "avg_dollar_volume": 2100000000.0
-  },
-  {
-   "symbol": "PANW",
-   "name": "Palo Alto Networks, Inc. Common Stock",
-   "avg_dollar_volume": 2100000000.0
-  },
-  {
-   "symbol": "TXN",
-   "name": "Texas Instruments Incorporated Common Stock",
-   "avg_dollar_volume": 2100000000.0
-  },
-  {
-   "symbol": "GS",
-   "name": "Goldman Sachs Group Inc.",
-   "avg_dollar_volume": 2000000000.0
-  },
-  {
-   "symbol": "KLAC",
-   "name": "KLA Corporation Common Stock",
-   "avg_dollar_volume": 2000000000.0
-  },
-  {
-   "symbol": "JNJ",
-   "name": "Johnson & Johnson",
-   "avg_dollar_volume": 2000000000.0
+   "avg_dollar_volume": 2300000000.0
   },
   {
    "symbol": "MA",
    "name": "Mastercard Incorporated",
+   "avg_dollar_volume": 2300000000.0
+  },
+  {
+   "symbol": "KLAC",
+   "name": "KLA Corporation Common Stock",
+   "avg_dollar_volume": 2200000000.0
+  },
+  {
+   "symbol": "PANW",
+   "name": "Palo Alto Networks, Inc. Common Stock",
+   "avg_dollar_volume": 2200000000.0
+  },
+  {
+   "symbol": "XLK",
+   "name": "State Street Technology Select Sector SPDR ETF",
+   "avg_dollar_volume": 2200000000.0
+  },
+  {
+   "symbol": "GS",
+   "name": "Goldman Sachs Group Inc.",
+   "avg_dollar_volume": 2200000000.0
+  },
+  {
+   "symbol": "JNJ",
+   "name": "Johnson & Johnson",
+   "avg_dollar_volume": 2200000000.0
+  },
+  {
+   "symbol": "XLV",
+   "name": "State Street Health Care Select Sector SPDR ETF",
+   "avg_dollar_volume": 2100000000.0
+  },
+  {
+   "symbol": "DIA",
+   "name": "State Street SPDR Dow Jones Industrial Average ETF Trust",
    "avg_dollar_volume": 2000000000.0
   },
   {
-   "symbol": "HOOD",
-   "name": "Robinhood Markets, Inc. Class A Common Stock",
-   "avg_dollar_volume": 1900000000.0
+   "symbol": "XLF",
+   "name": "State Street Financial Select Sector SPDR ETF",
+   "avg_dollar_volume": 2000000000.0
+  },
+  {
+   "symbol": "CSCO",
+   "name": "Cisco Systems, Inc. Common Stock (DE)",
+   "avg_dollar_volume": 2000000000.0
   },
   {
    "symbol": "COHR",
@@ -349,23 +374,33 @@
    "avg_dollar_volume": 1900000000.0
   },
   {
-   "symbol": "RSP",
-   "name": "Invesco S&P 500 Equal Weight ETF",
-   "avg_dollar_volume": 1900000000.0
-  },
-  {
-   "symbol": "QCOM",
-   "name": "QUALCOMM Incorporated Common Stock",
+   "symbol": "ADI",
+   "name": "Analog Devices, Inc. Common Stock",
    "avg_dollar_volume": 1900000000.0
   },
   {
    "symbol": "IBIT",
    "name": "iShares Bitcoin Trust ETF Shares",
+   "avg_dollar_volume": 1900000000.0
+  },
+  {
+   "symbol": "HOOD",
+   "name": "Robinhood Markets, Inc. Class A Common Stock",
+   "avg_dollar_volume": 1900000000.0
+  },
+  {
+   "symbol": "CVX",
+   "name": "Chevron Corporation",
    "avg_dollar_volume": 1800000000.0
   },
   {
-   "symbol": "XLF",
-   "name": "State Street Financial Select Sector SPDR ETF",
+   "symbol": "VRT",
+   "name": "Vertiv Holdings Co Class A Common Stock",
+   "avg_dollar_volume": 1800000000.0
+  },
+  {
+   "symbol": "GDX",
+   "name": "VanEck Gold Miners ETF",
    "avg_dollar_volume": 1800000000.0
   },
   {
@@ -374,23 +409,23 @@
    "avg_dollar_volume": 1800000000.0
   },
   {
-   "symbol": "CSCO",
-   "name": "Cisco Systems, Inc. Common Stock (DE)",
+   "symbol": "GE",
+   "name": "GE Aerospace",
    "avg_dollar_volume": 1800000000.0
   },
   {
-   "symbol": "XLK",
-   "name": "State Street Technology Select Sector SPDR ETF",
-   "avg_dollar_volume": 1700000000.0
-  },
-  {
-   "symbol": "DIA",
-   "name": "State Street SPDR Dow Jones Industrial Average ETF Trust",
-   "avg_dollar_volume": 1700000000.0
+   "symbol": "KO",
+   "name": "Coca-Cola Company",
+   "avg_dollar_volume": 1800000000.0
   },
   {
    "symbol": "CRM",
    "name": "Salesforce, Inc.",
+   "avg_dollar_volume": 1700000000.0
+  },
+  {
+   "symbol": "PG",
+   "name": "Procter & Gamble Company",
    "avg_dollar_volume": 1700000000.0
   },
   {
@@ -399,19 +434,9 @@
    "avg_dollar_volume": 1700000000.0
   },
   {
-   "symbol": "CVX",
-   "name": "Chevron Corporation",
+   "symbol": "XLP",
+   "name": "State Street Consumer Staples Select Sector SPDR ETF",
    "avg_dollar_volume": 1700000000.0
-  },
-  {
-   "symbol": "XLV",
-   "name": "State Street Health Care Select Sector SPDR ETF",
-   "avg_dollar_volume": 1700000000.0
-  },
-  {
-   "symbol": "GE",
-   "name": "GE Aerospace",
-   "avg_dollar_volume": 1600000000.0
   },
   {
    "symbol": "TMO",
@@ -419,18 +444,23 @@
    "avg_dollar_volume": 1600000000.0
   },
   {
-   "symbol": "VRT",
-   "name": "Vertiv Holdings Co Class A Common Stock",
+   "symbol": "MDT",
+   "name": "Medtronic plc",
    "avg_dollar_volume": 1600000000.0
   },
   {
-   "symbol": "GDX",
-   "name": "VanEck Gold Miners ETF",
+   "symbol": "APP",
+   "name": "Applovin Corporation Class A Common Stock",
    "avg_dollar_volume": 1600000000.0
   },
   {
-   "symbol": "PG",
-   "name": "Procter & Gamble Company",
+   "symbol": "EEM",
+   "name": "iShares MSCI Emerging Markets ETF",
+   "avg_dollar_volume": 1600000000.0
+  },
+  {
+   "symbol": "ABBV",
+   "name": "ABBVIE INC.",
    "avg_dollar_volume": 1600000000.0
   },
   {
@@ -439,29 +469,9 @@
    "avg_dollar_volume": 1600000000.0
   },
   {
-   "symbol": "MUB",
-   "name": "iShares National Muni Bond ETF",
+   "symbol": "SHOP",
+   "name": "Shopify Inc. Class A subordinate voting shares",
    "avg_dollar_volume": 1600000000.0
-  },
-  {
-   "symbol": "CRDO",
-   "name": "Credo Technology Group Holding Ltd Ordinary Shares",
-   "avg_dollar_volume": 1500000000.0
-  },
-  {
-   "symbol": "KO",
-   "name": "Coca-Cola Company",
-   "avg_dollar_volume": 1500000000.0
-  },
-  {
-   "symbol": "XBI",
-   "name": "State Street SPDR S&P Biotech ETF",
-   "avg_dollar_volume": 1500000000.0
-  },
-  {
-   "symbol": "ADI",
-   "name": "Analog Devices, Inc. Common Stock",
-   "avg_dollar_volume": 1500000000.0
   },
   {
    "symbol": "MRK",
@@ -469,28 +479,53 @@
    "avg_dollar_volume": 1500000000.0
   },
   {
-   "symbol": "ABBV",
-   "name": "ABBVIE INC.",
-   "avg_dollar_volume": 1500000000.0
-  },
-  {
-   "symbol": "CBRS",
-   "name": "Cerebras Systems Inc. Class A Common Stock",
-   "avg_dollar_volume": 1500000000.0
-  },
-  {
    "symbol": "HD",
    "name": "Home Depot, Inc.",
-   "avg_dollar_volume": 1400000000.0
+   "avg_dollar_volume": 1500000000.0
+  },
+  {
+   "symbol": "XLI",
+   "name": "State Street Industrial Select Sector SPDR ETF",
+   "avg_dollar_volume": 1500000000.0
   },
   {
    "symbol": "SNOW",
    "name": "Snowflake Inc.",
+   "avg_dollar_volume": 1500000000.0
+  },
+  {
+   "symbol": "EFA",
+   "name": "iShares MSCI EAFE ETF",
+   "avg_dollar_volume": 1500000000.0
+  },
+  {
+   "symbol": "CRDO",
+   "name": "Credo Technology Group Holding Ltd Ordinary Shares",
+   "avg_dollar_volume": 1500000000.0
+  },
+  {
+   "symbol": "MCD",
+   "name": "McDonald's Corporation",
+   "avg_dollar_volume": 1500000000.0
+  },
+  {
+   "symbol": "XBI",
+   "name": "State Street SPDR S&P Biotech ETF",
    "avg_dollar_volume": 1400000000.0
   },
   {
-   "symbol": "EEM",
-   "name": "iShares MSCI Emerging Markets ETF",
+   "symbol": "ANET",
+   "name": "Arista Networks",
+   "avg_dollar_volume": 1400000000.0
+  },
+  {
+   "symbol": "SMCI",
+   "name": "Super Micro Computer, Inc. Common Stock",
+   "avg_dollar_volume": 1400000000.0
+  },
+  {
+   "symbol": "GLW",
+   "name": "Corning Incorporated",
    "avg_dollar_volume": 1400000000.0
   },
   {
@@ -499,48 +534,8 @@
    "avg_dollar_volume": 1400000000.0
   },
   {
-   "symbol": "EFA",
-   "name": "iShares MSCI EAFE ETF",
-   "avg_dollar_volume": 1400000000.0
-  },
-  {
-   "symbol": "PEP",
-   "name": "PepsiCo, Inc. Common Stock",
-   "avg_dollar_volume": 1400000000.0
-  },
-  {
-   "symbol": "SHOP",
-   "name": "Shopify Inc. Class A subordinate voting shares",
-   "avg_dollar_volume": 1400000000.0
-  },
-  {
-   "symbol": "VZ",
-   "name": "Verizon Communications",
-   "avg_dollar_volume": 1300000000.0
-  },
-  {
-   "symbol": "MCD",
-   "name": "McDonald's Corporation",
-   "avg_dollar_volume": 1300000000.0
-  },
-  {
-   "symbol": "NU",
-   "name": "Nu Holdings Ltd.",
-   "avg_dollar_volume": 1300000000.0
-  },
-  {
-   "symbol": "IBM",
-   "name": "International Business Machines Corporation",
-   "avg_dollar_volume": 1300000000.0
-  },
-  {
-   "symbol": "VTEB",
-   "name": "Vanguard Tax-Exempt Bond Index Fund",
-   "avg_dollar_volume": 1300000000.0
-  },
-  {
-   "symbol": "XLP",
-   "name": "State Street Consumer Staples Select Sector SPDR ETF",
+   "symbol": "VTI",
+   "name": "Vanguard Morningstar Total Stock Market ETF",
    "avg_dollar_volume": 1300000000.0
   },
   {
@@ -549,43 +544,98 @@
    "avg_dollar_volume": 1300000000.0
   },
   {
-   "symbol": "XLI",
-   "name": "State Street Industrial Select Sector SPDR ETF",
+   "symbol": "PEP",
+   "name": "PepsiCo, Inc. Common Stock",
    "avg_dollar_volume": 1300000000.0
+  },
+  {
+   "symbol": "NXPI",
+   "name": "NXP Semiconductors N.V. Common Stock",
+   "avg_dollar_volume": 1300000000.0
+  },
+  {
+   "symbol": "MPWR",
+   "name": "Monolithic Power Systems, Inc. Common Stock",
+   "avg_dollar_volume": 1300000000.0
+  },
+  {
+   "symbol": "CBRS",
+   "name": "Cerebras Systems Inc. Class A Common Stock",
+   "avg_dollar_volume": 1300000000.0
+  },
+  {
+   "symbol": "IBM",
+   "name": "International Business Machines Corporation",
+   "avg_dollar_volume": 1300000000.0
+  },
+  {
+   "symbol": "QQQM",
+   "name": "Invesco Exchange-Traded Fund Trust II Invesco NASDAQ 100 ETF",
+   "avg_dollar_volume": 1300000000.0
+  },
+  {
+   "symbol": "C",
+   "name": "Citigroup Inc.",
+   "avg_dollar_volume": 1300000000.0
+  },
+  {
+   "symbol": "TER",
+   "name": "Teradyne, Inc. Common Stock",
+   "avg_dollar_volume": 1300000000.0
+  },
+  {
+   "symbol": "UBER",
+   "name": "Uber Technologies, Inc.",
+   "avg_dollar_volume": 1300000000.0
+  },
+  {
+   "symbol": "AMGN",
+   "name": "Amgen Inc. Common Stock",
+   "avg_dollar_volume": 1300000000.0
+  },
+  {
+   "symbol": "BKNG",
+   "name": "Booking Holdings Inc. Common Stock",
+   "avg_dollar_volume": 1300000000.0
+  },
+  {
+   "symbol": "MS",
+   "name": "Morgan Stanley",
+   "avg_dollar_volume": 1300000000.0
+  },
+  {
+   "symbol": "MUB",
+   "name": "iShares National Muni Bond ETF",
+   "avg_dollar_volume": 1300000000.0
+  },
+  {
+   "symbol": "VZ",
+   "name": "Verizon Communications",
+   "avg_dollar_volume": 1300000000.0
+  },
+  {
+   "symbol": "ARM",
+   "name": "Arm Holdings plc American Depositary Shares",
+   "avg_dollar_volume": 1200000000.0
+  },
+  {
+   "symbol": "ISRG",
+   "name": "Intuitive Surgical, Inc. Common Stock",
+   "avg_dollar_volume": 1200000000.0
+  },
+  {
+   "symbol": "VLO",
+   "name": "Valero Energy Corporation",
+   "avg_dollar_volume": 1200000000.0
+  },
+  {
+   "symbol": "ETN",
+   "name": "Eaton Corporation, plc Ordinary Shares",
+   "avg_dollar_volume": 1200000000.0
   },
   {
    "symbol": "ALAB",
    "name": "Astera Labs, Inc. Common Stock",
-   "avg_dollar_volume": 1300000000.0
-  },
-  {
-   "symbol": "GLW",
-   "name": "Corning Incorporated",
-   "avg_dollar_volume": 1300000000.0
-  },
-  {
-   "symbol": "SMCI",
-   "name": "Super Micro Computer, Inc. Common Stock",
-   "avg_dollar_volume": 1300000000.0
-  },
-  {
-   "symbol": "T",
-   "name": "AT&T Inc.",
-   "avg_dollar_volume": 1300000000.0
-  },
-  {
-   "symbol": "TWLO",
-   "name": "Twilio Inc.",
-   "avg_dollar_volume": 1200000000.0
-  },
-  {
-   "symbol": "CIEN",
-   "name": "Ciena Corporation",
-   "avg_dollar_volume": 1200000000.0
-  },
-  {
-   "symbol": "SPYM",
-   "name": "State Street SPDR Portfolio S&P 500 ETF",
    "avg_dollar_volume": 1200000000.0
   },
   {
@@ -594,78 +644,83 @@
    "avg_dollar_volume": 1200000000.0
   },
   {
-   "symbol": "TER",
-   "name": "Teradyne, Inc. Common Stock",
+   "symbol": "RTX",
+   "name": "RTX Corporation",
    "avg_dollar_volume": 1200000000.0
-  },
-  {
-   "symbol": "RKLB",
-   "name": "Rocket Lab Corporation Common Stock",
-   "avg_dollar_volume": 1200000000.0
-  },
-  {
-   "symbol": "ARM",
-   "name": "Arm Holdings plc American Depositary Shares",
-   "avg_dollar_volume": 1200000000.0
-  },
-  {
-   "symbol": "MS",
-   "name": "Morgan Stanley",
-   "avg_dollar_volume": 1200000000.0
-  },
-  {
-   "symbol": "C",
-   "name": "Citigroup Inc.",
-   "avg_dollar_volume": 1200000000.0
-  },
-  {
-   "symbol": "CEG",
-   "name": "Constellation Energy Corporation Common Stock",
-   "avg_dollar_volume": 1200000000.0
-  },
-  {
-   "symbol": "ANET",
-   "name": "Arista Networks",
-   "avg_dollar_volume": 1100000000.0
   },
   {
    "symbol": "IEF",
    "name": "iShares 7-10 Year Treasury Bond ETF",
-   "avg_dollar_volume": 1100000000.0
+   "avg_dollar_volume": 1200000000.0
   },
   {
    "symbol": "AGG",
    "name": "iShares Core U.S. Aggregate Bond ETF",
+   "avg_dollar_volume": 1200000000.0
+  },
+  {
+   "symbol": "T",
+   "name": "AT&T Inc.",
+   "avg_dollar_volume": 1200000000.0
+  },
+  {
+   "symbol": "NU",
+   "name": "Nu Holdings Ltd.",
+   "avg_dollar_volume": 1200000000.0
+  },
+  {
+   "symbol": "APH",
+   "name": "Amphenol Corporation",
+   "avg_dollar_volume": 1200000000.0
+  },
+  {
+   "symbol": "NET",
+   "name": "Cloudflare, Inc. Class A common stock, par value $0.001 per share",
+   "avg_dollar_volume": 1200000000.0
+  },
+  {
+   "symbol": "MELI",
+   "name": "MercadoLibre, Inc. Common Stock",
+   "avg_dollar_volume": 1200000000.0
+  },
+  {
+   "symbol": "GILD",
+   "name": "Gilead Sciences, Inc. Common Stock",
    "avg_dollar_volume": 1100000000.0
   },
   {
-   "symbol": "AMGN",
-   "name": "Amgen Inc. Common Stock",
+   "symbol": "SPYM",
+   "name": "State Street SPDR Portfolio S&P 500 ETF",
    "avg_dollar_volume": 1100000000.0
   },
   {
-   "symbol": "VLO",
-   "name": "Valero Energy Corporation",
+   "symbol": "BIL",
+   "name": "State Street SPDR Bloomberg 1-3 Month T-Bill ETF",
    "avg_dollar_volume": 1100000000.0
   },
   {
-   "symbol": "VST",
-   "name": "Vistra Corp.",
+   "symbol": "SPOT",
+   "name": "Spotify Technology S.A.",
    "avg_dollar_volume": 1100000000.0
   },
   {
-   "symbol": "HPE",
-   "name": "Hewlett Packard Enterprise Company",
+   "symbol": "LIN",
+   "name": "Linde plc Ordinary Shares",
    "avg_dollar_volume": 1100000000.0
   },
   {
-   "symbol": "UBER",
-   "name": "Uber Technologies, Inc.",
+   "symbol": "NEE",
+   "name": "NextEra Energy, Inc.",
    "avg_dollar_volume": 1100000000.0
   },
   {
-   "symbol": "SNPS",
-   "name": "Synopsys, Inc. Common Stock",
+   "symbol": "MCHP",
+   "name": "Microchip Technology Incorporated Common Stock",
+   "avg_dollar_volume": 1100000000.0
+  },
+  {
+   "symbol": "KRE",
+   "name": "State Street SPDR S&P Regional Banking ETF",
    "avg_dollar_volume": 1100000000.0
   },
   {
@@ -674,28 +729,28 @@
    "avg_dollar_volume": 1100000000.0
   },
   {
-   "symbol": "AAOI",
-   "name": "Applied Optoelectronics, Inc. Common Stock",
+   "symbol": "RKLB",
+   "name": "Rocket Lab Corporation Common Stock",
    "avg_dollar_volume": 1100000000.0
   },
   {
-   "symbol": "VTI",
-   "name": "Vanguard Morningstar Total Stock Market ETF",
+   "symbol": "CIEN",
+   "name": "Ciena Corporation",
    "avg_dollar_volume": 1100000000.0
   },
   {
-   "symbol": "NKE",
-   "name": "Nike, Inc.",
+   "symbol": "IEMG",
+   "name": "iShares Core MSCI Emerging Markets ETF",
    "avg_dollar_volume": 1100000000.0
   },
   {
-   "symbol": "RTX",
-   "name": "RTX Corporation",
+   "symbol": "INTU",
+   "name": "Intuit Inc. Common Stock",
    "avg_dollar_volume": 1100000000.0
   },
   {
-   "symbol": "BKNG",
-   "name": "Booking Holdings Inc. Common Stock",
+   "symbol": "XLY",
+   "name": "State Street Consumer Discretionary Select Sector SPDR ETF",
    "avg_dollar_volume": 1100000000.0
   },
   {
@@ -704,48 +759,33 @@
    "avg_dollar_volume": 1100000000.0
   },
   {
-   "symbol": "MPWR",
-   "name": "Monolithic Power Systems, Inc. Common Stock",
-   "avg_dollar_volume": 1100000000.0
-  },
-  {
-   "symbol": "NXPI",
-   "name": "NXP Semiconductors N.V. Common Stock",
+   "symbol": "VTEB",
+   "name": "Vanguard Tax-Exempt Bond Index Fund",
    "avg_dollar_volume": 1000000000.0
   },
   {
-   "symbol": "ISRG",
-   "name": "Intuitive Surgical, Inc. Common Stock",
+   "symbol": "OKTA",
+   "name": "Okta, Inc. Class A Common Stock",
    "avg_dollar_volume": 1000000000.0
   },
   {
-   "symbol": "LIN",
-   "name": "Linde plc Ordinary Shares",
+   "symbol": "HPE",
+   "name": "Hewlett Packard Enterprise Company",
    "avg_dollar_volume": 1000000000.0
   },
   {
-   "symbol": "INTU",
-   "name": "Intuit Inc. Common Stock",
+   "symbol": "LMT",
+   "name": "Lockheed Martin Corp.",
    "avg_dollar_volume": 1000000000.0
   },
   {
-   "symbol": "KRE",
-   "name": "State Street SPDR S&P Regional Banking ETF",
+   "symbol": "PFE",
+   "name": "Pfizer Inc.",
    "avg_dollar_volume": 1000000000.0
   },
   {
-   "symbol": "APP",
-   "name": "Applovin Corporation Class A Common Stock",
-   "avg_dollar_volume": 1000000000.0
-  },
-  {
-   "symbol": "MELI",
-   "name": "MercadoLibre, Inc. Common Stock",
-   "avg_dollar_volume": 1000000000.0
-  },
-  {
-   "symbol": "DHR",
-   "name": "Danaher Corporation",
+   "symbol": "SNPS",
+   "name": "Synopsys, Inc. Common Stock",
    "avg_dollar_volume": 1000000000.0
   },
   {
@@ -754,463 +794,553 @@
    "avg_dollar_volume": 1000000000.0
   },
   {
-   "symbol": "NET",
-   "name": "Cloudflare, Inc. Class A common stock, par value $0.001 per share",
+   "symbol": "VST",
+   "name": "Vistra Corp.",
    "avg_dollar_volume": 1000000000.0
-  },
-  {
-   "symbol": "ETN",
-   "name": "Eaton Corporation, plc Ordinary Shares",
-   "avg_dollar_volume": 1000000000.0
-  },
-  {
-   "symbol": "APH",
-   "name": "Amphenol Corporation",
-   "avg_dollar_volume": 1000000000.0
-  },
-  {
-   "symbol": "SPOT",
-   "name": "Spotify Technology S.A.",
-   "avg_dollar_volume": 1000000000.0
-  },
-  {
-   "symbol": "BIL",
-   "name": "State Street SPDR Bloomberg 1-3 Month T-Bill ETF",
-   "avg_dollar_volume": 980000000.0
-  },
-  {
-   "symbol": "SBUX",
-   "name": "Starbucks Corporation Common Stock",
-   "avg_dollar_volume": 980000000.0
-  },
-  {
-   "symbol": "GILD",
-   "name": "Gilead Sciences, Inc. Common Stock",
-   "avg_dollar_volume": 980000000.0
-  },
-  {
-   "symbol": "QQQM",
-   "name": "Invesco Exchange-Traded Fund Trust II Invesco NASDAQ 100 ETF",
-   "avg_dollar_volume": 970000000.0
-  },
-  {
-   "symbol": "AXP",
-   "name": "American Express Company",
-   "avg_dollar_volume": 960000000.0
-  },
-  {
-   "symbol": "NEE",
-   "name": "NextEra Energy, Inc.",
-   "avg_dollar_volume": 940000000.0
-  },
-  {
-   "symbol": "PM",
-   "name": "Philip Morris International Inc.",
-   "avg_dollar_volume": 930000000.0
-  },
-  {
-   "symbol": "MPC",
-   "name": "MARATHON PETROLEUM CORPORATION",
-   "avg_dollar_volume": 930000000.0
-  },
-  {
-   "symbol": "SLV",
-   "name": "iShares Silver Trust",
-   "avg_dollar_volume": 910000000.0
-  },
-  {
-   "symbol": "BABA",
-   "name": "Alibaba Group Holding Limited American Depositary Shares, each represents eight Ordinary Shares",
-   "avg_dollar_volume": 900000000.0
-  },
-  {
-   "symbol": "TJX",
-   "name": "TJX Companies, Inc. (The)",
-   "avg_dollar_volume": 900000000.0
-  },
-  {
-   "symbol": "IEMG",
-   "name": "iShares Core MSCI Emerging Markets ETF",
-   "avg_dollar_volume": 890000000.0
-  },
-  {
-   "symbol": "LMT",
-   "name": "Lockheed Martin Corp.",
-   "avg_dollar_volume": 880000000.0
-  },
-  {
-   "symbol": "PTC",
-   "name": "PTC Inc. Common Stock",
-   "avg_dollar_volume": 870000000.0
-  },
-  {
-   "symbol": "PFE",
-   "name": "Pfizer Inc.",
-   "avg_dollar_volume": 870000000.0
-  },
-  {
-   "symbol": "CLS",
-   "name": "Celestica, Inc.",
-   "avg_dollar_volume": 860000000.0
-  },
-  {
-   "symbol": "SOFI",
-   "name": "SoFi Technologies, Inc. Common Stock",
-   "avg_dollar_volume": 860000000.0
-  },
-  {
-   "symbol": "RDDT",
-   "name": "Reddit, Inc.",
-   "avg_dollar_volume": 850000000.0
-  },
-  {
-   "symbol": "DIS",
-   "name": "The Walt Disney Company",
-   "avg_dollar_volume": 850000000.0
-  },
-  {
-   "symbol": "FTNT",
-   "name": "Fortinet, Inc. Common Stock",
-   "avg_dollar_volume": 850000000.0
-  },
-  {
-   "symbol": "ASTS",
-   "name": "AST SpaceMobile, Inc. Class A Common Stock",
-   "avg_dollar_volume": 830000000.0
-  },
-  {
-   "symbol": "COP",
-   "name": "ConocoPhillips",
-   "avg_dollar_volume": 830000000.0
-  },
-  {
-   "symbol": "VCIT",
-   "name": "Vanguard Intermediate-Term Corporate Bond ETF",
-   "avg_dollar_volume": 820000000.0
-  },
-  {
-   "symbol": "CRCL",
-   "name": "Circle Internet Group, Inc.",
-   "avg_dollar_volume": 820000000.0
-  },
-  {
-   "symbol": "BND",
-   "name": "Vanguard Total Bond Market ETF",
-   "avg_dollar_volume": 820000000.0
-  },
-  {
-   "symbol": "XLY",
-   "name": "State Street Consumer Discretionary Select Sector SPDR ETF",
-   "avg_dollar_volume": 810000000.0
-  },
-  {
-   "symbol": "SCHW",
-   "name": "The Charles Schwab Corporation",
-   "avg_dollar_volume": 810000000.0
-  },
-  {
-   "symbol": "BSX",
-   "name": "Boston Scientific Corp.",
-   "avg_dollar_volume": 800000000.0
   },
   {
    "symbol": "PWR",
    "name": "Quanta Services, Inc.",
-   "avg_dollar_volume": 800000000.0
+   "avg_dollar_volume": 1000000000.0
   },
   {
-   "symbol": "MCHP",
-   "name": "Microchip Technology Incorporated Common Stock",
-   "avg_dollar_volume": 800000000.0
-  },
-  {
-   "symbol": "SYK",
-   "name": "Stryker Corporation",
-   "avg_dollar_volume": 800000000.0
-  },
-  {
-   "symbol": "COF",
-   "name": "Capital One Financial",
-   "avg_dollar_volume": 800000000.0
-  },
-  {
-   "symbol": "SPGI",
-   "name": "S&P Global Inc.",
-   "avg_dollar_volume": 800000000.0
-  },
-  {
-   "symbol": "HWM",
-   "name": "Howmet Aerospace Inc.",
-   "avg_dollar_volume": 800000000.0
-  },
-  {
-   "symbol": "CDNS",
-   "name": "Cadence Design Systems, Inc. Common Stock",
-   "avg_dollar_volume": 790000000.0
-  },
-  {
-   "symbol": "FIX",
-   "name": "Comfort Systems USA, Inc.",
-   "avg_dollar_volume": 790000000.0
-  },
-  {
-   "symbol": "SCHD",
-   "name": "Schwab US Dividend Equity ETF",
-   "avg_dollar_volume": 790000000.0
-  },
-  {
-   "symbol": "DDOG",
-   "name": "Datadog, Inc. Class A Common Stock",
-   "avg_dollar_volume": 780000000.0
-  },
-  {
-   "symbol": "ON",
-   "name": "ON Semiconductor Corporation Common Stock",
-   "avg_dollar_volume": 770000000.0
-  },
-  {
-   "symbol": "FCX",
-   "name": "Freeport-McMoran Inc.",
-   "avg_dollar_volume": 770000000.0
-  },
-  {
-   "symbol": "BLK",
-   "name": "Blackrock, Inc.",
-   "avg_dollar_volume": 770000000.0
-  },
-  {
-   "symbol": "IONQ",
-   "name": "IonQ, Inc.",
-   "avg_dollar_volume": 770000000.0
-  },
-  {
-   "symbol": "AAL",
-   "name": "American Airlines Group Inc. Common Stock",
-   "avg_dollar_volume": 760000000.0
-  },
-  {
-   "symbol": "NOK",
-   "name": "Nokia Corporation",
-   "avg_dollar_volume": 760000000.0
-  },
-  {
-   "symbol": "CMG",
-   "name": "Chipotle Mexican Grill, Inc.",
-   "avg_dollar_volume": 760000000.0
-  },
-  {
-   "symbol": "BMY",
-   "name": "Bristol-Myers Squibb Co.",
-   "avg_dollar_volume": 750000000.0
-  },
-  {
-   "symbol": "CVS",
-   "name": "CVS HEALTH CORPORATION",
-   "avg_dollar_volume": 750000000.0
-  },
-  {
-   "symbol": "USO",
-   "name": "United States Oil Fund, LP",
-   "avg_dollar_volume": 730000000.0
-  },
-  {
-   "symbol": "XLC",
-   "name": "State Street Communication Services Select Sector SPDR ETF",
-   "avg_dollar_volume": 730000000.0
+   "symbol": "DHR",
+   "name": "Danaher Corporation",
+   "avg_dollar_volume": 1000000000.0
   },
   {
    "symbol": "DASH",
    "name": "DoorDash, Inc. Class A Common Stock",
-   "avg_dollar_volume": 730000000.0
+   "avg_dollar_volume": 1000000000.0
   },
   {
-   "symbol": "FICO",
-   "name": "Fair Isaac Corporation",
-   "avg_dollar_volume": 730000000.0
+   "symbol": "MPC",
+   "name": "MARATHON PETROLEUM CORPORATION",
+   "avg_dollar_volume": 1000000000.0
   },
   {
-   "symbol": "BITO",
-   "name": "ProShares Bitcoin ETF",
-   "avg_dollar_volume": 730000000.0
+   "symbol": "DDOG",
+   "name": "Datadog, Inc. Class A Common Stock",
+   "avg_dollar_volume": 1000000000.0
   },
   {
-   "symbol": "PBR",
-   "name": "PETROLEO BRASILEIRO S.A.-PETROBRAS ADS (REP 1 COMMON SHARE)",
-   "avg_dollar_volume": 720000000.0
+   "symbol": "PM",
+   "name": "Philip Morris International Inc.",
+   "avg_dollar_volume": 1000000000.0
+  },
+  {
+   "symbol": "COP",
+   "name": "ConocoPhillips",
+   "avg_dollar_volume": 990000000.0
+  },
+  {
+   "symbol": "AXP",
+   "name": "American Express Company",
+   "avg_dollar_volume": 980000000.0
+  },
+  {
+   "symbol": "AAOI",
+   "name": "Applied Optoelectronics, Inc. Common Stock",
+   "avg_dollar_volume": 970000000.0
+  },
+  {
+   "symbol": "SYK",
+   "name": "Stryker Corporation",
+   "avg_dollar_volume": 970000000.0
+  },
+  {
+   "symbol": "CEG",
+   "name": "Constellation Energy Corporation Common Stock",
+   "avg_dollar_volume": 970000000.0
+  },
+  {
+   "symbol": "BABA",
+   "name": "Alibaba Group Holding Limited American Depositary Shares, each represents eight Ordinary Shares",
+   "avg_dollar_volume": 960000000.0
+  },
+  {
+   "symbol": "FIX",
+   "name": "Comfort Systems USA, Inc.",
+   "avg_dollar_volume": 960000000.0
+  },
+  {
+   "symbol": "CLS",
+   "name": "Celestica, Inc.",
+   "avg_dollar_volume": 950000000.0
+  },
+  {
+   "symbol": "CVS",
+   "name": "CVS HEALTH CORPORATION",
+   "avg_dollar_volume": 950000000.0
+  },
+  {
+   "symbol": "SLV",
+   "name": "iShares Silver Trust",
+   "avg_dollar_volume": 940000000.0
+  },
+  {
+   "symbol": "SOFI",
+   "name": "SoFi Technologies, Inc. Common Stock",
+   "avg_dollar_volume": 940000000.0
+  },
+  {
+   "symbol": "NKE",
+   "name": "Nike, Inc.",
+   "avg_dollar_volume": 930000000.0
+  },
+  {
+   "symbol": "HWM",
+   "name": "Howmet Aerospace Inc.",
+   "avg_dollar_volume": 930000000.0
+  },
+  {
+   "symbol": "DIS",
+   "name": "The Walt Disney Company",
+   "avg_dollar_volume": 920000000.0
+  },
+  {
+   "symbol": "FTNT",
+   "name": "Fortinet, Inc. Common Stock",
+   "avg_dollar_volume": 920000000.0
+  },
+  {
+   "symbol": "SBUX",
+   "name": "Starbucks Corporation Common Stock",
+   "avg_dollar_volume": 920000000.0
+  },
+  {
+   "symbol": "VCIT",
+   "name": "Vanguard Intermediate-Term Corporate Bond ETF",
+   "avg_dollar_volume": 910000000.0
+  },
+  {
+   "symbol": "COF",
+   "name": "Capital One Financial",
+   "avg_dollar_volume": 900000000.0
+  },
+  {
+   "symbol": "BSX",
+   "name": "Boston Scientific Corp.",
+   "avg_dollar_volume": 890000000.0
+  },
+  {
+   "symbol": "RDDT",
+   "name": "Reddit, Inc.",
+   "avg_dollar_volume": 890000000.0
   },
   {
    "symbol": "VRTX",
    "name": "Vertex Pharmaceuticals Incorporated Common Stock",
-   "avg_dollar_volume": 720000000.0
+   "avg_dollar_volume": 890000000.0
   },
   {
-   "symbol": "CMCSA",
-   "name": "Comcast Corporation Class A Common Stock",
-   "avg_dollar_volume": 720000000.0
+   "symbol": "TJX",
+   "name": "TJX Companies, Inc. (The)",
+   "avg_dollar_volume": 880000000.0
   },
   {
-   "symbol": "BMNR",
-   "name": "BitMine Immersion Technologies, Inc.",
-   "avg_dollar_volume": 710000000.0
+   "symbol": "BLK",
+   "name": "Blackrock, Inc.",
+   "avg_dollar_volume": 880000000.0
   },
   {
-   "symbol": "EMB",
-   "name": "iShares J,P. Morgan USD Emerging Markets Bond ETF",
-   "avg_dollar_volume": 710000000.0
+   "symbol": "SCHW",
+   "name": "The Charles Schwab Corporation",
+   "avg_dollar_volume": 870000000.0
   },
   {
-   "symbol": "DE",
-   "name": "Deere & Company",
-   "avg_dollar_volume": 700000000.0
+   "symbol": "SCHD",
+   "name": "Schwab US Dividend Equity ETF",
+   "avg_dollar_volume": 870000000.0
+  },
+  {
+   "symbol": "SPGI",
+   "name": "S&P Global Inc.",
+   "avg_dollar_volume": 860000000.0
+  },
+  {
+   "symbol": "XLC",
+   "name": "State Street Communication Services Select Sector SPDR ETF",
+   "avg_dollar_volume": 850000000.0
+  },
+  {
+   "symbol": "USO",
+   "name": "United States Oil Fund, LP",
+   "avg_dollar_volume": 840000000.0
+  },
+  {
+   "symbol": "CDNS",
+   "name": "Cadence Design Systems, Inc. Common Stock",
+   "avg_dollar_volume": 840000000.0
+  },
+  {
+   "symbol": "CRCL",
+   "name": "Circle Internet Group, Inc.",
+   "avg_dollar_volume": 830000000.0
   },
   {
    "symbol": "UNP",
    "name": "Union Pacific Corp.",
-   "avg_dollar_volume": 690000000.0
-  },
-  {
-   "symbol": "IWF",
-   "name": "iShares Russell 1000 Growth ETF",
-   "avg_dollar_volume": 690000000.0
-  },
-  {
-   "symbol": "OKTA",
-   "name": "Okta, Inc. Class A Common Stock",
-   "avg_dollar_volume": 690000000.0
-  },
-  {
-   "symbol": "PSX",
-   "name": "PHILLIPS 66",
-   "avg_dollar_volume": 690000000.0
-  },
-  {
-   "symbol": "HUM",
-   "name": "Humana Inc.",
-   "avg_dollar_volume": 690000000.0
-  },
-  {
-   "symbol": "ILMN",
-   "name": "Illumina, Inc. Common Stock",
-   "avg_dollar_volume": 670000000.0
-  },
-  {
-   "symbol": "MCK",
-   "name": "McKesson Corporation",
-   "avg_dollar_volume": 670000000.0
-  },
-  {
-   "symbol": "NEM",
-   "name": "Newmont Corporation",
-   "avg_dollar_volume": 670000000.0
-  },
-  {
-   "symbol": "GM",
-   "name": "General Motors Company",
-   "avg_dollar_volume": 670000000.0
-  },
-  {
-   "symbol": "AMT",
-   "name": "American Tower Corporation",
-   "avg_dollar_volume": 670000000.0
-  },
-  {
-   "symbol": "TT",
-   "name": "Trane Technologies plc",
-   "avg_dollar_volume": 670000000.0
-  },
-  {
-   "symbol": "WELL",
-   "name": "Welltower Inc.",
-   "avg_dollar_volume": 660000000.0
-  },
-  {
-   "symbol": "VEA",
-   "name": "Vanguard FTSE Developed Markets ETF",
-   "avg_dollar_volume": 660000000.0
-  },
-  {
-   "symbol": "ZS",
-   "name": "Zscaler, Inc. Common Stock",
-   "avg_dollar_volume": 660000000.0
-  },
-  {
-   "symbol": "BX",
-   "name": "Blackstone Inc.",
-   "avg_dollar_volume": 660000000.0
-  },
-  {
-   "symbol": "VTV",
-   "name": "Vanguard Morningstar Value ETF",
-   "avg_dollar_volume": 650000000.0
-  },
-  {
-   "symbol": "PYPL",
-   "name": "PayPal Holdings, Inc. Common Stock",
-   "avg_dollar_volume": 650000000.0
-  },
-  {
-   "symbol": "HLT",
-   "name": "Hilton Worldwide Holdings Inc.",
-   "avg_dollar_volume": 640000000.0
-  },
-  {
-   "symbol": "NTRA",
-   "name": "Natera, Inc. Common Stock",
-   "avg_dollar_volume": 640000000.0
-  },
-  {
-   "symbol": "MDB",
-   "name": "MongoDB, Inc. Class A Common Stock",
-   "avg_dollar_volume": 630000000.0
-  },
-  {
-   "symbol": "FXI",
-   "name": "iShares China Large-Cap ETF",
-   "avg_dollar_volume": 630000000.0
-  },
-  {
-   "symbol": "MO",
-   "name": "Altria Group, Inc.",
-   "avg_dollar_volume": 620000000.0
-  },
-  {
-   "symbol": "CME",
-   "name": "CME Group Inc. Class A Common Stock",
-   "avg_dollar_volume": 620000000.0
-  },
-  {
-   "symbol": "LOW",
-   "name": "Lowe's Companies Inc.",
-   "avg_dollar_volume": 620000000.0
-  },
-  {
-   "symbol": "RCL",
-   "name": "Royal Caribbean Group",
-   "avg_dollar_volume": 610000000.0
-  },
-  {
-   "symbol": "SHEL",
-   "name": "Shell plc American Depositary Shares (Each represents two Ordinary shares)",
-   "avg_dollar_volume": 610000000.0
+   "avg_dollar_volume": 830000000.0
   },
   {
    "symbol": "REGN",
    "name": "Regeneron Pharmaceuticals, Inc. Common Stock",
-   "avg_dollar_volume": 610000000.0
+   "avg_dollar_volume": 820000000.0
   },
   {
-   "symbol": "AXTI",
-   "name": "AXT Inc Common Stock",
-   "avg_dollar_volume": 600000000.0
+   "symbol": "ON",
+   "name": "ON Semiconductor Corporation Common Stock",
+   "avg_dollar_volume": 810000000.0
+  },
+  {
+   "symbol": "PSX",
+   "name": "PHILLIPS 66",
+   "avg_dollar_volume": 810000000.0
+  },
+  {
+   "symbol": "FCX",
+   "name": "Freeport-McMoran Inc.",
+   "avg_dollar_volume": 800000000.0
+  },
+  {
+   "symbol": "IONQ",
+   "name": "IonQ, Inc.",
+   "avg_dollar_volume": 780000000.0
+  },
+  {
+   "symbol": "AAL",
+   "name": "American Airlines Group Inc. Common Stock",
+   "avg_dollar_volume": 780000000.0
+  },
+  {
+   "symbol": "NEM",
+   "name": "Newmont Corporation",
+   "avg_dollar_volume": 780000000.0
+  },
+  {
+   "symbol": "BND",
+   "name": "Vanguard Total Bond Market ETF",
+   "avg_dollar_volume": 780000000.0
+  },
+  {
+   "symbol": "MCK",
+   "name": "McKesson Corporation",
+   "avg_dollar_volume": 760000000.0
+  },
+  {
+   "symbol": "IWF",
+   "name": "iShares Russell 1000 Growth ETF",
+   "avg_dollar_volume": 760000000.0
+  },
+  {
+   "symbol": "CVNA",
+   "name": "Carvana Co.",
+   "avg_dollar_volume": 760000000.0
+  },
+  {
+   "symbol": "ABNB",
+   "name": "Airbnb, Inc. Class A Common Stock",
+   "avg_dollar_volume": 750000000.0
+  },
+  {
+   "symbol": "NTRA",
+   "name": "Natera, Inc. Common Stock",
+   "avg_dollar_volume": 750000000.0
+  },
+  {
+   "symbol": "CMCSA",
+   "name": "Comcast Corporation Class A Common Stock",
+   "avg_dollar_volume": 750000000.0
+  },
+  {
+   "symbol": "GM",
+   "name": "General Motors Company",
+   "avg_dollar_volume": 740000000.0
+  },
+  {
+   "symbol": "VEA",
+   "name": "Vanguard FTSE Developed Markets ETF",
+   "avg_dollar_volume": 740000000.0
+  },
+  {
+   "symbol": "BMY",
+   "name": "Bristol-Myers Squibb Co.",
+   "avg_dollar_volume": 740000000.0
+  },
+  {
+   "symbol": "HLT",
+   "name": "Hilton Worldwide Holdings Inc. Common Stock",
+   "avg_dollar_volume": 740000000.0
+  },
+  {
+   "symbol": "CMI",
+   "name": "Cummins Inc.",
+   "avg_dollar_volume": 730000000.0
+  },
+  {
+   "symbol": "TT",
+   "name": "Trane Technologies plc",
+   "avg_dollar_volume": 730000000.0
+  },
+  {
+   "symbol": "KMB",
+   "name": "Kimberly-Clark Corporation Common Stock",
+   "avg_dollar_volume": 720000000.0
+  },
+  {
+   "symbol": "WELL",
+   "name": "Welltower Inc.",
+   "avg_dollar_volume": 720000000.0
+  },
+  {
+   "symbol": "FXI",
+   "name": "iShares China Large-Cap ETF",
+   "avg_dollar_volume": 720000000.0
+  },
+  {
+   "symbol": "VTV",
+   "name": "Vanguard Morningstar Value ETF",
+   "avg_dollar_volume": 720000000.0
+  },
+  {
+   "symbol": "NOK",
+   "name": "Nokia Corporation",
+   "avg_dollar_volume": 720000000.0
+  },
+  {
+   "symbol": "BX",
+   "name": "Blackstone Inc.",
+   "avg_dollar_volume": 720000000.0
+  },
+  {
+   "symbol": "PH",
+   "name": "Parker-Hannifin Corporation",
+   "avg_dollar_volume": 720000000.0
+  },
+  {
+   "symbol": "DE",
+   "name": "Deere & Company",
+   "avg_dollar_volume": 720000000.0
+  },
+  {
+   "symbol": "LOW",
+   "name": "Lowe's Companies Inc.",
+   "avg_dollar_volume": 710000000.0
+  },
+  {
+   "symbol": "ASTS",
+   "name": "AST SpaceMobile, Inc. Class A Common Stock",
+   "avg_dollar_volume": 710000000.0
+  },
+  {
+   "symbol": "JCI",
+   "name": "Johnson Controls International plc",
+   "avg_dollar_volume": 710000000.0
+  },
+  {
+   "symbol": "ADP",
+   "name": "Automatic Data Processing, Inc. Common Stock",
+   "avg_dollar_volume": 710000000.0
+  },
+  {
+   "symbol": "LNG",
+   "name": "Cheniere Energy Inc",
+   "avg_dollar_volume": 690000000.0
+  },
+  {
+   "symbol": "HCA",
+   "name": "HCA Healthcare, Inc.",
+   "avg_dollar_volume": 690000000.0
+  },
+  {
+   "symbol": "MMM",
+   "name": "3M Company",
+   "avg_dollar_volume": 690000000.0
+  },
+  {
+   "symbol": "CMG",
+   "name": "Chipotle Mexican Grill, Inc.",
+   "avg_dollar_volume": 690000000.0
+  },
+  {
+   "symbol": "EWT",
+   "name": "iShares MSCI Taiwan ETF",
+   "avg_dollar_volume": 680000000.0
+  },
+  {
+   "symbol": "SHW",
+   "name": "The Sherwin-Williams Company",
+   "avg_dollar_volume": 680000000.0
+  },
+  {
+   "symbol": "WMB",
+   "name": "Williams Companies Inc.",
+   "avg_dollar_volume": 680000000.0
+  },
+  {
+   "symbol": "VGT",
+   "name": "Vanguard Information Technology ETF",
+   "avg_dollar_volume": 680000000.0
+  },
+  {
+   "symbol": "BMNR",
+   "name": "BitMine Immersion Technologies, Inc.",
+   "avg_dollar_volume": 680000000.0
+  },
+  {
+   "symbol": "TWLO",
+   "name": "Twilio Inc.",
+   "avg_dollar_volume": 670000000.0
+  },
+  {
+   "symbol": "EQIX",
+   "name": "Equinix, Inc. Common Stock REIT",
+   "avg_dollar_volume": 670000000.0
+  },
+  {
+   "symbol": "EMB",
+   "name": "iShares J,P. Morgan USD Emerging Markets Bond ETF",
+   "avg_dollar_volume": 670000000.0
+  },
+  {
+   "symbol": "PYPL",
+   "name": "PayPal Holdings, Inc. Common Stock",
+   "avg_dollar_volume": 660000000.0
+  },
+  {
+   "symbol": "URI",
+   "name": "United Rentals, Inc.",
+   "avg_dollar_volume": 660000000.0
+  },
+  {
+   "symbol": "MAR",
+   "name": "Marriott International Class A Common Stock",
+   "avg_dollar_volume": 660000000.0
+  },
+  {
+   "symbol": "CSX",
+   "name": "CSX Corporation Common Stock",
+   "avg_dollar_volume": 660000000.0
+  },
+  {
+   "symbol": "BITO",
+   "name": "ProShares Bitcoin ETF",
+   "avg_dollar_volume": 660000000.0
+  },
+  {
+   "symbol": "MO",
+   "name": "Altria Group, Inc.",
+   "avg_dollar_volume": 660000000.0
+  },
+  {
+   "symbol": "FICO",
+   "name": "Fair Isaac Corporation",
+   "avg_dollar_volume": 660000000.0
   },
   {
    "symbol": "SLB",
    "name": "SLB Limited",
-   "avg_dollar_volume": 600000000.0
+   "avg_dollar_volume": 650000000.0
   },
   {
-   "symbol": "APLD",
-   "name": "Applied Digital Corporation Common Stock",
+   "symbol": "AMT",
+   "name": "American Tower Corporation",
+   "avg_dollar_volume": 650000000.0
+  },
+  {
+   "symbol": "WULF",
+   "name": "TeraWulf Inc. Common Stock",
+   "avg_dollar_volume": 640000000.0
+  },
+  {
+   "symbol": "ELV",
+   "name": "Elevance Health, Inc.",
+   "avg_dollar_volume": 640000000.0
+  },
+  {
+   "symbol": "SO",
+   "name": "The Southern Company",
+   "avg_dollar_volume": 640000000.0
+  },
+  {
+   "symbol": "KDP",
+   "name": "Keurig Dr Pepper Inc. Common Stock",
+   "avg_dollar_volume": 640000000.0
+  },
+  {
+   "symbol": "IWD",
+   "name": "iShares Russell 1000 Value ETF",
+   "avg_dollar_volume": 640000000.0
+  },
+  {
+   "symbol": "RCL",
+   "name": "Royal Caribbean Group",
+   "avg_dollar_volume": 640000000.0
+  },
+  {
+   "symbol": "TRV",
+   "name": "The Travelers Companies, Inc.",
+   "avg_dollar_volume": 640000000.0
+  },
+  {
+   "symbol": "XLB",
+   "name": "State Street Materials Select Sector SPDR ETF",
+   "avg_dollar_volume": 630000000.0
+  },
+  {
+   "symbol": "SE",
+   "name": "Sea Limited American Depositary Shares, each representing one Class A Ordinary Share",
+   "avg_dollar_volume": 630000000.0
+  },
+  {
+   "symbol": "AXTI",
+   "name": "AXT Inc Common Stock",
+   "avg_dollar_volume": 630000000.0
+  },
+  {
+   "symbol": "SAP",
+   "name": "SAP SE",
+   "avg_dollar_volume": 620000000.0
+  },
+  {
+   "symbol": "HON",
+   "name": "Honeywell International Inc. Common Stock",
+   "avg_dollar_volume": 620000000.0
+  },
+  {
+   "symbol": "TEAM",
+   "name": "Atlassian Corporation Class A Common Stock",
+   "avg_dollar_volume": 620000000.0
+  },
+  {
+   "symbol": "FLEX",
+   "name": "Flex Ltd. Ordinary Shares",
+   "avg_dollar_volume": 620000000.0
+  },
+  {
+   "symbol": "VUG",
+   "name": "Vanguard Morningstar Growth ETF",
+   "avg_dollar_volume": 620000000.0
+  },
+  {
+   "symbol": "PGR",
+   "name": "Progressive Corporation",
+   "avg_dollar_volume": 620000000.0
+  },
+  {
+   "symbol": "PBR",
+   "name": "PETROLEO BRASILEIRO S.A.-PETROBRAS ADS (REP 1 COMMON SHARE)",
+   "avg_dollar_volume": 610000000.0
+  },
+  {
+   "symbol": "CME",
+   "name": "CME Group Inc. Class A Common Stock",
+   "avg_dollar_volume": 610000000.0
+  },
+  {
+   "symbol": "ILMN",
+   "name": "Illumina, Inc. Common Stock",
    "avg_dollar_volume": 600000000.0
   },
   {
@@ -1219,198 +1349,183 @@
    "avg_dollar_volume": 600000000.0
   },
   {
-   "symbol": "SE",
-   "name": "Sea Limited American Depositary Shares, each representing one Class A Ordinary Share",
-   "avg_dollar_volume": 600000000.0
-  },
-  {
-   "symbol": "CVNA",
-   "name": "Carvana Co.",
-   "avg_dollar_volume": 590000000.0
-  },
-  {
-   "symbol": "ADP",
-   "name": "Automatic Data Processing, Inc. Common Stock",
-   "avg_dollar_volume": 590000000.0
-  },
-  {
-   "symbol": "HCA",
-   "name": "HCA Healthcare, Inc.",
-   "avg_dollar_volume": 590000000.0
-  },
-  {
-   "symbol": "JCI",
-   "name": "Johnson Controls International plc",
-   "avg_dollar_volume": 590000000.0
-  },
-  {
-   "symbol": "CMI",
-   "name": "Cummins Inc.",
-   "avg_dollar_volume": 580000000.0
-  },
-  {
-   "symbol": "ELV",
-   "name": "Elevance Health, Inc.",
-   "avg_dollar_volume": 580000000.0
-  },
-  {
    "symbol": "WM",
    "name": "Waste Management, Inc.",
-   "avg_dollar_volume": 580000000.0
-  },
-  {
-   "symbol": "URI",
-   "name": "United Rentals, Inc.",
-   "avg_dollar_volume": 580000000.0
-  },
-  {
-   "symbol": "VGT",
-   "name": "Vanguard Information Technology ETF",
-   "avg_dollar_volume": 580000000.0
+   "avg_dollar_volume": 600000000.0
   },
   {
    "symbol": "IYR",
    "name": "iShares U.S. Real Estate ETF",
-   "avg_dollar_volume": 580000000.0
+   "avg_dollar_volume": 600000000.0
   },
   {
-   "symbol": "MMM",
-   "name": "3M Company",
-   "avg_dollar_volume": 580000000.0
+   "symbol": "AZN",
+   "name": "AstraZeneca PLC",
+   "avg_dollar_volume": 600000000.0
   },
   {
-   "symbol": "WMB",
-   "name": "Williams Companies Inc.",
-   "avg_dollar_volume": 580000000.0
-  },
-  {
-   "symbol": "HON",
-   "name": "Honeywell International Inc. Common Stock",
-   "avg_dollar_volume": 570000000.0
-  },
-  {
-   "symbol": "PH",
-   "name": "Parker-Hannifin Corporation",
-   "avg_dollar_volume": 570000000.0
-  },
-  {
-   "symbol": "PGR",
-   "name": "Progressive Corporation",
-   "avg_dollar_volume": 570000000.0
-  },
-  {
-   "symbol": "SAP",
-   "name": "SAP SE",
-   "avg_dollar_volume": 570000000.0
-  },
-  {
-   "symbol": "FLEX",
-   "name": "Flex Ltd. Ordinary Shares",
-   "avg_dollar_volume": 570000000.0
-  },
-  {
-   "symbol": "LNG",
-   "name": "Cheniere Energy Inc",
-   "avg_dollar_volume": 560000000.0
-  },
-  {
-   "symbol": "DAL",
-   "name": "Delta Air Lines, Inc.",
-   "avg_dollar_volume": 560000000.0
-  },
-  {
-   "symbol": "EQIX",
-   "name": "Equinix, Inc. Common Stock REIT",
-   "avg_dollar_volume": 560000000.0
-  },
-  {
-   "symbol": "SHW",
-   "name": "The Sherwin-Williams Company",
-   "avg_dollar_volume": 560000000.0
-  },
-  {
-   "symbol": "CB",
-   "name": "Chubb Limited",
-   "avg_dollar_volume": 560000000.0
-  },
-  {
-   "symbol": "TRV",
-   "name": "The Travelers Companies, Inc.",
-   "avg_dollar_volume": 550000000.0
-  },
-  {
-   "symbol": "ETHA",
-   "name": "iShares Ethereum Trust ETF Shares",
-   "avg_dollar_volume": 550000000.0
-  },
-  {
-   "symbol": "IWD",
-   "name": "iShares Russell 1000 Value ETF",
-   "avg_dollar_volume": 550000000.0
-  },
-  {
-   "symbol": "AZO",
-   "name": "AutoZone, Inc.",
-   "avg_dollar_volume": 550000000.0
-  },
-  {
-   "symbol": "WULF",
-   "name": "TeraWulf Inc. Common Stock",
-   "avg_dollar_volume": 550000000.0
-  },
-  {
-   "symbol": "MAR",
-   "name": "Marriott International Class A Common Stock",
-   "avg_dollar_volume": 550000000.0
-  },
-  {
-   "symbol": "ABNB",
-   "name": "Airbnb, Inc. Class A Common Stock",
-   "avg_dollar_volume": 550000000.0
-  },
-  {
-   "symbol": "UAL",
-   "name": "United Airlines Holdings, Inc. Common Stock",
-   "avg_dollar_volume": 540000000.0
-  },
-  {
-   "symbol": "SWKS",
-   "name": "Skyworks Solutions, Inc. Common Stock",
-   "avg_dollar_volume": 540000000.0
-  },
-  {
-   "symbol": "CSX",
-   "name": "CSX Corporation Common Stock",
-   "avg_dollar_volume": 540000000.0
-  },
-  {
-   "symbol": "EWT",
-   "name": "iShares MSCI Taiwan ETF",
-   "avg_dollar_volume": 540000000.0
-  },
-  {
-   "symbol": "NOC",
-   "name": "Northrop Grumman Corp.",
-   "avg_dollar_volume": 530000000.0
+   "symbol": "SHEL",
+   "name": "Shell plc American Depositary Shares (Each represents two Ordinary shares)",
+   "avg_dollar_volume": 590000000.0
   },
   {
    "symbol": "ORLY",
    "name": "O'Reilly Automotive, Inc. Common Stock",
-   "avg_dollar_volume": 530000000.0
+   "avg_dollar_volume": 590000000.0
   },
   {
-   "symbol": "XLB",
-   "name": "State Street Materials Select Sector SPDR ETF",
-   "avg_dollar_volume": 530000000.0
+   "symbol": "HUM",
+   "name": "Humana Inc.",
+   "avg_dollar_volume": 590000000.0
+  },
+  {
+   "symbol": "ZS",
+   "name": "Zscaler, Inc. Common Stock",
+   "avg_dollar_volume": 590000000.0
+  },
+  {
+   "symbol": "XOP",
+   "name": "State Street SPDR S&P Oil & Gas Exploration & Production ETF",
+   "avg_dollar_volume": 590000000.0
+  },
+  {
+   "symbol": "CB",
+   "name": "Chubb Limited",
+   "avg_dollar_volume": 580000000.0
+  },
+  {
+   "symbol": "TSEM",
+   "name": "Tower Semiconductor Ltd. Ordinary Shares",
+   "avg_dollar_volume": 580000000.0
+  },
+  {
+   "symbol": "NOC",
+   "name": "Northrop Grumman Corp.",
+   "avg_dollar_volume": 580000000.0
+  },
+  {
+   "symbol": "MDB",
+   "name": "MongoDB, Inc. Class A Common Stock",
+   "avg_dollar_volume": 570000000.0
   },
   {
    "symbol": "ICE",
    "name": "Intercontinental Exchange  Inc.",
+   "avg_dollar_volume": 570000000.0
+  },
+  {
+   "symbol": "UAL",
+   "name": "United Airlines Holdings, Inc. Common Stock",
+   "avg_dollar_volume": 560000000.0
+  },
+  {
+   "symbol": "CCL",
+   "name": "Carnival Corporation Ltd.",
+   "avg_dollar_volume": 560000000.0
+  },
+  {
+   "symbol": "TTWO",
+   "name": "Take-Two Interactive Software, Inc. Common Stock",
+   "avg_dollar_volume": 560000000.0
+  },
+  {
+   "symbol": "OXY",
+   "name": "Occidental Petroleum Corporation",
+   "avg_dollar_volume": 560000000.0
+  },
+  {
+   "symbol": "UPS",
+   "name": "United Parcel Service, Inc. Class B",
+   "avg_dollar_volume": 560000000.0
+  },
+  {
+   "symbol": "MSI",
+   "name": "Motorola Solutions, Inc. New",
+   "avg_dollar_volume": 560000000.0
+  },
+  {
+   "symbol": "EXPE",
+   "name": "Expedia Group, Inc. Common Stock",
+   "avg_dollar_volume": 560000000.0
+  },
+  {
+   "symbol": "IJH",
+   "name": "iShares Core S&P Mid-Cap ETF",
+   "avg_dollar_volume": 560000000.0
+  },
+  {
+   "symbol": "BNY",
+   "name": "Bank of New York Mellon Corporation",
+   "avg_dollar_volume": 550000000.0
+  },
+  {
+   "symbol": "HONA",
+   "name": "Honeywell Aerospace Inc. Common Stock",
+   "avg_dollar_volume": 550000000.0
+  },
+  {
+   "symbol": "U",
+   "name": "Unity Software Inc.",
+   "avg_dollar_volume": 540000000.0
+  },
+  {
+   "symbol": "IJR",
+   "name": "iShares Core S&P Small-Cap ETF",
+   "avg_dollar_volume": 540000000.0
+  },
+  {
+   "symbol": "PLD",
+   "name": "PROLOGIS, INC.",
+   "avg_dollar_volume": 540000000.0
+  },
+  {
+   "symbol": "FSLR",
+   "name": "First Solar, Inc. Common Stock",
+   "avg_dollar_volume": 540000000.0
+  },
+  {
+   "symbol": "DAL",
+   "name": "Delta Air Lines, Inc.",
+   "avg_dollar_volume": 540000000.0
+  },
+  {
+   "symbol": "AZO",
+   "name": "AutoZone, Inc.",
+   "avg_dollar_volume": 540000000.0
+  },
+  {
+   "symbol": "XEL",
+   "name": "Xcel Energy Inc. Common Stock",
    "avg_dollar_volume": 530000000.0
   },
   {
-   "symbol": "RBLX",
-   "name": "Roblox Corporation",
+   "symbol": "MDLZ",
+   "name": "Mondelez International, Inc. Class A Common Stock",
+   "avg_dollar_volume": 530000000.0
+  },
+  {
+   "symbol": "DT",
+   "name": "Dynatrace, Inc.",
+   "avg_dollar_volume": 530000000.0
+  },
+  {
+   "symbol": "ROKU",
+   "name": "Roku, Inc. Class A Common Stock",
+   "avg_dollar_volume": 530000000.0
+  },
+  {
+   "symbol": "CDE",
+   "name": "Coeur Mining, Inc.",
+   "avg_dollar_volume": 530000000.0
+  },
+  {
+   "symbol": "STM",
+   "name": "STMicroelectronics N.V.",
+   "avg_dollar_volume": 530000000.0
+  },
+  {
+   "symbol": "F",
+   "name": "Ford Motor Company",
    "avg_dollar_volume": 530000000.0
   },
   {
@@ -1419,238 +1534,318 @@
    "avg_dollar_volume": 530000000.0
   },
   {
-   "symbol": "VALE",
-   "name": "VALE S.A.",
-   "avg_dollar_volume": 520000000.0
-  },
-  {
-   "symbol": "TEAM",
-   "name": "Atlassian Corporation Class A Common Stock",
-   "avg_dollar_volume": 520000000.0
-  },
-  {
-   "symbol": "P",
-   "name": "Everpure, Inc.",
-   "avg_dollar_volume": 520000000.0
-  },
-  {
-   "symbol": "PLD",
-   "name": "PROLOGIS, INC.",
-   "avg_dollar_volume": 520000000.0
-  },
-  {
-   "symbol": "CDE",
-   "name": "Coeur Mining, Inc.",
-   "avg_dollar_volume": 520000000.0
-  },
-  {
-   "symbol": "OXY",
-   "name": "Occidental Petroleum Corporation",
-   "avg_dollar_volume": 520000000.0
-  },
-  {
-   "symbol": "XP",
-   "name": "XP Inc. Class A Common Stock",
-   "avg_dollar_volume": 520000000.0
-  },
-  {
-   "symbol": "BNY",
-   "name": "Bank of New York Mellon Corporation",
-   "avg_dollar_volume": 520000000.0
-  },
-  {
-   "symbol": "CCL",
-   "name": "Carnival Corporation Ltd.",
-   "avg_dollar_volume": 520000000.0
-  },
-  {
-   "symbol": "AZN",
-   "name": "AstraZeneca PLC",
-   "avg_dollar_volume": 520000000.0
-  },
-  {
    "symbol": "KKR",
    "name": "KKR & Co. Inc.",
-   "avg_dollar_volume": 510000000.0
-  },
-  {
-   "symbol": "VUG",
-   "name": "Vanguard Morningstar Growth ETF",
-   "avg_dollar_volume": 510000000.0
-  },
-  {
-   "symbol": "TSEM",
-   "name": "Tower Semiconductor Ltd. Ordinary Shares",
-   "avg_dollar_volume": 510000000.0
-  },
-  {
-   "symbol": "SO",
-   "name": "The Southern Company",
-   "avg_dollar_volume": 510000000.0
+   "avg_dollar_volume": 530000000.0
   },
   {
    "symbol": "AON",
    "name": "Aon plc Class A",
+   "avg_dollar_volume": 530000000.0
+  },
+  {
+   "symbol": "EBAY",
+   "name": "eBay Inc. Common Stock",
+   "avg_dollar_volume": 530000000.0
+  },
+  {
+   "symbol": "ENTG",
+   "name": "Entegris, Inc. Common Stock",
+   "avg_dollar_volume": 520000000.0
+  },
+  {
+   "symbol": "APLD",
+   "name": "Applied Digital Corporation Common Stock",
+   "avg_dollar_volume": 520000000.0
+  },
+  {
+   "symbol": "DUK",
+   "name": "Duke Energy Corporation",
+   "avg_dollar_volume": 520000000.0
+  },
+  {
+   "symbol": "LHX",
+   "name": "L3Harris Technologies, Inc.",
+   "avg_dollar_volume": 520000000.0
+  },
+  {
+   "symbol": "EMR",
+   "name": "Emerson Electric Co.",
+   "avg_dollar_volume": 520000000.0
+  },
+  {
+   "symbol": "MBB",
+   "name": "iShares MBS ETF",
+   "avg_dollar_volume": 520000000.0
+  },
+  {
+   "symbol": "CIFR",
+   "name": "Cipher Digital Inc. Common Stock",
+   "avg_dollar_volume": 520000000.0
+  },
+  {
+   "symbol": "RBLX",
+   "name": "Roblox Corporation",
+   "avg_dollar_volume": 520000000.0
+  },
+  {
+   "symbol": "EQT",
+   "name": "EQT CORP",
+   "avg_dollar_volume": 520000000.0
+  },
+  {
+   "symbol": "CRH",
+   "name": "CRH Public Limited Company",
+   "avg_dollar_volume": 520000000.0
+  },
+  {
+   "symbol": "RKT",
+   "name": "Rocket Companies, Inc.",
+   "avg_dollar_volume": 510000000.0
+  },
+  {
+   "symbol": "KMI",
+   "name": "Kinder Morgan, Inc.",
+   "avg_dollar_volume": 510000000.0
+  },
+  {
+   "symbol": "ALNY",
+   "name": "Alnylam Pharmaceuticals, Inc. Common Stock",
+   "avg_dollar_volume": 510000000.0
+  },
+  {
+   "symbol": "VWO",
+   "name": "Vanguard FTSE Emerging Markets ETF",
+   "avg_dollar_volume": 510000000.0
+  },
+  {
+   "symbol": "MLM",
+   "name": "Martin Marietta Materials",
+   "avg_dollar_volume": 510000000.0
+  },
+  {
+   "symbol": "ROP",
+   "name": "Roper Technologies, Inc. Common Stock",
+   "avg_dollar_volume": 510000000.0
+  },
+  {
+   "symbol": "VT",
+   "name": "Vanguard Total World Stock ETF",
+   "avg_dollar_volume": 510000000.0
+  },
+  {
+   "symbol": "CCI",
+   "name": "Crown Castle Inc.",
+   "avg_dollar_volume": 510000000.0
+  },
+  {
+   "symbol": "ROST",
+   "name": "Ross Stores, Inc. Common Stock",
+   "avg_dollar_volume": 510000000.0
+  },
+  {
+   "symbol": "ECL",
+   "name": "Ecolab, Inc.",
    "avg_dollar_volume": 510000000.0
   },
   {
    "symbol": "TSCO",
    "name": "Tractor Supply Company Common Stock",
-   "avg_dollar_volume": 510000000.0
-  },
-  {
-   "symbol": "MBB",
-   "name": "iShares MBS ETF",
-   "avg_dollar_volume": 510000000.0
-  },
-  {
-   "symbol": "STM",
-   "name": "STMicroelectronics N.V.",
-   "avg_dollar_volume": 510000000.0
-  },
-  {
-   "symbol": "CIFR",
-   "name": "Cipher Digital Inc. Common Stock",
-   "avg_dollar_volume": 510000000.0
-  },
-  {
-   "symbol": "IJH",
-   "name": "iShares Core S&P Mid-Cap ETF",
-   "avg_dollar_volume": 510000000.0
-  },
-  {
-   "symbol": "HONA",
-   "name": "Honeywell Aerospace Inc. Common Stock",
    "avg_dollar_volume": 500000000.0
   },
   {
-   "symbol": "KMB",
-   "name": "Kimberly-Clark Corporation Common Stock",
+   "symbol": "MDY",
+   "name": "State Street SPDR S&P MIDCAP 400 ETF Trust",
    "avg_dollar_volume": 500000000.0
   },
   {
-   "symbol": "CCI",
-   "name": "Crown Castle Inc.",
+   "symbol": "KWEB",
+   "name": "KraneShares CSI China Internet ETF",
    "avg_dollar_volume": 500000000.0
   },
   {
-   "symbol": "VCSH",
-   "name": "Vanguard Short-Term Corporate Bond ETF",
+   "symbol": "MTSI",
+   "name": "MACOM Technology Solutions Holdings, Inc. Common Stock",
    "avg_dollar_volume": 500000000.0
   },
   {
-   "symbol": "NTAP",
-   "name": "NetApp, Inc. Common Stock",
+   "symbol": "SCHB",
+   "name": "Schwab U.S. Broad Market ETF",
    "avg_dollar_volume": 500000000.0
   },
   {
-   "symbol": "F",
-   "name": "Ford Motor Company",
+   "symbol": "DVN",
+   "name": "Devon Energy Corporation",
    "avg_dollar_volume": 500000000.0
   },
   {
-   "symbol": "UPS",
-   "name": "United Parcel Service, Inc. Class B",
+   "symbol": "CI",
+   "name": "The Cigna Group",
    "avg_dollar_volume": 500000000.0
-  },
-  {
-   "symbol": "EQT",
-   "name": "EQT CORP",
-   "avg_dollar_volume": 500000000.0
-  },
-  {
-   "symbol": "KMI",
-   "name": "Kinder Morgan, Inc.",
-   "avg_dollar_volume": 490000000.0
-  },
-  {
-   "symbol": "XOP",
-   "name": "State Street SPDR S&P Oil & Gas Exploration & Production ETF",
-   "avg_dollar_volume": 490000000.0
-  },
-  {
-   "symbol": "HUT",
-   "name": "Hut 8 Corp. Common Stock",
-   "avg_dollar_volume": 480000000.0
-  },
-  {
-   "symbol": "MDLZ",
-   "name": "Mondelez International, Inc. Class A Common Stock",
-   "avg_dollar_volume": 480000000.0
-  },
-  {
-   "symbol": "TTWO",
-   "name": "Take-Two Interactive Software, Inc. Common Stock",
-   "avg_dollar_volume": 480000000.0
-  },
-  {
-   "symbol": "KDP",
-   "name": "Keurig Dr Pepper Inc. Common Stock",
-   "avg_dollar_volume": 480000000.0
-  },
-  {
-   "symbol": "EBAY",
-   "name": "eBay Inc. Common Stock",
-   "avg_dollar_volume": 480000000.0
-  },
-  {
-   "symbol": "TWST",
-   "name": "Twist Bioscience Corporation Common Stock",
-   "avg_dollar_volume": 480000000.0
-  },
-  {
-   "symbol": "MRSH",
-   "name": "Marsh",
-   "avg_dollar_volume": 470000000.0
-  },
-  {
-   "symbol": "DT",
-   "name": "Dynatrace, Inc.",
-   "avg_dollar_volume": 470000000.0
-  },
-  {
-   "symbol": "IJR",
-   "name": "iShares Core S&P Small-Cap ETF",
-   "avg_dollar_volume": 470000000.0
-  },
-  {
-   "symbol": "ROST",
-   "name": "Ross Stores, Inc. Common Stock",
-   "avg_dollar_volume": 470000000.0
-  },
-  {
-   "symbol": "PNC",
-   "name": "PNC Financial Services Group",
-   "avg_dollar_volume": 470000000.0
   },
   {
    "symbol": "VEEV",
    "name": "Veeva Systems Inc.",
-   "avg_dollar_volume": 460000000.0
+   "avg_dollar_volume": 500000000.0
   },
   {
-   "symbol": "AKAM",
-   "name": "Akamai Technologies, Inc. Common Stock",
-   "avg_dollar_volume": 460000000.0
+   "symbol": "TTMI",
+   "name": "TTM Technologies, Inc. Common Stock",
+   "avg_dollar_volume": 500000000.0
   },
   {
-   "symbol": "HL",
-   "name": "Hecla Mining Company",
-   "avg_dollar_volume": 460000000.0
-  },
-  {
-   "symbol": "EMR",
-   "name": "Emerson Electric Co.",
-   "avg_dollar_volume": 460000000.0
-  },
-  {
-   "symbol": "KEYS",
-   "name": "Keysight Technologies, Inc.",
-   "avg_dollar_volume": 460000000.0
+   "symbol": "GDXJ",
+   "name": "VanEck Junior Gold Miners ETF",
+   "avg_dollar_volume": 490000000.0
   },
   {
    "symbol": "DHI",
    "name": "D.R. Horton Inc.",
+   "avg_dollar_volume": 490000000.0
+  },
+  {
+   "symbol": "MRSH",
+   "name": "Marsh",
+   "avg_dollar_volume": 490000000.0
+  },
+  {
+   "symbol": "GD",
+   "name": "General Dynamics Corporation",
+   "avg_dollar_volume": 490000000.0
+  },
+  {
+   "symbol": "AKAM",
+   "name": "Akamai Technologies, Inc. Common Stock",
+   "avg_dollar_volume": 490000000.0
+  },
+  {
+   "symbol": "CL",
+   "name": "Colgate-Palmolive Company",
+   "avg_dollar_volume": 490000000.0
+  },
+  {
+   "symbol": "MCO",
+   "name": "Moody's Corporation",
+   "avg_dollar_volume": 490000000.0
+  },
+  {
+   "symbol": "AEP",
+   "name": "American Electric Power Company, Inc. Common Stock",
+   "avg_dollar_volume": 490000000.0
+  },
+  {
+   "symbol": "AXON",
+   "name": "Axon Enterprise, Inc. Common Stock",
+   "avg_dollar_volume": 490000000.0
+  },
+  {
+   "symbol": "VCSH",
+   "name": "Vanguard Short-Term Corporate Bond ETF",
+   "avg_dollar_volume": 490000000.0
+  },
+  {
+   "symbol": "AJG",
+   "name": "Arthur J. Gallagher & Co.",
+   "avg_dollar_volume": 490000000.0
+  },
+  {
+   "symbol": "BKR",
+   "name": "Baker Hughes Company Class A Common Stock",
+   "avg_dollar_volume": 480000000.0
+  },
+  {
+   "symbol": "VXUS",
+   "name": "Vanguard STAR Funds Vanguard Total International Stock ETF",
+   "avg_dollar_volume": 480000000.0
+  },
+  {
+   "symbol": "XYZ",
+   "name": "Block, Inc.",
+   "avg_dollar_volume": 480000000.0
+  },
+  {
+   "symbol": "TEL",
+   "name": "TE Connectivity plc",
+   "avg_dollar_volume": 480000000.0
+  },
+  {
+   "symbol": "APO",
+   "name": "Apollo Global Management, Inc.",
+   "avg_dollar_volume": 480000000.0
+  },
+  {
+   "symbol": "ETHA",
+   "name": "iShares Ethereum Trust ETF Shares",
+   "avg_dollar_volume": 480000000.0
+  },
+  {
+   "symbol": "COR",
+   "name": "Cencora, Inc.",
+   "avg_dollar_volume": 480000000.0
+  },
+  {
+   "symbol": "CAH",
+   "name": "Cardinal Health, Inc.",
+   "avg_dollar_volume": 480000000.0
+  },
+  {
+   "symbol": "ADSK",
+   "name": "Autodesk, Inc. Common Stock",
+   "avg_dollar_volume": 480000000.0
+  },
+  {
+   "symbol": "CART",
+   "name": "Maplebear Inc. Common Stock",
+   "avg_dollar_volume": 470000000.0
+  },
+  {
+   "symbol": "KEYS",
+   "name": "Keysight Technologies, Inc.",
+   "avg_dollar_volume": 470000000.0
+  },
+  {
+   "symbol": "MNST",
+   "name": "Monster Beverage Corporation",
+   "avg_dollar_volume": 470000000.0
+  },
+  {
+   "symbol": "WDAY",
+   "name": "Workday, Inc. Class A Common Stock",
+   "avg_dollar_volume": 470000000.0
+  },
+  {
+   "symbol": "DLR",
+   "name": "Digital Realty Trust, Inc.",
+   "avg_dollar_volume": 470000000.0
+  },
+  {
+   "symbol": "WAT",
+   "name": "Waters Corp",
+   "avg_dollar_volume": 470000000.0
+  },
+  {
+   "symbol": "EOG",
+   "name": "EOG Resources, Inc.",
+   "avg_dollar_volume": 470000000.0
+  },
+  {
+   "symbol": "HUT",
+   "name": "Hut 8 Corp. Common Stock",
+   "avg_dollar_volume": 470000000.0
+  },
+  {
+   "symbol": "FAST",
+   "name": "Fastenal Company Common Stock",
+   "avg_dollar_volume": 470000000.0
+  },
+  {
+   "symbol": "USB",
+   "name": "U.S. Bancorp",
+   "avg_dollar_volume": 460000000.0
+  },
+  {
+   "symbol": "JEPQ",
+   "name": "J.P. Morgan Exchange-Traded Fund Trust JPMorgan Nasdaq Equity Premium Income ETF",
    "avg_dollar_volume": 460000000.0
   },
   {
@@ -1659,28 +1854,38 @@
    "avg_dollar_volume": 460000000.0
   },
   {
-   "symbol": "TTMI",
-   "name": "TTM Technologies, Inc. Common Stock",
+   "symbol": "CTAS",
+   "name": "Cintas Corporation Common Stock",
+   "avg_dollar_volume": 460000000.0
+  },
+  {
+   "symbol": "PDD",
+   "name": "PDD Holdings Inc. American Depositary Shares",
+   "avg_dollar_volume": 460000000.0
+  },
+  {
+   "symbol": "PTC",
+   "name": "PTC Inc. Common Stock",
+   "avg_dollar_volume": 460000000.0
+  },
+  {
+   "symbol": "PNC",
+   "name": "PNC Financial Services Group",
+   "avg_dollar_volume": 460000000.0
+  },
+  {
+   "symbol": "FDX",
+   "name": "FedEx Corporation",
    "avg_dollar_volume": 450000000.0
   },
   {
-   "symbol": "MTSI",
-   "name": "MACOM Technology Solutions Holdings, Inc. Common Stock",
+   "symbol": "CTSH",
+   "name": "Cognizant Technology Solutions Corporation Class A Common Stock",
    "avg_dollar_volume": 450000000.0
   },
   {
-   "symbol": "DUK",
-   "name": "Duke Energy Corporation",
-   "avg_dollar_volume": 450000000.0
-  },
-  {
-   "symbol": "MDY",
-   "name": "State Street SPDR S&P MIDCAP 400 ETF Trust",
-   "avg_dollar_volume": 450000000.0
-  },
-  {
-   "symbol": "TEL",
-   "name": "TE Connectivity plc",
+   "symbol": "ALL",
+   "name": "The Allstate Corporation",
    "avg_dollar_volume": 450000000.0
   },
   {
@@ -1689,93 +1894,78 @@
    "avg_dollar_volume": 450000000.0
   },
   {
-   "symbol": "GD",
-   "name": "General Dynamics Corporation",
-   "avg_dollar_volume": 450000000.0
-  },
-  {
-   "symbol": "LHX",
-   "name": "L3Harris Technologies, Inc.",
-   "avg_dollar_volume": 450000000.0
-  },
-  {
-   "symbol": "CL",
-   "name": "Colgate-Palmolive Company",
-   "avg_dollar_volume": 450000000.0
-  },
-  {
-   "symbol": "USB",
-   "name": "U.S. Bancorp",
-   "avg_dollar_volume": 440000000.0
-  },
-  {
-   "symbol": "VWO",
-   "name": "Vanguard FTSE Emerging Markets ETF",
-   "avg_dollar_volume": 440000000.0
-  },
-  {
-   "symbol": "ENTG",
-   "name": "Entegris, Inc. Common Stock",
-   "avg_dollar_volume": 440000000.0
-  },
-  {
    "symbol": "O",
    "name": "Realty Income Corporation",
-   "avg_dollar_volume": 440000000.0
+   "avg_dollar_volume": 450000000.0
   },
   {
    "symbol": "SHV",
    "name": "iShares Trust iShares 0-1 Year Treasury Bond ETF",
+   "avg_dollar_volume": 450000000.0
+  },
+  {
+   "symbol": "ACWI",
+   "name": "iShares MSCI ACWI ETF",
+   "avg_dollar_volume": 450000000.0
+  },
+  {
+   "symbol": "VALE",
+   "name": "VALE S.A.",
    "avg_dollar_volume": 440000000.0
   },
   {
-   "symbol": "ALNY",
-   "name": "Alnylam Pharmaceuticals, Inc. Common Stock",
+   "symbol": "NVO",
+   "name": "Novo-Nordisk A/S",
    "avg_dollar_volume": 440000000.0
   },
   {
-   "symbol": "CRH",
-   "name": "CRH Public Limited Company",
+   "symbol": "SCHX",
+   "name": "Schwab U.S. Large- Cap ETF",
    "avg_dollar_volume": 440000000.0
   },
   {
-   "symbol": "WDAY",
-   "name": "Workday, Inc. Class A Common Stock",
+   "symbol": "NVT",
+   "name": "nVent Electric plc Ordinary Shares",
    "avg_dollar_volume": 440000000.0
   },
   {
-   "symbol": "MCO",
-   "name": "Moody's Corporation",
+   "symbol": "ROK",
+   "name": "Rockwell Automation, Inc.",
    "avg_dollar_volume": 440000000.0
   },
   {
-   "symbol": "VXUS",
-   "name": "Vanguard STAR Funds Vanguard Total International Stock ETF",
+   "symbol": "NTAP",
+   "name": "NetApp, Inc. Common Stock",
    "avg_dollar_volume": 440000000.0
   },
   {
-   "symbol": "PCG",
-   "name": "PG&E Corporation",
+   "symbol": "P",
+   "name": "Everpure, Inc.",
    "avg_dollar_volume": 440000000.0
   },
   {
-   "symbol": "VT",
-   "name": "Vanguard Total World Stock ETF",
+   "symbol": "HL",
+   "name": "Hecla Mining Company",
+   "avg_dollar_volume": 440000000.0
+  },
+  {
+   "symbol": "EW",
+   "name": "Edwards Lifesciences Corp",
    "avg_dollar_volume": 430000000.0
   },
   {
-   "symbol": "ARGX",
-   "name": "argenx SE American Depositary Shares",
+   "symbol": "IDXX",
+   "name": "IDEXX Laboratories, Inc. Common Stock",
    "avg_dollar_volume": 430000000.0
   },
   {
-   "symbol": "DVN",
-   "name": "Devon Energy Corporation",
+   "symbol": "VCLT",
+   "name": "Vanguard Long-Term Corporate Bond ETF",
    "avg_dollar_volume": 430000000.0
   },
   {
-   "symbol": "SCHB",
-   "name": "Schwab U.S. Broad Market ETF",
+   "symbol": "CRL",
+   "name": "Charles River Laboratories International, Inc.",
    "avg_dollar_volume": 430000000.0
   },
   {
@@ -1784,138 +1974,123 @@
    "avg_dollar_volume": 430000000.0
   },
   {
-   "symbol": "AEP",
-   "name": "American Electric Power Company, Inc. Common Stock",
+   "symbol": "IBKR",
+   "name": "Interactive Brokers Group, Inc. Class A Common Stock",
    "avg_dollar_volume": 430000000.0
   },
   {
-   "symbol": "FAST",
-   "name": "Fastenal Company Common Stock",
+   "symbol": "FOXA",
+   "name": "Fox Corporation Class A Common Stock",
    "avg_dollar_volume": 430000000.0
-  },
-  {
-   "symbol": "CI",
-   "name": "The Cigna Group",
-   "avg_dollar_volume": 420000000.0
-  },
-  {
-   "symbol": "CTSH",
-   "name": "Cognizant Technology Solutions Corporation Class A Common Stock",
-   "avg_dollar_volume": 420000000.0
-  },
-  {
-   "symbol": "RKT",
-   "name": "Rocket Companies, Inc.",
-   "avg_dollar_volume": 420000000.0
-  },
-  {
-   "symbol": "ITUB",
-   "name": "Itau Unibanco Holding S.A. American Depositary Shares",
-   "avg_dollar_volume": 420000000.0
-  },
-  {
-   "symbol": "WAT",
-   "name": "Waters Corp",
-   "avg_dollar_volume": 420000000.0
-  },
-  {
-   "symbol": "ADSK",
-   "name": "Autodesk, Inc. Common Stock",
-   "avg_dollar_volume": 420000000.0
-  },
-  {
-   "symbol": "MSI",
-   "name": "Motorola Solutions, Inc. New",
-   "avg_dollar_volume": 420000000.0
-  },
-  {
-   "symbol": "ECL",
-   "name": "Ecolab, Inc.",
-   "avg_dollar_volume": 420000000.0
-  },
-  {
-   "symbol": "CART",
-   "name": "Maplebear Inc. Common Stock",
-   "avg_dollar_volume": 420000000.0
-  },
-  {
-   "symbol": "XEL",
-   "name": "Xcel Energy Inc. Common Stock",
-   "avg_dollar_volume": 420000000.0
-  },
-  {
-   "symbol": "GDXJ",
-   "name": "VanEck Junior Gold Miners ETF",
-   "avg_dollar_volume": 420000000.0
-  },
-  {
-   "symbol": "NVO",
-   "name": "Novo-Nordisk A/S",
-   "avg_dollar_volume": 410000000.0
-  },
-  {
-   "symbol": "PDD",
-   "name": "PDD Holdings Inc. American Depositary Shares",
-   "avg_dollar_volume": 410000000.0
-  },
-  {
-   "symbol": "CTAS",
-   "name": "Cintas Corporation Common Stock",
-   "avg_dollar_volume": 410000000.0
-  },
-  {
-   "symbol": "APO",
-   "name": "Apollo Global Management, Inc.",
-   "avg_dollar_volume": 410000000.0
-  },
-  {
-   "symbol": "MLM",
-   "name": "Martin Marietta Materials",
-   "avg_dollar_volume": 410000000.0
-  },
-  {
-   "symbol": "CAH",
-   "name": "Cardinal Health, Inc.",
-   "avg_dollar_volume": 410000000.0
-  },
-  {
-   "symbol": "ALL",
-   "name": "The Allstate Corporation",
-   "avg_dollar_volume": 410000000.0
   },
   {
    "symbol": "ECHO",
    "name": "EchoStar Corporation Common Stock",
+   "avg_dollar_volume": 430000000.0
+  },
+  {
+   "symbol": "FANG",
+   "name": "Diamondback Energy, Inc. Common Stock",
+   "avg_dollar_volume": 430000000.0
+  },
+  {
+   "symbol": "FN",
+   "name": "Fabrinet",
+   "avg_dollar_volume": 420000000.0
+  },
+  {
+   "symbol": "RVMD",
+   "name": "Revolution Medicines, Inc. Common Stock",
+   "avg_dollar_volume": 420000000.0
+  },
+  {
+   "symbol": "MSCI",
+   "name": "MSCI, Inc.",
+   "avg_dollar_volume": 420000000.0
+  },
+  {
+   "symbol": "JPST",
+   "name": "JPMorgan Ultra-Short Income ETF",
+   "avg_dollar_volume": 420000000.0
+  },
+  {
+   "symbol": "EWJ",
+   "name": "iShares MSCI Japan ETF",
+   "avg_dollar_volume": 420000000.0
+  },
+  {
+   "symbol": "FFIV",
+   "name": "F5, Inc. Common Stock",
+   "avg_dollar_volume": 420000000.0
+  },
+  {
+   "symbol": "WCN",
+   "name": "Waste Connections, Inc.",
+   "avg_dollar_volume": 420000000.0
+  },
+  {
+   "symbol": "ASX",
+   "name": "ASE Technology Holding Co., Ltd.",
+   "avg_dollar_volume": 420000000.0
+  },
+  {
+   "symbol": "TDG",
+   "name": "TransDigm Group Incorporated",
+   "avg_dollar_volume": 420000000.0
+  },
+  {
+   "symbol": "HPQ",
+   "name": "HP Inc.",
+   "avg_dollar_volume": 420000000.0
+  },
+  {
+   "symbol": "DXCM",
+   "name": "DexCom, Inc. Common Stock",
+   "avg_dollar_volume": 420000000.0
+  },
+  {
+   "symbol": "LYV",
+   "name": "Live Nation Entertainment Inc.",
+   "avg_dollar_volume": 420000000.0
+  },
+  {
+   "symbol": "BRZE",
+   "name": "Braze, Inc. Class A Common Stock",
    "avg_dollar_volume": 410000000.0
   },
   {
-   "symbol": "MNST",
-   "name": "Monster Beverage Corporation",
+   "symbol": "XRT",
+   "name": "State Street SPDR S&P Retail ETF",
    "avg_dollar_volume": 410000000.0
   },
   {
-   "symbol": "AXON",
-   "name": "Axon Enterprise, Inc. Common Stock",
+   "symbol": "GKOS",
+   "name": "Glaukos Corporation",
    "avg_dollar_volume": 410000000.0
   },
   {
-   "symbol": "JEPQ",
-   "name": "J.P. Morgan Exchange-Traded Fund Trust JPMorgan Nasdaq Equity Premium Income ETF",
+   "symbol": "PCAR",
+   "name": "PACCAR Inc. Common Stock",
+   "avg_dollar_volume": 410000000.0
+  },
+  {
+   "symbol": "EL",
+   "name": "The Estee Lauder Companies Inc. Class A",
+   "avg_dollar_volume": 410000000.0
+  },
+  {
+   "symbol": "CRS",
+   "name": "Carpenter Technology Corp",
    "avg_dollar_volume": 410000000.0
   },
   {
    "symbol": "VNQ",
    "name": "Vanguard Real Estate ETF",
-   "avg_dollar_volume": 400000000.0
+   "avg_dollar_volume": 410000000.0
   },
   {
-   "symbol": "JPST",
-   "name": "JPMorgan Ultra-Short Income ETF",
-   "avg_dollar_volume": 400000000.0
-  },
-  {
-   "symbol": "BKR",
-   "name": "Baker Hughes Company Class A Common Stock",
+   "symbol": "NUE",
+   "name": "Nucor Corporation",
    "avg_dollar_volume": 400000000.0
   },
   {
@@ -1924,13 +2099,33 @@
    "avg_dollar_volume": 400000000.0
   },
   {
-   "symbol": "CTVA",
-   "name": "Corteva, Inc. Common Stock",
+   "symbol": "ITW",
+   "name": "Illinois Tool Works Inc.",
    "avg_dollar_volume": 400000000.0
   },
   {
-   "symbol": "EOG",
-   "name": "EOG Resources, Inc.",
+   "symbol": "XP",
+   "name": "XP Inc. Class A Common Stock",
+   "avg_dollar_volume": 400000000.0
+  },
+  {
+   "symbol": "STRL",
+   "name": "Sterling Infrastructure, Inc. Common Stock",
+   "avg_dollar_volume": 400000000.0
+  },
+  {
+   "symbol": "SPYG",
+   "name": "State Street SPDR Portfolio S&P 500 Growth ETF",
+   "avg_dollar_volume": 400000000.0
+  },
+  {
+   "symbol": "CNC",
+   "name": "Centene Corporation",
+   "avg_dollar_volume": 400000000.0
+  },
+  {
+   "symbol": "PCG",
+   "name": "PG&E Corporation",
    "avg_dollar_volume": 400000000.0
   },
   {
@@ -1939,218 +2134,143 @@
    "avg_dollar_volume": 400000000.0
   },
   {
-   "symbol": "FANG",
-   "name": "Diamondback Energy, Inc. Common Stock",
-   "avg_dollar_volume": 400000000.0
-  },
-  {
-   "symbol": "AJG",
-   "name": "Arthur J. Gallagher & Co.",
-   "avg_dollar_volume": 400000000.0
-  },
-  {
-   "symbol": "CRL",
-   "name": "Charles River Laboratories International, Inc.",
-   "avg_dollar_volume": 400000000.0
-  },
-  {
-   "symbol": "EXPE",
-   "name": "Expedia Group, Inc. Common Stock",
-   "avg_dollar_volume": 400000000.0
-  },
-  {
-   "symbol": "NVT",
-   "name": "nVent Electric plc Ordinary Shares",
-   "avg_dollar_volume": 400000000.0
-  },
-  {
-   "symbol": "HPQ",
-   "name": "HP Inc.",
+   "symbol": "AME",
+   "name": "Ametek, Inc.",
    "avg_dollar_volume": 390000000.0
   },
   {
-   "symbol": "TDG",
-   "name": "TransDigm Group Incorporated",
+   "symbol": "FISV",
+   "name": "Fiserv, Inc. Common Stock",
    "avg_dollar_volume": 390000000.0
-  },
-  {
-   "symbol": "KWEB",
-   "name": "KraneShares CSI China Internet ETF",
-   "avg_dollar_volume": 390000000.0
-  },
-  {
-   "symbol": "KVUE",
-   "name": "Kenvue Inc.",
-   "avg_dollar_volume": 390000000.0
-  },
-  {
-   "symbol": "DXCM",
-   "name": "DexCom, Inc. Common Stock",
-   "avg_dollar_volume": 390000000.0
-  },
-  {
-   "symbol": "FITB",
-   "name": "Fifth Third Bancorp",
-   "avg_dollar_volume": 390000000.0
-  },
-  {
-   "symbol": "ACWI",
-   "name": "iShares MSCI ACWI ETF",
-   "avg_dollar_volume": 390000000.0
-  },
-  {
-   "symbol": "VCLT",
-   "name": "Vanguard Long-Term Corporate Bond ETF",
-   "avg_dollar_volume": 390000000.0
-  },
-  {
-   "symbol": "FN",
-   "name": "Fabrinet",
-   "avg_dollar_volume": 390000000.0
-  },
-  {
-   "symbol": "ROP",
-   "name": "Roper Technologies, Inc. Common Stock",
-   "avg_dollar_volume": 390000000.0
-  },
-  {
-   "symbol": "LULU",
-   "name": "lululemon athletica inc. Common Stock",
-   "avg_dollar_volume": 390000000.0
-  },
-  {
-   "symbol": "DLR",
-   "name": "Digital Realty Trust, Inc.",
-   "avg_dollar_volume": 390000000.0
-  },
-  {
-   "symbol": "UTHR",
-   "name": "United Therapeutics Corporation Common Stock",
-   "avg_dollar_volume": 380000000.0
-  },
-  {
-   "symbol": "FDX",
-   "name": "FedEx Corporation",
-   "avg_dollar_volume": 380000000.0
-  },
-  {
-   "symbol": "RBRK",
-   "name": "Rubrik, Inc.",
-   "avg_dollar_volume": 380000000.0
-  },
-  {
-   "symbol": "IBB",
-   "name": "iShares Biotechnology ETF",
-   "avg_dollar_volume": 380000000.0
-  },
-  {
-   "symbol": "STT",
-   "name": "State Street Corporation",
-   "avg_dollar_volume": 380000000.0
-  },
-  {
-   "symbol": "COR",
-   "name": "Cencora, Inc.",
-   "avg_dollar_volume": 380000000.0
-  },
-  {
-   "symbol": "FFIV",
-   "name": "F5, Inc. Common Stock",
-   "avg_dollar_volume": 380000000.0
   },
   {
    "symbol": "INSM",
    "name": "Insmed Incorporated Common Stock",
+   "avg_dollar_volume": 390000000.0
+  },
+  {
+   "symbol": "FTAI",
+   "name": "FTAI Aviation Ltd. Common Stock",
+   "avg_dollar_volume": 390000000.0
+  },
+  {
+   "symbol": "SWKS",
+   "name": "Skyworks Solutions, Inc. Common Stock",
+   "avg_dollar_volume": 390000000.0
+  },
+  {
+   "symbol": "IBB",
+   "name": "iShares Biotechnology ETF",
+   "avg_dollar_volume": 390000000.0
+  },
+  {
+   "symbol": "RBRK",
+   "name": "Rubrik, Inc.",
+   "avg_dollar_volume": 390000000.0
+  },
+  {
+   "symbol": "RIVN",
+   "name": "Rivian Automotive, Inc. Class A Common Stock",
+   "avg_dollar_volume": 390000000.0
+  },
+  {
+   "symbol": "YUM",
+   "name": "Yum! Brands, Inc.",
+   "avg_dollar_volume": 390000000.0
+  },
+  {
+   "symbol": "OTIS",
+   "name": "Otis Worldwide Corporation",
    "avg_dollar_volume": 380000000.0
   },
   {
-   "symbol": "PCAR",
-   "name": "PACCAR Inc. Common Stock",
+   "symbol": "IQV",
+   "name": "IQVIA Holdings Inc.",
    "avg_dollar_volume": 380000000.0
   },
   {
-   "symbol": "SPTL",
-   "name": "State Street SPDR Portfolio Long Term Treasury ETF",
+   "symbol": "GWW",
+   "name": "W.W. Grainger, Inc.",
+   "avg_dollar_volume": 380000000.0
+  },
+  {
+   "symbol": "DOCN",
+   "name": "DigitalOcean Holdings, Inc.",
+   "avg_dollar_volume": 380000000.0
+  },
+  {
+   "symbol": "TRGP",
+   "name": "Targa Resources Corp.",
+   "avg_dollar_volume": 380000000.0
+  },
+  {
+   "symbol": "FITB",
+   "name": "Fifth Third Bancorp",
+   "avg_dollar_volume": 380000000.0
+  },
+  {
+   "symbol": "EXC",
+   "name": "Exelon Corporation Common Stock",
    "avg_dollar_volume": 380000000.0
   },
   {
    "symbol": "KEY",
    "name": "KeyCorp",
+   "avg_dollar_volume": 380000000.0
+  },
+  {
+   "symbol": "BDX",
+   "name": "Becton, Dickinson and Co.",
    "avg_dollar_volume": 370000000.0
   },
   {
-   "symbol": "CRS",
-   "name": "Carpenter Technology Corp",
+   "symbol": "ODFL",
+   "name": "Old Dominion Freight Line, Inc. Common Stock",
    "avg_dollar_volume": 370000000.0
   },
   {
-   "symbol": "ITW",
-   "name": "Illinois Tool Works Inc.",
+   "symbol": "RIOT",
+   "name": "Riot Platforms, Inc. Common Stock",
    "avg_dollar_volume": 370000000.0
   },
   {
-   "symbol": "ROK",
-   "name": "Rockwell Automation, Inc.",
+   "symbol": "NDAQ",
+   "name": "Nasdaq, Inc. Common Stock",
    "avg_dollar_volume": 370000000.0
   },
   {
-   "symbol": "JNK",
-   "name": "State Street SPDR Bloomberg High Yield Bond ETF",
+   "symbol": "VMC",
+   "name": "Vulcan Materials Company(Holding Company)",
    "avg_dollar_volume": 370000000.0
   },
   {
-   "symbol": "WCN",
-   "name": "Waste Connections, Inc.",
+   "symbol": "NCLH",
+   "name": "Norwegian Cruise Line Holdings Ltd. Ordinary Shares",
    "avg_dollar_volume": 370000000.0
   },
   {
-   "symbol": "HBAN",
-   "name": "Huntington Bancshares Incorporated Common Stock",
+   "symbol": "STT",
+   "name": "State Street Corporation",
    "avg_dollar_volume": 370000000.0
   },
   {
-   "symbol": "RVMD",
-   "name": "Revolution Medicines, Inc. Common Stock",
+   "symbol": "IR",
+   "name": "Ingersoll Rand Inc. Common Stock",
    "avg_dollar_volume": 370000000.0
   },
   {
-   "symbol": "VYLR",
-   "name": "Vylor Inc.",
+   "symbol": "CPRT",
+   "name": "Copart, Inc. (DE) Common Stock",
    "avg_dollar_volume": 370000000.0
   },
   {
-   "symbol": "SCHX",
-   "name": "Schwab U.S. Large- Cap ETF",
+   "symbol": "SITM",
+   "name": "SiTime Corporation Common Stock",
    "avg_dollar_volume": 370000000.0
   },
   {
-   "symbol": "IQV",
-   "name": "IQVIA Holdings Inc.",
-   "avg_dollar_volume": 370000000.0
-  },
-  {
-   "symbol": "LEN",
-   "name": "Lennar Corporation Class A",
-   "avg_dollar_volume": 370000000.0
-  },
-  {
-   "symbol": "U",
-   "name": "Unity Software Inc.",
-   "avg_dollar_volume": 370000000.0
-  },
-  {
-   "symbol": "FSLR",
-   "name": "First Solar, Inc. Common Stock",
-   "avg_dollar_volume": 360000000.0
-  },
-  {
-   "symbol": "JBL",
-   "name": "Jabil Inc.",
-   "avg_dollar_volume": 360000000.0
-  },
-  {
-   "symbol": "JAAA",
-   "name": "Janus Henderson AAA CLO ETF",
+   "symbol": "MDLN",
+   "name": "Medline Inc. Class A common stock",
    "avg_dollar_volume": 360000000.0
   },
   {
@@ -2159,138 +2279,183 @@
    "avg_dollar_volume": 360000000.0
   },
   {
-   "symbol": "MSCI",
-   "name": "MSCI, Inc.",
+   "symbol": "NRG",
+   "name": "NRG Energy, Inc.",
    "avg_dollar_volume": 360000000.0
   },
   {
-   "symbol": "ODFL",
-   "name": "Old Dominion Freight Line, Inc. Common Stock",
+   "symbol": "ARGX",
+   "name": "argenx SE American Depositary Shares",
    "avg_dollar_volume": 360000000.0
-  },
-  {
-   "symbol": "IBKR",
-   "name": "Interactive Brokers Group, Inc. Class A Common Stock",
-   "avg_dollar_volume": 360000000.0
-  },
-  {
-   "symbol": "ASX",
-   "name": "ASE Technology Holding Co., Ltd.",
-   "avg_dollar_volume": 360000000.0
-  },
-  {
-   "symbol": "EWJ",
-   "name": "iShares MSCI Japan ETF",
-   "avg_dollar_volume": 360000000.0
-  },
-  {
-   "symbol": "ROKU",
-   "name": "Roku, Inc. Class A Common Stock",
-   "avg_dollar_volume": 350000000.0
-  },
-  {
-   "symbol": "PENG",
-   "name": "Penguin Solutions, Inc. Common Stock",
-   "avg_dollar_volume": 350000000.0
-  },
-  {
-   "symbol": "YUM",
-   "name": "Yum! Brands, Inc.",
-   "avg_dollar_volume": 350000000.0
-  },
-  {
-   "symbol": "PATH",
-   "name": "UiPath, Inc.",
-   "avg_dollar_volume": 350000000.0
-  },
-  {
-   "symbol": "IR",
-   "name": "Ingersoll Rand Inc. Common Stock",
-   "avg_dollar_volume": 350000000.0
-  },
-  {
-   "symbol": "STRL",
-   "name": "Sterling Infrastructure, Inc. Common Stock",
-   "avg_dollar_volume": 350000000.0
-  },
-  {
-   "symbol": "CHRW",
-   "name": "C.H. Robinson Worldwide, Inc. Common Stock",
-   "avg_dollar_volume": 350000000.0
-  },
-  {
-   "symbol": "BRZE",
-   "name": "Braze, Inc. Class A Common Stock",
-   "avg_dollar_volume": 350000000.0
-  },
-  {
-   "symbol": "XYZ",
-   "name": "Block, Inc.",
-   "avg_dollar_volume": 350000000.0
-  },
-  {
-   "symbol": "STZ",
-   "name": "Constellation Brands, Inc.",
-   "avg_dollar_volume": 350000000.0
-  },
-  {
-   "symbol": "NCLH",
-   "name": "Norwegian Cruise Line Holdings Ltd. Ordinary Shares",
-   "avg_dollar_volume": 350000000.0
-  },
-  {
-   "symbol": "VTR",
-   "name": "Ventas, Inc.",
-   "avg_dollar_volume": 340000000.0
-  },
-  {
-   "symbol": "CBRE",
-   "name": "CBRE GROUP, INC.",
-   "avg_dollar_volume": 340000000.0
-  },
-  {
-   "symbol": "DKS",
-   "name": "Dick's Sporting Goods, Inc.",
-   "avg_dollar_volume": 340000000.0
-  },
-  {
-   "symbol": "XLRE",
-   "name": "State Street Real Estate Select Sector SPDR ETF",
-   "avg_dollar_volume": 340000000.0
-  },
-  {
-   "symbol": "LPLA",
-   "name": "LPL Financial Holdings Inc. Common Stock",
-   "avg_dollar_volume": 340000000.0
   },
   {
    "symbol": "EFX",
    "name": "Equifax, Incorporated",
-   "avg_dollar_volume": 340000000.0
+   "avg_dollar_volume": 360000000.0
+  },
+  {
+   "symbol": "IAU",
+   "name": "iShares Gold Trust",
+   "avg_dollar_volume": 360000000.0
+  },
+  {
+   "symbol": "AEM",
+   "name": "Agnico Eagle Mines Ltd.",
+   "avg_dollar_volume": 360000000.0
+  },
+  {
+   "symbol": "SPTL",
+   "name": "State Street SPDR Portfolio Long Term Treasury Index ETF",
+   "avg_dollar_volume": 360000000.0
+  },
+  {
+   "symbol": "HBAN",
+   "name": "Huntington Bancshares Incorporated Common Stock",
+   "avg_dollar_volume": 360000000.0
+  },
+  {
+   "symbol": "CBRE",
+   "name": "CBRE GROUP, INC.",
+   "avg_dollar_volume": 360000000.0
+  },
+  {
+   "symbol": "JBL",
+   "name": "Jabil Inc.",
+   "avg_dollar_volume": 360000000.0
+  },
+  {
+   "symbol": "ZTS",
+   "name": "ZOETIS INC.",
+   "avg_dollar_volume": 360000000.0
+  },
+  {
+   "symbol": "CNP",
+   "name": "CenterPoint Energy, Inc.",
+   "avg_dollar_volume": 360000000.0
+  },
+  {
+   "symbol": "XLRE",
+   "name": "State Street Real Estate Select Sector SPDR ETF",
+   "avg_dollar_volume": 360000000.0
+  },
+  {
+   "symbol": "RMD",
+   "name": "ResMed Inc.",
+   "avg_dollar_volume": 360000000.0
+  },
+  {
+   "symbol": "EME",
+   "name": "EMCOR Group, Inc.",
+   "avg_dollar_volume": 360000000.0
   },
   {
    "symbol": "CLF",
    "name": "Cleveland-Cliffs Inc.",
-   "avg_dollar_volume": 340000000.0
+   "avg_dollar_volume": 360000000.0
   },
   {
-   "symbol": "NUE",
-   "name": "Nucor Corporation",
-   "avg_dollar_volume": 340000000.0
+   "symbol": "LPLA",
+   "name": "LPL Financial Holdings Inc. Common Stock",
+   "avg_dollar_volume": 350000000.0
   },
   {
-   "symbol": "OTIS",
-   "name": "Otis Worldwide Corporation",
-   "avg_dollar_volume": 340000000.0
+   "symbol": "LULU",
+   "name": "lululemon athletica inc. Common Stock",
+   "avg_dollar_volume": 350000000.0
+  },
+  {
+   "symbol": "MTD",
+   "name": "Mettler-Toledo International",
+   "avg_dollar_volume": 350000000.0
+  },
+  {
+   "symbol": "JAAA",
+   "name": "Janus Henderson AAA CLO ETF",
+   "avg_dollar_volume": 350000000.0
+  },
+  {
+   "symbol": "TYL",
+   "name": "Tyler Technologies, Inc.",
+   "avg_dollar_volume": 350000000.0
   },
   {
    "symbol": "HAL",
    "name": "Halliburton Company",
+   "avg_dollar_volume": 350000000.0
+  },
+  {
+   "symbol": "SRE",
+   "name": "Sempra",
+   "avg_dollar_volume": 350000000.0
+  },
+  {
+   "symbol": "MTZ",
+   "name": "MasTec, Inc.",
+   "avg_dollar_volume": 350000000.0
+  },
+  {
+   "symbol": "CARR",
+   "name": "Carrier Global Corporation",
+   "avg_dollar_volume": 350000000.0
+  },
+  {
+   "symbol": "CNQ",
+   "name": "Canadian Natural Resources Limited",
+   "avg_dollar_volume": 350000000.0
+  },
+  {
+   "symbol": "SCHG",
+   "name": "Schwab U.S. Large-Cap Growth ETF",
+   "avg_dollar_volume": 350000000.0
+  },
+  {
+   "symbol": "SPMO",
+   "name": "Invesco S&P 500 Momentum ETF",
+   "avg_dollar_volume": 350000000.0
+  },
+  {
+   "symbol": "MKSI",
+   "name": "MKS Inc. Common Stock",
+   "avg_dollar_volume": 350000000.0
+  },
+  {
+   "symbol": "LEN",
+   "name": "Lennar Corporation Class A",
+   "avg_dollar_volume": 350000000.0
+  },
+  {
+   "symbol": "HUBB",
+   "name": "Hubbell Incorporated",
+   "avg_dollar_volume": 350000000.0
+  },
+  {
+   "symbol": "JNK",
+   "name": "State Street SPDR Bloomberg High Yield Bond ETF",
    "avg_dollar_volume": 340000000.0
   },
   {
-   "symbol": "RIVN",
-   "name": "Rivian Automotive, Inc. Class A Common Stock",
+   "symbol": "ONON",
+   "name": "On Holding AG",
+   "avg_dollar_volume": 340000000.0
+  },
+  {
+   "symbol": "WEC",
+   "name": "WEC Energy Group, Inc.",
+   "avg_dollar_volume": 340000000.0
+  },
+  {
+   "symbol": "GH",
+   "name": "Guardant Health, Inc. Common Stock",
+   "avg_dollar_volume": 340000000.0
+  },
+  {
+   "symbol": "SHY",
+   "name": "iShares 1-3 Year Treasury Bond ETF",
+   "avg_dollar_volume": 340000000.0
+  },
+  {
+   "symbol": "TWST",
+   "name": "Twist Bioscience Corporation Common Stock",
    "avg_dollar_volume": 340000000.0
   },
   {
@@ -2299,209 +2464,44 @@
    "avg_dollar_volume": 340000000.0
   },
   {
-   "symbol": "IAU",
-   "name": "iShares Gold Trust",
-   "avg_dollar_volume": 330000000.0
+   "symbol": "APD",
+   "name": "Air Products & Chemicals, Inc.",
+   "avg_dollar_volume": 340000000.0
   },
   {
-   "symbol": "CPRT",
-   "name": "Copart, Inc. (DE) Common Stock",
-   "avg_dollar_volume": 330000000.0
-  },
-  {
-   "symbol": "MMED",
-   "name": "MiniMed Group, Inc. Common Stock",
-   "avg_dollar_volume": 330000000.0
-  },
-  {
-   "symbol": "NDAQ",
-   "name": "Nasdaq, Inc. Common Stock",
-   "avg_dollar_volume": 330000000.0
-  },
-  {
-   "symbol": "FTAI",
-   "name": "FTAI Aviation Ltd. Common Stock",
-   "avg_dollar_volume": 330000000.0
-  },
-  {
-   "symbol": "EL",
-   "name": "The Estee Lauder Companies Inc. Class A",
-   "avg_dollar_volume": 330000000.0
-  },
-  {
-   "symbol": "ONON",
-   "name": "On Holding AG",
-   "avg_dollar_volume": 330000000.0
-  },
-  {
-   "symbol": "VMC",
-   "name": "Vulcan Materials Company(Holding Company)",
-   "avg_dollar_volume": 330000000.0
-  },
-  {
-   "symbol": "XRT",
-   "name": "State Street SPDR S&P Retail ETF",
-   "avg_dollar_volume": 330000000.0
+   "symbol": "UTHR",
+   "name": "United Therapeutics Corporation Common Stock",
+   "avg_dollar_volume": 340000000.0
   },
   {
    "symbol": "AIG",
    "name": "American International Group, Inc.",
-   "avg_dollar_volume": 330000000.0
+   "avg_dollar_volume": 340000000.0
   },
   {
-   "symbol": "AEM",
-   "name": "Agnico Eagle Mines Ltd.",
-   "avg_dollar_volume": 330000000.0
+   "symbol": "DKS",
+   "name": "Dick's Sporting Goods, Inc.",
+   "avg_dollar_volume": 340000000.0
   },
   {
-   "symbol": "EXC",
-   "name": "Exelon Corporation Common Stock",
-   "avg_dollar_volume": 330000000.0
-  },
-  {
-   "symbol": "CNC",
-   "name": "Centene Corporation",
-   "avg_dollar_volume": 320000000.0
-  },
-  {
-   "symbol": "KHC",
-   "name": "The Kraft Heinz Company",
-   "avg_dollar_volume": 320000000.0
-  },
-  {
-   "symbol": "TRGP",
-   "name": "Targa Resources Corp.",
-   "avg_dollar_volume": 320000000.0
-  },
-  {
-   "symbol": "MTD",
-   "name": "Mettler-Toledo International",
-   "avg_dollar_volume": 320000000.0
-  },
-  {
-   "symbol": "EW",
-   "name": "Edwards Lifesciences Corp",
-   "avg_dollar_volume": 320000000.0
-  },
-  {
-   "symbol": "NRG",
-   "name": "NRG Energy, Inc.",
-   "avg_dollar_volume": 320000000.0
-  },
-  {
-   "symbol": "BIIB",
-   "name": "Biogen Inc. Common Stock",
-   "avg_dollar_volume": 320000000.0
-  },
-  {
-   "symbol": "BURL",
-   "name": "BURLINGTON STORES, INC.",
-   "avg_dollar_volume": 320000000.0
-  },
-  {
-   "symbol": "ONDS",
-   "name": "Ondas Inc. Common Stock",
-   "avg_dollar_volume": 320000000.0
-  },
-  {
-   "symbol": "RF",
-   "name": "Regions Financial Corp.",
-   "avg_dollar_volume": 320000000.0
-  },
-  {
-   "symbol": "AME",
-   "name": "Ametek, Inc.",
-   "avg_dollar_volume": 320000000.0
-  },
-  {
-   "symbol": "MET",
-   "name": "MetLife, Inc.",
-   "avg_dollar_volume": 320000000.0
-  },
-  {
-   "symbol": "CCC",
-   "name": "CCC Intelligent Solutions Holdings Inc. Common Stock",
-   "avg_dollar_volume": 320000000.0
-  },
-  {
-   "symbol": "XYL",
-   "name": "Xylem Inc",
-   "avg_dollar_volume": 310000000.0
-  },
-  {
-   "symbol": "CASY",
-   "name": "Casey's General Stores, Inc. Common Stock",
-   "avg_dollar_volume": 310000000.0
-  },
-  {
-   "symbol": "NVS",
-   "name": "Novartis AG",
-   "avg_dollar_volume": 310000000.0
-  },
-  {
-   "symbol": "TXG",
-   "name": "10x Genomics, Inc. Class A Common Stock",
-   "avg_dollar_volume": 310000000.0
-  },
-  {
-   "symbol": "IUSB",
-   "name": "iShares Trust iShares Core Universal USD Bond ETF",
-   "avg_dollar_volume": 310000000.0
-  },
-  {
-   "symbol": "PAYX",
-   "name": "Paychex, Inc. Common Stock",
-   "avg_dollar_volume": 310000000.0
-  },
-  {
-   "symbol": "VRSN",
-   "name": "VeriSign, Inc. Common Stock",
-   "avg_dollar_volume": 310000000.0
-  },
-  {
-   "symbol": "FOXA",
-   "name": "Fox Corporation Class A Common Stock",
-   "avg_dollar_volume": 310000000.0
-  },
-  {
-   "symbol": "BTI",
-   "name": "British American Tobacco p.l.c. American Depositary Shares, American Depositary Shares, each representing one Ordinary Share",
-   "avg_dollar_volume": 310000000.0
-  },
-  {
-   "symbol": "CARR",
-   "name": "Carrier Global Corporation",
-   "avg_dollar_volume": 310000000.0
-  },
-  {
-   "symbol": "GIS",
-   "name": "General Mills, Inc.",
-   "avg_dollar_volume": 310000000.0
-  },
-  {
-   "symbol": "MKSI",
-   "name": "MKS Inc. Common Stock",
-   "avg_dollar_volume": 310000000.0
-  },
-  {
-   "symbol": "PINS",
-   "name": "Pinterest, Inc. Class A Common Stock",
-   "avg_dollar_volume": 310000000.0
+   "symbol": "ETR",
+   "name": "Entergy Corporation",
+   "avg_dollar_volume": 340000000.0
   },
   {
    "symbol": "RSG",
    "name": "Republic Services Inc.",
-   "avg_dollar_volume": 310000000.0
+   "avg_dollar_volume": 340000000.0
   },
   {
-   "symbol": "IDXX",
-   "name": "IDEXX Laboratories, Inc. Common Stock",
-   "avg_dollar_volume": 300000000.0
+   "symbol": "BTI",
+   "name": "British American Tobacco p.l.c. American Depositary Shares, American Depositary Shares, each representing one Ordinary Share",
+   "avg_dollar_volume": 340000000.0
   },
   {
-   "symbol": "HUBB",
-   "name": "Hubbell Incorporated",
-   "avg_dollar_volume": 300000000.0
+   "symbol": "GEHC",
+   "name": "GE HealthCare Technologies Inc. Common Stock",
+   "avg_dollar_volume": 330000000.0
   }
  ]
 }
