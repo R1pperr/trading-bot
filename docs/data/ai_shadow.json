@@ -16,54 +16,54 @@
   "ai_errors": 5,
   "latest": [
     {
-      "time_utc": "2026-11-06 14:17:24",
+      "time_utc": "2026-11-09 14:12:33",
+      "symbol": "AAOI",
+      "reason": "The stock spiked sharply, then collapsed by more than half in a month with wild swings and a recent huge one-day plunge, so the momentum signal looks unreliable."
+    },
+    {
+      "time_utc": "2026-11-09 14:12:26",
+      "symbol": "DELL",
+      "reason": "The stock has fallen sharply from its recent peak with repeated large drops and wild swings, so the long-term strength signal looks unreliable right now."
+    },
+    {
+      "time_utc": "2026-11-09 14:12:19",
+      "symbol": "MU",
+      "reason": "The stock has fallen sharply over the past month, including a very steep one-day collapse recently, followed by a choppy bounce; the signal looks unreliable."
+    },
+    {
+      "time_utc": "2026-11-09 14:12:12",
+      "symbol": "LITE",
+      "reason": "Price has collapsed sharply from its recent peak with violent swings and a huge recent drop, so the long-term momentum signal looks unreliable right now."
+    },
+    {
+      "time_utc": "2026-11-09 14:12:05",
+      "symbol": "TWST",
+      "reason": "Prices have been extremely choppy with huge swings both ways and a sharp overall decline from the early peak, so the long-term momentum signal looks unreliable."
+    },
+    {
+      "time_utc": "2026-11-09 14:11:58",
+      "symbol": "MRNA",
+      "reason": "Prices have been extremely choppy with repeated sharp swings both ways, including a huge recent jump and a big earlier drop, so the trend signal looks unreliable."
+    },
+    {
+      "time_utc": "2026-11-09 14:11:51",
+      "symbol": "SNDK",
+      "reason": "The stock has fallen sharply for weeks, with a recent extreme one-day collapse and very volatile swings, so the long-term momentum signal looks unreliable right now."
+    },
+    {
+      "time_utc": "2026-11-09 14:11:44",
+      "symbol": "AXTI",
+      "reason": "The stock has fallen sharply from its recent peak, with violent swings and a steep recent drop, so the long-term strength signal looks unreliable right now."
+    },
+    {
+      "time_utc": "2026-11-09 14:11:36",
       "symbol": "DBC",
-      "reason": "After a steady climb, prices dropped sharply in two separate steps and the uptrend has broken, so the medium-term buy signal looks unreliable right now."
+      "reason": "After a steady climb, prices dropped sharply in two separate sessions and have not recovered, so the uptrend behind the entry signal looks broken and unreliable."
     },
     {
-      "time_utc": "2026-11-06 14:17:10",
-      "symbol": "ZS",
-      "reason": "Prices have been extremely volatile with sharp swings both ways, and the latest one-day drop was steep, so the oversold signal looks unreliable and the trend choppy."
-    },
-    {
-      "time_utc": "2026-11-06 14:17:04",
-      "symbol": "ILMN",
-      "reason": "The stock suffered a violent one-day collapse after a steady climb, followed by further sharp drops, so the oversold signal looks unreliable and the price action is erratic."
-    },
-    {
-      "time_utc": "2026-11-06 14:16:57",
-      "symbol": "PSX",
-      "reason": "The stock has dropped sharply over several sessions, ending with steep consecutive declines after a big spike lower earlier, so the signal looks unstable and the plunge may not be done."
-    },
-    {
-      "time_utc": "2026-11-06 14:16:51",
-      "symbol": "OKTA",
-      "reason": "Prices have been extremely choppy with repeated sharp swings, and the latest one-day drop is steep, so the oversold signal looks unreliable and the weak approval record adds caution."
-    },
-    {
-      "time_utc": "2026-11-06 14:16:30",
-      "symbol": "MPC",
-      "reason": "The stock has fallen sharply over the last few sessions, including a big one-day drop after a steep run-up, so the price action looks unstable and unreliable."
-    },
-    {
-      "time_utc": "2026-11-06 14:16:24",
-      "symbol": "HPE",
-      "reason": "The latest day saw a sharp, outsized drop after a steep multi-week slide, and prices have been very choppy, so the oversold signal looks unreliable."
-    },
-    {
-      "time_utc": "2026-11-06 14:16:18",
-      "symbol": "VLO",
-      "reason": "The stock had a sharp one-day plunge, then choppy swings and a steady slide to well below its recent highs, so the dip signal looks unreliable."
-    },
-    {
-      "time_utc": "2026-11-06 14:16:11",
-      "symbol": "SNOW",
-      "reason": "Prices have been very choppy with large swings both ways, and the latest sharp multi-day slide and big drop suggest an unreliable, falling-knife signal with no clear trend."
-    },
-    {
-      "time_utc": "2026-11-06 14:16:05",
+      "time_utc": "2026-11-09 14:11:22",
       "symbol": "TXN",
-      "reason": "The latest session shows an extreme one-day plunge after a sharp run-up, a drop large enough to suggest unstable conditions and a possible continued slide rather than a clean bounce."
+      "reason": "A sharp one-day plunge following a strong rally looks like an extreme move, and recent prices have been choppy, so the oversold signal looks unreliable."
     }
   ]
 }

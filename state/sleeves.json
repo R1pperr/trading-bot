@@ -6,7 +6,7 @@
   },
   "days": {
     "crypto": "2026-11-02",
-    "stock": "2026-11-06"
+    "stock": "2026-11-09"
   },
   "entries": {
     "11ee5671-d61d-4874-a4bd-a435f711dbd8": {
@@ -80,6 +80,18 @@
       "sleeve": "rsi2_stocks",
       "spread": "wide",
       "symbol": "XOM"
+    },
+    "8d5a3d24-84a2-49b1-9b7a-2385993086c2": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "The prices show a steady uptrend followed by a sharp multi-day pullback, which fits a short-term oversold setup; nothing looks choppy or like a single extreme reversal-prone spike.",
+      "day": "2026-11-09",
+      "equity": 98049.78,
+      "placed_utc": "2026-11-09T14:11:29Z",
+      "pre_open": true,
+      "qty": 3.111828,
+      "sleeve": "rsi2_stocks",
+      "spread": "wide",
+      "symbol": "XLE"
     },
     "9494b5cb-8baf-4455-8be1-dc77c60cb943": {
       "ai_decision": "APPROVE",
@@ -231,6 +243,11 @@
       "entry_date": "2026-11-04",
       "sleeve": "rotation",
       "stop": 90.61455
+    },
+    "XLE": {
+      "entry_date": "2026-11-09",
+      "sleeve": "rsi2_stocks",
+      "stop": 57.0276
     },
     "XLP": {
       "entry_date": "2026-11-04",
