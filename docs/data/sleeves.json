@@ -24,8 +24,8 @@
       "allocation": 0.2,
       "enabled": true,
       "positions": 3,
-      "value": 9876.3,
-      "open_pl": 60.47,
+      "value": 9886.07,
+      "open_pl": 70.24,
       "closed_pl": -519.96
     },
     {
@@ -34,9 +34,9 @@
       "market": "stock",
       "allocation": 0.2,
       "enabled": true,
-      "positions": 5,
-      "value": 19389.74,
-      "open_pl": -203.92,
+      "positions": 6,
+      "value": 19595.54,
+      "open_pl": -188.26,
       "closed_pl": -1048.48
     },
     {
@@ -46,8 +46,8 @@
       "allocation": 0.2,
       "enabled": true,
       "positions": 2,
-      "value": 9846.33,
-      "open_pl": -109.52,
+      "value": 9874.08,
+      "open_pl": -81.76,
       "closed_pl": 0.0
     },
     {
