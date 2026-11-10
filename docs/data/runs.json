@@ -1,10 +1,5 @@
 [
   {
-    "time_utc": "2026-11-03T21:08:06Z",
-    "status": "market_closed",
-    "orders": 0
-  },
-  {
     "time_utc": "2026-11-03T21:23:20Z",
     "status": "market_closed",
     "orders": 0
@@ -597,6 +592,11 @@
   {
     "time_utc": "2026-11-10T14:28:21Z",
     "status": "market_closed",
+    "orders": 0
+  },
+  {
+    "time_utc": "2026-11-10T14:43:16Z",
+    "status": "ok",
     "orders": 0
   }
 ]
