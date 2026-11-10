@@ -236,6 +236,10 @@
       "sleeve": "rotation",
       "stop": 98.3289
     },
+    "IWM": {
+      "entry_date": "2026-11-03",
+      "sleeve": "ibs_etfs"
+    },
     "LMT": {
       "entry_date": "2026-11-06",
       "sleeve": "rsi2_stocks",
@@ -260,6 +264,14 @@
       "entry_date": "2026-11-09",
       "sleeve": "rsi2_stocks",
       "stop": 57.0276
+    },
+    "XLP": {
+      "entry_date": "2026-11-04",
+      "sleeve": "ibs_etfs"
+    },
+    "XLV": {
+      "entry_date": "2026-11-06",
+      "sleeve": "ibs_etfs"
     },
     "XOM": {
       "entry_date": "2026-11-05",
