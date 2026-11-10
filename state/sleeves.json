@@ -1,12 +1,12 @@
 {
   "closed_pl": {
-    "ibs_etfs": -519.96,
+    "ibs_etfs": -351.0,
     "momentum_stocks": -161.54,
     "rsi2_stocks": -1048.48
   },
   "days": {
     "crypto": "2026-11-02",
-    "stock": "2026-11-09"
+    "stock": "2026-11-10"
   },
   "entries": {
     "11ee5671-d61d-4874-a4bd-a435f711dbd8": {
@@ -117,6 +117,18 @@
       "spread": "wide",
       "symbol": "SHEL"
     },
+    "9eac0df4-542f-4805-b834-e507bb47189f": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "The stock has pulled back steadily over several days after an uptrend, which fits a short-term oversold entry, with no single extreme one-day move or directionless chop.",
+      "day": "2026-11-10",
+      "equity": 98165.59,
+      "placed_utc": "2026-11-10T14:12:16Z",
+      "pre_open": true,
+      "qty": 0.535158,
+      "sleeve": "rsi2_stocks",
+      "spread": "wide",
+      "symbol": "PM"
+    },
     "a794ba71-5e71-42cd-833a-a3b59b9b6463": {
       "ai_decision": "APPROVE",
       "ai_reason": "Prices dipped and swung for a few weeks but have recovered most of the drop recently, with no single extreme one-day move, so the long-term signal looks acceptable.",
@@ -224,15 +236,15 @@
       "sleeve": "rotation",
       "stop": 98.3289
     },
-    "IWM": {
-      "entry_date": "2026-11-03",
-      "sleeve": "ibs_etfs",
-      "stop": 260.0094
-    },
     "LMT": {
       "entry_date": "2026-11-06",
       "sleeve": "rsi2_stocks",
       "stop": 535.9962
+    },
+    "PM": {
+      "entry_date": "2026-11-10",
+      "sleeve": "rsi2_stocks",
+      "stop": 179.6295
     },
     "SHEL": {
       "entry_date": "2026-11-06",
@@ -248,16 +260,6 @@
       "entry_date": "2026-11-09",
       "sleeve": "rsi2_stocks",
       "stop": 57.0276
-    },
-    "XLP": {
-      "entry_date": "2026-11-04",
-      "sleeve": "ibs_etfs",
-      "stop": 85.5693
-    },
-    "XLV": {
-      "entry_date": "2026-11-06",
-      "sleeve": "ibs_etfs",
-      "stop": 172.0407
     },
     "XOM": {
       "entry_date": "2026-11-05",

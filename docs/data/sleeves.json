@@ -23,10 +23,10 @@
       "market": "stock",
       "allocation": 0.2,
       "enabled": true,
-      "positions": 3,
-      "value": 10019.32,
-      "open_pl": 203.49,
-      "closed_pl": -519.96
+      "positions": 0,
+      "value": 0,
+      "open_pl": 0,
+      "closed_pl": -351.0
     },
     {
       "name": "rsi2_stocks",
@@ -35,8 +35,8 @@
       "allocation": 0.2,
       "enabled": true,
       "positions": 6,
-      "value": 19712.95,
-      "open_pl": -70.85,
+      "value": 19522.15,
+      "open_pl": -261.65,
       "closed_pl": -1048.48
     },
     {
@@ -46,8 +46,8 @@
       "allocation": 0.2,
       "enabled": true,
       "positions": 2,
-      "value": 9948.29,
-      "open_pl": -7.56,
+      "value": 9939.51,
+      "open_pl": -16.34,
       "closed_pl": 0.0
     },
     {
