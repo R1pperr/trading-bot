@@ -8,10 +8,10 @@
     "pnl": 0.0
   },
   "approved": {
-    "trades": 7,
-    "win_rate": 0.1429,
-    "expectancy_pct": -0.03642,
-    "pnl": -695.02
+    "trades": 9,
+    "win_rate": 0.3333,
+    "expectancy_pct": -0.02007,
+    "pnl": -446.32
   },
   "ai_errors": 5,
   "latest": [
