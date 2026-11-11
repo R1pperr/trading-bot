@@ -282,6 +282,10 @@
       "sleeve": "rsi2_stocks",
       "stop": 38.8275
     },
+    "LMT": {
+      "entry_date": "2026-11-06",
+      "sleeve": "rsi2_stocks"
+    },
     "PM": {
       "entry_date": "2026-11-10",
       "sleeve": "rsi2_stocks",
@@ -301,6 +305,10 @@
       "entry_date": "2026-11-04",
       "sleeve": "rotation",
       "stop": 90.61455
+    },
+    "XLE": {
+      "entry_date": "2026-11-09",
+      "sleeve": "rsi2_stocks"
     },
     "XOM": {
       "entry_date": "2026-11-05",
