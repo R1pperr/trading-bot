@@ -16,6 +16,46 @@
   "ai_errors": 5,
   "latest": [
     {
+      "time_utc": "2026-11-11 14:09:20",
+      "symbol": "AAOI",
+      "reason": "The stock surged sharply then collapsed by well over half in a few weeks, with violent swings and a steep downtrend, so the long-term signal looks unreliable."
+    },
+    {
+      "time_utc": "2026-11-11 14:09:13",
+      "symbol": "DELL",
+      "reason": "The stock has fallen sharply from its recent peak with several big drops and wild swings, so the long-term strength signal looks unreliable right now."
+    },
+    {
+      "time_utc": "2026-11-11 14:09:06",
+      "symbol": "MU",
+      "reason": "The stock has fallen steeply over the month, including an extreme one-day plunge, and the rebound is choppy and unproven, so this momentum entry looks unreliable."
+    },
+    {
+      "time_utc": "2026-11-11 14:08:59",
+      "symbol": "LITE",
+      "reason": "Price has swung wildly and fallen sharply, including several huge one-day drops, so there is no steady trend and the long-term signal looks unreliable."
+    },
+    {
+      "time_utc": "2026-11-11 14:08:52",
+      "symbol": "TWST",
+      "reason": "Prices have been extremely choppy with large swings both ways and a steep slide from the early-October high, so there is no clear trend and the signal looks unreliable."
+    },
+    {
+      "time_utc": "2026-11-11 14:08:45",
+      "symbol": "MRNA",
+      "reason": "Prices have swung wildly with repeated sharp jumps and drops, including a big recent spike and pullback, so the trend signal looks unreliable right now."
+    },
+    {
+      "time_utc": "2026-11-11 14:08:38",
+      "symbol": "SNDK",
+      "reason": "The stock has fallen sharply for weeks, including a huge one-day plunge recently, with wild swings afterward; the long-term signal looks unreliable amid this turmoil."
+    },
+    {
+      "time_utc": "2026-11-11 14:08:31",
+      "symbol": "AXTI",
+      "reason": "The stock has fallen sharply from its peak with wild, choppy swings and a huge one-day drop, so the momentum signal looks unreliable right now."
+    },
+    {
       "time_utc": "2026-11-10 14:13:22",
       "symbol": "AAOI",
       "reason": "The price spiked sharply, then collapsed by well over half with wild swings and a violent one-day drop; the long-term signal looks unreliable amid this volatility."
@@ -24,46 +64,6 @@
       "time_utc": "2026-11-10 14:13:15",
       "symbol": "DELL",
       "reason": "The stock has fallen sharply from its recent highs with violent swings and large one-day drops, so the long-term momentum signal looks unreliable right now."
-    },
-    {
-      "time_utc": "2026-11-10 14:13:08",
-      "symbol": "MU",
-      "reason": "The stock has fallen sharply over several weeks, including a huge one-day collapse followed by a volatile bounce, so the long-term signal looks unreliable right now."
-    },
-    {
-      "time_utc": "2026-11-10 14:13:01",
-      "symbol": "LITE",
-      "reason": "The price has fallen sharply and erratically, with several huge daily drops and rebounds, so the long-term momentum signal looks unreliable and the choppiness is extreme."
-    },
-    {
-      "time_utc": "2026-11-10 14:12:54",
-      "symbol": "TWST",
-      "reason": "Prices have swung wildly with sharp drops and rebounds, including a big jump on the latest day, so there is no steady trend and the signal looks unreliable."
-    },
-    {
-      "time_utc": "2026-11-10 14:12:47",
-      "symbol": "MRNA",
-      "reason": "Prices have swung wildly with several large one-day jumps and drops, and the latest surge is sharp, so the trend signal looks unreliable and prone to reversal."
-    },
-    {
-      "time_utc": "2026-11-10 14:12:39",
-      "symbol": "SNDK",
-      "reason": "The stock has fallen sharply for weeks, including a huge one-day collapse, and swings wildly; the long-term strength signal looks unreliable against this volatile downtrend."
-    },
-    {
-      "time_utc": "2026-11-10 14:12:32",
-      "symbol": "AXTI",
-      "reason": "The price has fallen sharply over the past month with wild swings and a recent collapse, so the long-term momentum signal looks unreliable right now."
-    },
-    {
-      "time_utc": "2026-11-10 14:12:25",
-      "symbol": "DBC",
-      "reason": "After a steady climb, the price has dropped sharply in a few sudden steps, undermining the uptrend and making the entry signal look unreliable."
-    },
-    {
-      "time_utc": "2026-11-09 14:12:33",
-      "symbol": "AAOI",
-      "reason": "The stock spiked sharply, then collapsed by more than half in a month with wild swings and a recent huge one-day plunge, so the momentum signal looks unreliable."
     }
   ]
 }

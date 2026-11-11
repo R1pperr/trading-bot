@@ -2,11 +2,11 @@
   "closed_pl": {
     "ibs_etfs": -351.0,
     "momentum_stocks": -161.54,
-    "rsi2_stocks": -1048.48
+    "rsi2_stocks": -800.77
   },
   "days": {
     "crypto": "2026-11-02",
-    "stock": "2026-11-10"
+    "stock": "2026-11-11"
   },
   "entries": {
     "11ee5671-d61d-4874-a4bd-a435f711dbd8": {
@@ -81,6 +81,18 @@
       "spread": "wide",
       "symbol": "XOM"
     },
+    "4301195b-eb02-4a0a-bc6a-5ff731ca540c": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Prices show a steady, gradual downtrend into the signal with no single extreme one-day collapse or erratic chop, so the oversold entry looks reasonably reliable.",
+      "day": "2026-11-11",
+      "equity": 98488.43,
+      "placed_utc": "2026-11-11T14:08:09Z",
+      "pre_open": true,
+      "qty": 117.950215,
+      "sleeve": "rsi2_stocks",
+      "spread": "normal",
+      "symbol": "IBIT"
+    },
     "8d5a3d24-84a2-49b1-9b7a-2385993086c2": {
       "ai_decision": "APPROVE",
       "ai_reason": "The prices show a steady uptrend followed by a sharp multi-day pullback, which fits a short-term oversold setup; nothing looks choppy or like a single extreme reversal-prone spike.",
@@ -141,6 +153,18 @@
       "spread": "wide",
       "symbol": "RVMD"
     },
+    "cf8fa1f4-cac7-4150-95f0-106e5fb6e328": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Prices rose steadily, then pulled back sharply in recent days; the drop is gradual rather than one extreme reversal-prone move, so the signal isn't clearly unreliable.",
+      "day": "2026-11-11",
+      "equity": 98488.43,
+      "placed_utc": "2026-11-11T14:08:24Z",
+      "pre_open": true,
+      "qty": 160.143788,
+      "sleeve": "rotation",
+      "spread": null,
+      "symbol": "DBC"
+    },
     "d0fedaaa-44fb-442b-b0e1-39aa38d41f09": {
       "ai_decision": "APPROVE",
       "ai_reason": "After a strong rally, the stock has fallen sharply over three days, which fits a short-term oversold pullback; there is no extreme single-day collapse or directionless chop.",
@@ -176,6 +200,18 @@
       "sleeve": "rsi2_stocks",
       "spread": "normal",
       "symbol": "AAPL"
+    },
+    "dfdf475e-12c9-4ad2-9e36-de6b71a5c836": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Prices pulled back through steady declines after a strong rally, with no single extreme final-day move or aimless chop, so the oversold signal looks reasonably reliable.",
+      "day": "2026-11-11",
+      "equity": 98488.43,
+      "placed_utc": "2026-11-11T14:08:16Z",
+      "pre_open": true,
+      "qty": 0.123131,
+      "sleeve": "rsi2_stocks",
+      "spread": "normal",
+      "symbol": "USO"
     },
     "f5429913-8c72-44c5-a8ec-17aee340dfc6": {
       "ai_decision": "APPROVE",
@@ -231,15 +267,20 @@
       "sleeve": "rsi2_stocks",
       "stop": 201.7914
     },
+    "DBC": {
+      "entry_date": "2026-11-11",
+      "sleeve": "rotation",
+      "stop": 28.5975
+    },
     "EFA": {
       "entry_date": "2026-11-05",
       "sleeve": "rotation",
       "stop": 98.3289
     },
-    "LMT": {
-      "entry_date": "2026-11-06",
+    "IBIT": {
+      "entry_date": "2026-11-11",
       "sleeve": "rsi2_stocks",
-      "stop": 535.9962
+      "stop": 38.8275
     },
     "PM": {
       "entry_date": "2026-11-10",
@@ -251,15 +292,15 @@
       "sleeve": "rsi2_stocks",
       "stop": 93.1209
     },
+    "USO": {
+      "entry_date": "2026-11-11",
+      "sleeve": "rsi2_stocks",
+      "stop": 132.618
+    },
     "VNQ": {
       "entry_date": "2026-11-04",
       "sleeve": "rotation",
       "stop": 90.61455
-    },
-    "XLE": {
-      "entry_date": "2026-11-09",
-      "sleeve": "rsi2_stocks",
-      "stop": 57.0276
     },
     "XOM": {
       "entry_date": "2026-11-05",

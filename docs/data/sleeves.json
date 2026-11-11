@@ -34,10 +34,10 @@
       "market": "stock",
       "allocation": 0.2,
       "enabled": true,
-      "positions": 7,
-      "value": 19872.98,
-      "open_pl": -14.69,
-      "closed_pl": -1048.48
+      "positions": 5,
+      "value": 14755.71,
+      "open_pl": -107.66,
+      "closed_pl": -800.77
     },
     {
       "name": "rotation",
@@ -46,8 +46,8 @@
       "allocation": 0.2,
       "enabled": true,
       "positions": 2,
-      "value": 9918.53,
-      "open_pl": -37.32,
+      "value": 9883.61,
+      "open_pl": -72.23,
       "closed_pl": 0.0
     },
     {
