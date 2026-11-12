@@ -2,11 +2,11 @@
   "closed_pl": {
     "ibs_etfs": -351.0,
     "momentum_stocks": -161.54,
-    "rsi2_stocks": -800.77
+    "rsi2_stocks": -731.66
   },
   "days": {
     "crypto": "2026-11-02",
-    "stock": "2026-11-11"
+    "stock": "2026-11-12"
   },
   "entries": {
     "11ee5671-d61d-4874-a4bd-a435f711dbd8": {
@@ -69,6 +69,18 @@
       "spread": "wide",
       "symbol": "PANW"
     },
+    "31dc6e7f-6d6b-4cf7-8261-bc372af91927": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Prices have trended steadily upward with low volatility, and the latest dip is a modest pullback, so nothing suggests the oversold signal is unreliable.",
+      "day": "2026-11-12",
+      "equity": 98581.73,
+      "placed_utc": "2026-11-12T14:17:19Z",
+      "pre_open": true,
+      "qty": 63.617533,
+      "sleeve": "rsi2_stocks",
+      "spread": "wide",
+      "symbol": "VCSH"
+    },
     "337c70c5-66a9-47b5-9235-ce0d42f94487": {
       "ai_decision": "APPROVE",
       "ai_reason": "Prices rose in a clear uptrend and then pulled back sharply over the last few days, which fits an oversold dip entry rather than unreliable choppy action.",
@@ -81,6 +93,30 @@
       "spread": "wide",
       "symbol": "XOM"
     },
+    "37b30018-6544-4b90-8dac-33575c546319": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Despite a steep recent slide and a sharp rebound, nothing here clearly shows the long-term signal is unreliable, and past vetoes have cost money.",
+      "day": "2026-11-12",
+      "equity": 98581.73,
+      "placed_utc": "2026-11-12T14:17:41Z",
+      "pre_open": true,
+      "qty": 2.213777,
+      "sleeve": "momentum_stocks",
+      "spread": null,
+      "symbol": "SNDK"
+    },
+    "420b9e02-9c17-4cfa-8bbe-bdb158082de1": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Despite sharp swings, prices have trended clearly upward over the month, and the latest moves are not extreme enough to show the long-term signal is unreliable.",
+      "day": "2026-11-12",
+      "equity": 98581.73,
+      "placed_utc": "2026-11-12T14:17:49Z",
+      "pre_open": true,
+      "qty": 7.92824,
+      "sleeve": "momentum_stocks",
+      "spread": "wide",
+      "symbol": "MRNA"
+    },
     "4301195b-eb02-4a0a-bc6a-5ff731ca540c": {
       "ai_decision": "APPROVE",
       "ai_reason": "Prices show a steady, gradual downtrend into the signal with no single extreme one-day collapse or erratic chop, so the oversold entry looks reasonably reliable.",
@@ -92,6 +128,18 @@
       "sleeve": "rsi2_stocks",
       "spread": "normal",
       "symbol": "IBIT"
+    },
+    "595ee9ee-a59f-487a-92a8-c6fe0ed75166": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Prices show a steady uptrend with only mild recent pullback, no extreme one-day move or choppiness, so the dip-buy signal looks reasonably reliable.",
+      "day": "2026-11-12",
+      "equity": 98581.73,
+      "placed_utc": "2026-11-12T14:17:27Z",
+      "pre_open": true,
+      "qty": 3.496326,
+      "sleeve": "rsi2_stocks",
+      "spread": "wide",
+      "symbol": "OTIS"
     },
     "8d5a3d24-84a2-49b1-9b7a-2385993086c2": {
       "ai_decision": "APPROVE",
@@ -213,6 +261,18 @@
       "spread": "normal",
       "symbol": "USO"
     },
+    "e1866fc2-0d04-4ea0-b2ec-9c2034710561": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Prices pulled back sharply after a big rally, which fits an oversold dip entry, and no single extreme one-day move or directionless chop stands out.",
+      "day": "2026-11-12",
+      "equity": 98581.73,
+      "placed_utc": "2026-11-12T14:17:12Z",
+      "pre_open": true,
+      "qty": 25.435195,
+      "sleeve": "rsi2_stocks",
+      "spread": "wide",
+      "symbol": "ZS"
+    },
     "f5429913-8c72-44c5-a8ec-17aee340dfc6": {
       "ai_decision": "APPROVE",
       "ai_reason": "The latest two closes fell modestly after a rally, consistent with the oversold signal, and there is no extreme one-day move or unusually choppy pattern making it unreliable.",
@@ -257,16 +317,6 @@
     ]
   },
   "positions": {
-    "COP": {
-      "entry_date": "2026-11-06",
-      "sleeve": "rsi2_stocks",
-      "stop": 126.0243
-    },
-    "CVX": {
-      "entry_date": "2026-11-05",
-      "sleeve": "rsi2_stocks",
-      "stop": 201.7914
-    },
     "DBC": {
       "entry_date": "2026-11-11",
       "sleeve": "rotation",
@@ -282,6 +332,16 @@
       "sleeve": "rsi2_stocks",
       "stop": 38.8275
     },
+    "MRNA": {
+      "entry_date": "2026-11-12",
+      "sleeve": "momentum_stocks",
+      "stop": 231.27705
+    },
+    "OTIS": {
+      "entry_date": "2026-11-12",
+      "sleeve": "rsi2_stocks",
+      "stop": 72.07965
+    },
     "PM": {
       "entry_date": "2026-11-10",
       "sleeve": "rsi2_stocks",
@@ -292,20 +352,30 @@
       "sleeve": "rsi2_stocks",
       "stop": 93.1209
     },
+    "SNDK": {
+      "entry_date": "2026-11-12",
+      "sleeve": "momentum_stocks",
+      "stop": 828.2766
+    },
     "USO": {
       "entry_date": "2026-11-11",
       "sleeve": "rsi2_stocks",
       "stop": 132.618
+    },
+    "VCSH": {
+      "entry_date": "2026-11-12",
+      "sleeve": "rsi2_stocks",
+      "stop": 72.0564
     },
     "VNQ": {
       "entry_date": "2026-11-04",
       "sleeve": "rotation",
       "stop": 90.61455
     },
-    "XOM": {
-      "entry_date": "2026-11-05",
+    "ZS": {
+      "entry_date": "2026-11-12",
       "sleeve": "rsi2_stocks",
-      "stop": 157.5978
+      "stop": 180.2247
     }
   },
   "rotation": {

@@ -16,6 +16,11 @@
   "ai_errors": 5,
   "latest": [
     {
+      "time_utc": "2026-11-12 14:17:34",
+      "symbol": "AXTI",
+      "reason": "The price has fallen sharply over the month with wild swings in both directions, including a steep one-day drop and sharp rebound, so the long-term signal looks unreliable."
+    },
+    {
       "time_utc": "2026-11-11 14:09:20",
       "symbol": "AAOI",
       "reason": "The stock surged sharply then collapsed by well over half in a few weeks, with violent swings and a steep downtrend, so the long-term signal looks unreliable."
@@ -59,11 +64,6 @@
       "time_utc": "2026-11-10 14:13:22",
       "symbol": "AAOI",
       "reason": "The price spiked sharply, then collapsed by well over half with wild swings and a violent one-day drop; the long-term signal looks unreliable amid this volatility."
-    },
-    {
-      "time_utc": "2026-11-10 14:13:15",
-      "symbol": "DELL",
-      "reason": "The stock has fallen sharply from its recent highs with violent swings and large one-day drops, so the long-term momentum signal looks unreliable right now."
     }
   ]
 }
