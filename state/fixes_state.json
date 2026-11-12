@@ -5,9 +5,13 @@
  "cooldown": {
   "turn_of_month": {},
   "ibs_etfs": {},
-  "rsi2_stocks": {},
+  "rsi2_stocks": {
+   "trend_below": "2027-02-03"
+  },
   "rotation": {},
-  "momentum_stocks": {},
+  "momentum_stocks": {
+   "trend_below": "2027-02-03"
+  },
   "realtime": {}
  },
  "ibs_etfs": {
