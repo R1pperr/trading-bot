@@ -24,14 +24,6 @@
       "order_id": "cf8fa1f4-cac7-4150-95f0-106e5fb6e328",
       "time": "2026-11-11 14:31:52"
     },
-    "MRNA": {
-      "qty": 7.92824,
-      "cost": 1894.84936,
-      "sleeve": "momentum_stocks",
-      "day": "2026-11-12",
-      "order_id": "420b9e02-9c17-4cfa-8bbe-bdb158082de1",
-      "time": "2026-11-12 14:31:05"
-    },
     "OTIS": {
       "qty": 3.496326,
       "cost": 274.74129708,
@@ -161,7 +153,8 @@
     "f4aeb239-66eb-420b-9bc1-eca1f912b4c6",
     "b044d473-1720-4842-9745-a6817fb13b75",
     "9b143b92-493f-4a72-8ba3-03d9790deea8",
-    "d573b92f-e118-48bc-b902-f3dcf833ae70"
+    "d573b92f-e118-48bc-b902-f3dcf833ae70",
+    "7b24f287-59a6-46c1-adde-3a0f28b3cf53"
   ],
   "trades": [
     {
@@ -602,6 +595,23 @@
       "entry_time": "2026-11-06 14:32:45",
       "exit_time": "2026-11-13 14:32:50",
       "exit_order": "f4aeb239-66eb-420b-9bc1-eca1f912b4c6"
+    },
+    {
+      "symbol": "MRNA",
+      "sleeve": "momentum_stocks",
+      "entry_day": "2026-11-12",
+      "exit_day": "2026-11-13",
+      "days": 1,
+      "qty": 7.92824,
+      "entry": 239.0,
+      "exit": 221.723,
+      "pnl": -136.98,
+      "ret": -0.07229,
+      "stop": true,
+      "entry_order": "420b9e02-9c17-4cfa-8bbe-bdb158082de1",
+      "entry_time": "2026-11-12 14:31:05",
+      "exit_time": "2026-11-13 14:34:48",
+      "exit_order": "7b24f287-59a6-46c1-adde-3a0f28b3cf53"
     }
   ]
 }

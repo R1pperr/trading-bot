@@ -1,5 +1,19 @@
 [
   {
+    "time_utc": "2026-11-13 14:48:45",
+    "event": "ORDER",
+    "symbol": "MRNA",
+    "asset_class": "stock",
+    "sleeve": "momentum_stocks",
+    "side": "sell",
+    "qty": 7.9282,
+    "price": 221.723,
+    "order_status": "filled",
+    "reason": "stop-loss: filled at Alpaca, -7.2% from buy price 239.00",
+    "ai_decision": "",
+    "ai_reason": ""
+  },
+  {
     "time_utc": "2026-11-13 14:18:25",
     "event": "ORDER",
     "symbol": "ABT",
@@ -1384,19 +1398,5 @@
     "reason": "long-term entry signal",
     "ai_decision": "VETO",
     "ai_reason": "Prices have been extremely choppy with sharp swings and a steep slide from the recent peak, so there is no steady trend and the long-term signal looks unreliable."
-  },
-  {
-    "time_utc": "2026-11-05 14:17:48",
-    "event": "ORDER",
-    "symbol": "EFA",
-    "asset_class": "stock",
-    "sleeve": "rotation",
-    "side": "buy",
-    "qty": 47.1875,
-    "price": 105.73,
-    "order_status": "pending_new",
-    "reason": "medium-term entry signal",
-    "ai_decision": "APPROVE",
-    "ai_reason": "Prices have moved in a narrow range, and the latest jump is sizable but not extreme enough to clearly signal an unreliable setup or a likely reversal."
   }
 ]

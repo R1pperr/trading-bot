@@ -1,7 +1,7 @@
 {
   "closed_pl": {
     "ibs_etfs": -351.0,
-    "momentum_stocks": -161.54,
+    "momentum_stocks": -298.52,
     "rsi2_stocks": -1000.61
   },
   "days": {
@@ -361,7 +361,8 @@
   "momentum": {
     "month": "2026-11",
     "stopped": [
-      "RVMD"
+      "RVMD",
+      "MRNA"
     ],
     "targets": [
       "AXTI",
@@ -401,11 +402,6 @@
       "entry_date": "2026-11-13",
       "sleeve": "ibs_etfs",
       "stop": 259.9071
-    },
-    "MRNA": {
-      "entry_date": "2026-11-12",
-      "sleeve": "momentum_stocks",
-      "stop": 231.27705
     },
     "OTIS": {
       "entry_date": "2026-11-12",
@@ -453,6 +449,7 @@
     "17c1d00e-9dbc-49f8-97d4-36b98118cbe0",
     "e48e40ab-c6c0-424e-853d-e250cdf4e819",
     "c3c670ea-7860-4bf8-b425-12176598f7c4",
-    "79263ed7-d59a-4abe-b5e2-1aad0b46dfc5"
+    "79263ed7-d59a-4abe-b5e2-1aad0b46dfc5",
+    "7b24f287-59a6-46c1-adde-3a0f28b3cf53"
   ]
 }
