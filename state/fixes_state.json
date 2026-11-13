@@ -31,7 +31,7 @@
  },
  "ai": {
   "main": {
-   "auto_shadow": false
+   "auto_shadow": true
   },
   "realtime": {
    "auto_shadow": false
