@@ -16,38 +16,6 @@
       "order_id": "25a41c39-e981-4728-a55f-adf0049b65a6",
       "time": "2026-11-05 14:36:24"
     },
-    "SHEL": {
-      "qty": 47.205885,
-      "cost": 4647.8914371,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-06",
-      "order_id": "94d8e6ec-7b78-4e9d-b206-eb19882d2bf2",
-      "time": "2026-11-06 14:32:45"
-    },
-    "PM": {
-      "qty": 0.535158,
-      "cost": 103.86881622,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-10",
-      "order_id": "9eac0df4-542f-4805-b834-e507bb47189f",
-      "time": "2026-11-10 14:30:01"
-    },
-    "USO": {
-      "qty": 0.123131,
-      "cost": 17.56586846,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-11",
-      "order_id": "dfdf475e-12c9-4ad2-9e36-de6b71a5c836",
-      "time": "2026-11-11 14:30:00"
-    },
-    "IBIT": {
-      "qty": 117.950215,
-      "cost": 4907.90844615,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-11",
-      "order_id": "4301195b-eb02-4a0a-bc6a-5ff731ca540c",
-      "time": "2026-11-11 14:31:16"
-    },
     "DBC": {
       "qty": 160.143788,
       "cost": 4943.057253465772,
@@ -72,14 +40,6 @@
       "order_id": "595ee9ee-a59f-487a-92a8-c6fe0ed75166",
       "time": "2026-11-12 14:31:41"
     },
-    "VCSH": {
-      "qty": 63.617533,
-      "cost": 4925.90558019,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-12",
-      "order_id": "31dc6e7f-6d6b-4cf7-8261-bc372af91927",
-      "time": "2026-11-12 14:31:50"
-    },
     "ZS": {
       "qty": 25.435195,
       "cost": 4818.69769275,
@@ -95,6 +55,46 @@
       "day": "2026-11-12",
       "order_id": "37b30018-6544-4b90-8dac-33575c546319",
       "time": "2026-11-12 14:33:11"
+    },
+    "ABT": {
+      "qty": 45.94731,
+      "cost": 4971.498942,
+      "sleeve": "rsi2_stocks",
+      "day": "2026-11-13",
+      "order_id": "9816b8ed-bc1c-4bad-a108-24ba2acea5b9",
+      "time": "2026-11-13 14:31:10"
+    },
+    "IWM": {
+      "qty": 17.636125,
+      "cost": 4922.06612625,
+      "sleeve": "ibs_etfs",
+      "day": "2026-11-13",
+      "order_id": "f4f3c963-2ff9-4e20-a4e2-a4a9d55ec677",
+      "time": "2026-11-13 14:32:26"
+    },
+    "XLF": {
+      "qty": 84.686735,
+      "cost": 4961.8889590584995,
+      "sleeve": "ibs_etfs",
+      "day": "2026-11-13",
+      "order_id": "b044d473-1720-4842-9745-a6817fb13b75",
+      "time": "2026-11-13 14:33:02"
+    },
+    "XLV": {
+      "qty": 26.240579,
+      "cost": 4942.767486150553,
+      "sleeve": "ibs_etfs",
+      "day": "2026-11-13",
+      "order_id": "9b143b92-493f-4a72-8ba3-03d9790deea8",
+      "time": "2026-11-13 14:33:06"
+    },
+    "DIA": {
+      "qty": 9.385984,
+      "cost": 4922.637012103169,
+      "sleeve": "ibs_etfs",
+      "day": "2026-11-13",
+      "order_id": "d573b92f-e118-48bc-b902-f3dcf833ae70",
+      "time": "2026-11-13 14:33:33"
     }
   },
   "seen": [
@@ -151,7 +151,17 @@
     "31dc6e7f-6d6b-4cf7-8261-bc372af91927",
     "587cab08-313f-44a9-bc36-0afa9ede277a",
     "e1866fc2-0d04-4ea0-b2ec-9c2034710561",
-    "37b30018-6544-4b90-8dac-33575c546319"
+    "37b30018-6544-4b90-8dac-33575c546319",
+    "f0a64140-84a1-405f-9dcb-da4579f3f4c8",
+    "c88fdcf9-fb78-41ca-a793-ddd8f689c997",
+    "9816b8ed-bc1c-4bad-a108-24ba2acea5b9",
+    "f106310e-78c2-42fd-92da-36a077dab14a",
+    "6aaa9b92-f1a6-480f-8742-6ca4a265a986",
+    "f4f3c963-2ff9-4e20-a4e2-a4a9d55ec677",
+    "f4aeb239-66eb-420b-9bc1-eca1f912b4c6",
+    "b044d473-1720-4842-9745-a6817fb13b75",
+    "9b143b92-493f-4a72-8ba3-03d9790deea8",
+    "d573b92f-e118-48bc-b902-f3dcf833ae70"
   ],
   "trades": [
     {
@@ -507,6 +517,91 @@
       "entry_time": "2026-11-06 14:33:42",
       "exit_time": "2026-11-12 14:32:08",
       "exit_order": "587cab08-313f-44a9-bc36-0afa9ede277a"
+    },
+    {
+      "symbol": "USO",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-11",
+      "exit_day": "2026-11-13",
+      "days": 2,
+      "qty": 0.123131,
+      "entry": 142.66,
+      "exit": 146.69,
+      "pnl": 0.5,
+      "ret": 0.02825,
+      "stop": false,
+      "entry_order": "dfdf475e-12c9-4ad2-9e36-de6b71a5c836",
+      "entry_time": "2026-11-11 14:30:00",
+      "exit_time": "2026-11-13 14:30:00",
+      "exit_order": "f0a64140-84a1-405f-9dcb-da4579f3f4c8"
+    },
+    {
+      "symbol": "PM",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-10",
+      "exit_day": "2026-11-13",
+      "days": 3,
+      "qty": 0.535158,
+      "entry": 194.09,
+      "exit": 198.52,
+      "pnl": 2.37,
+      "ret": 0.02282,
+      "stop": false,
+      "entry_order": "9eac0df4-542f-4805-b834-e507bb47189f",
+      "entry_time": "2026-11-10 14:30:01",
+      "exit_time": "2026-11-13 14:30:01",
+      "exit_order": "c88fdcf9-fb78-41ca-a793-ddd8f689c997"
+    },
+    {
+      "symbol": "IBIT",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-11",
+      "exit_day": "2026-11-13",
+      "days": 2,
+      "qty": 117.950215,
+      "entry": 41.61,
+      "exit": 39.18,
+      "pnl": -286.62,
+      "ret": -0.0584,
+      "stop": false,
+      "entry_order": "4301195b-eb02-4a0a-bc6a-5ff731ca540c",
+      "entry_time": "2026-11-11 14:31:16",
+      "exit_time": "2026-11-13 14:31:32",
+      "exit_order": "f106310e-78c2-42fd-92da-36a077dab14a"
+    },
+    {
+      "symbol": "VCSH",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-12",
+      "exit_day": "2026-11-13",
+      "days": 1,
+      "qty": 63.617533,
+      "entry": 77.43,
+      "exit": 77.26,
+      "pnl": -10.81,
+      "ret": -0.0022,
+      "stop": false,
+      "entry_order": "31dc6e7f-6d6b-4cf7-8261-bc372af91927",
+      "entry_time": "2026-11-12 14:31:50",
+      "exit_time": "2026-11-13 14:31:39",
+      "exit_order": "6aaa9b92-f1a6-480f-8742-6ca4a265a986"
+    },
+    {
+      "symbol": "SHEL",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-06",
+      "exit_day": "2026-11-13",
+      "days": 7,
+      "qty": 47.205885,
+      "entry": 98.46,
+      "exit": 98.87,
+      "pnl": 19.35,
+      "ret": 0.00416,
+      "stop": false,
+      "entry_order": "94d8e6ec-7b78-4e9d-b206-eb19882d2bf2",
+      "entry_time": "2026-11-06 14:32:45",
+      "exit_time": "2026-11-13 14:32:50",
+      "exit_order": "f4aeb239-66eb-420b-9bc1-eca1f912b4c6"
     }
   ]
 }
