@@ -1,5 +1,5 @@
 {
-  "mode": "enforce",
+  "mode": "shadow",
   "on": true,
   "would_veto": {
     "trades": 0,
