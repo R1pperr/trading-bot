@@ -10,7 +10,8 @@
   },
   "rotation": {},
   "momentum_stocks": {
-   "trend_below": "2027-02-03"
+   "trend_below": "2027-02-03",
+   "gap_filter": "2027-02-05"
   },
   "realtime": {}
  },
@@ -18,7 +19,10 @@
   "stage": "idle"
  },
  "rsi2_stocks": {
-  "stage": "idle"
+  "stage": "shadow",
+  "fix": "liquidity_filter",
+  "since": "2026-11-13",
+  "problem": "Loses on thin volume or wide spreads"
  },
  "rotation": {
   "stage": "idle"
@@ -31,7 +35,7 @@
  },
  "ai": {
   "main": {
-   "auto_shadow": true
+   "auto_shadow": false
   },
   "realtime": {
    "auto_shadow": false
