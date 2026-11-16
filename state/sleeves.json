@@ -427,6 +427,10 @@
       "sleeve": "ibs_etfs",
       "stop": 259.9071
     },
+    "OTIS": {
+      "entry_date": "2026-11-12",
+      "sleeve": "rsi2_stocks"
+    },
     "SNDK": {
       "entry_date": "2026-11-12",
       "sleeve": "momentum_stocks",
@@ -446,6 +450,14 @@
       "entry_date": "2026-11-16",
       "sleeve": "rsi2_stocks",
       "stop": 500.84685
+    },
+    "XLF": {
+      "entry_date": "2026-11-13",
+      "sleeve": "ibs_etfs"
+    },
+    "XLV": {
+      "entry_date": "2026-11-13",
+      "sleeve": "ibs_etfs"
     },
     "ZS": {
       "entry_date": "2026-11-12",
