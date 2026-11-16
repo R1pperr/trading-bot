@@ -1,12 +1,12 @@
 {
   "closed_pl": {
-    "ibs_etfs": -351.0,
+    "ibs_etfs": -280.08,
     "momentum_stocks": -298.52,
-    "rsi2_stocks": -1000.61
+    "rsi2_stocks": -1001.82
   },
   "days": {
     "crypto": "2026-11-02",
-    "stock": "2026-11-13"
+    "stock": "2026-11-16"
   },
   "entries": {
     "11ee5671-d61d-4874-a4bd-a435f711dbd8": {
@@ -237,6 +237,18 @@
       "spread": "wide",
       "symbol": "XLF"
     },
+    "b3f3d0b1-26c7-41e0-bca7-3bdd21c6782c": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Prices have trended upward over the month with only modest pullbacks recently, and there is no extreme one-day collapse or directionless chop undermining the oversold signal.",
+      "day": "2026-11-16",
+      "equity": 98111.06,
+      "placed_utc": "2026-11-16T14:06:58Z",
+      "pre_open": true,
+      "qty": 9.1089,
+      "sleeve": "rsi2_stocks",
+      "spread": null,
+      "symbol": "VRTX"
+    },
     "cf8fa1f4-cac7-4150-95f0-106e5fb6e328": {
       "ai_decision": "APPROVE",
       "ai_reason": "Prices rose steadily, then pulled back sharply in recent days; the drop is gradual rather than one extreme reversal-prone move, so the signal isn't clearly unreliable.",
@@ -345,6 +357,18 @@
       "spread": "wide",
       "symbol": "TSLA"
     },
+    "fbc4f796-301c-4e47-8dbf-98dd66b5437b": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Recent prices show a sharp but not extreme pullback after a strong rally, with no single-day collapse or directionless chop, so the oversold signal looks usable.",
+      "day": "2026-11-16",
+      "equity": 98111.06,
+      "placed_utc": "2026-11-16T14:07:05Z",
+      "pre_open": true,
+      "qty": 44.377021,
+      "sleeve": "rsi2_stocks",
+      "spread": "wide",
+      "symbol": "UAL"
+    },
     "fbe2b62c-87b3-46dd-b8d0-8f8a4897a470": {
       "ai_decision": "APPROVE",
       "ai_reason": "The trade buys a minor pullback within a clear, strong uptrend over the past month.",
@@ -403,30 +427,25 @@
       "sleeve": "ibs_etfs",
       "stop": 259.9071
     },
-    "OTIS": {
-      "entry_date": "2026-11-12",
-      "sleeve": "rsi2_stocks",
-      "stop": 72.07965
-    },
     "SNDK": {
       "entry_date": "2026-11-12",
       "sleeve": "momentum_stocks",
       "stop": 828.2766
+    },
+    "UAL": {
+      "entry_date": "2026-11-16",
+      "sleeve": "rsi2_stocks",
+      "stop": 101.5839
     },
     "VNQ": {
       "entry_date": "2026-11-04",
       "sleeve": "rotation",
       "stop": 90.61455
     },
-    "XLF": {
-      "entry_date": "2026-11-13",
-      "sleeve": "ibs_etfs",
-      "stop": 54.126
-    },
-    "XLV": {
-      "entry_date": "2026-11-13",
-      "sleeve": "ibs_etfs",
-      "stop": 174.6819
+    "VRTX": {
+      "entry_date": "2026-11-16",
+      "sleeve": "rsi2_stocks",
+      "stop": 500.84685
     },
     "ZS": {
       "entry_date": "2026-11-12",
