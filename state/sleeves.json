@@ -1,7 +1,7 @@
 {
   "closed_pl": {
     "ibs_etfs": -280.08,
-    "momentum_stocks": -298.52,
+    "momentum_stocks": -453.79,
     "rsi2_stocks": -1001.82
   },
   "days": {
@@ -386,7 +386,8 @@
     "month": "2026-11",
     "stopped": [
       "RVMD",
-      "MRNA"
+      "MRNA",
+      "SNDK"
     ],
     "targets": [
       "AXTI",
@@ -427,15 +428,6 @@
       "sleeve": "ibs_etfs",
       "stop": 259.9071
     },
-    "OTIS": {
-      "entry_date": "2026-11-12",
-      "sleeve": "rsi2_stocks"
-    },
-    "SNDK": {
-      "entry_date": "2026-11-12",
-      "sleeve": "momentum_stocks",
-      "stop": 828.2766
-    },
     "UAL": {
       "entry_date": "2026-11-16",
       "sleeve": "rsi2_stocks",
@@ -450,14 +442,6 @@
       "entry_date": "2026-11-16",
       "sleeve": "rsi2_stocks",
       "stop": 500.84685
-    },
-    "XLF": {
-      "entry_date": "2026-11-13",
-      "sleeve": "ibs_etfs"
-    },
-    "XLV": {
-      "entry_date": "2026-11-13",
-      "sleeve": "ibs_etfs"
     },
     "ZS": {
       "entry_date": "2026-11-12",
@@ -481,6 +465,7 @@
     "e48e40ab-c6c0-424e-853d-e250cdf4e819",
     "c3c670ea-7860-4bf8-b425-12176598f7c4",
     "79263ed7-d59a-4abe-b5e2-1aad0b46dfc5",
-    "7b24f287-59a6-46c1-adde-3a0f28b3cf53"
+    "7b24f287-59a6-46c1-adde-3a0f28b3cf53",
+    "1cfb792b-2c17-4fbe-9103-c1ee67d5cf02"
   ]
 }

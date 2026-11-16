@@ -17,7 +17,7 @@
     },
     {
       "sleeve": "ibs_etfs",
-      "trades": 6,
+      "trades": 8,
       "status": "waiting",
       "expectancy": null,
       "win_rate": null,
@@ -32,7 +32,7 @@
     },
     {
       "sleeve": "rsi2_stocks",
-      "trades": 18,
+      "trades": 19,
       "status": "waiting",
       "expectancy": null,
       "win_rate": null,
@@ -62,7 +62,7 @@
     },
     {
       "sleeve": "momentum_stocks",
-      "trades": 2,
+      "trades": 3,
       "status": "waiting",
       "expectancy": null,
       "win_rate": null,

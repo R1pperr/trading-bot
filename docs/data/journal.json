@@ -24,14 +24,6 @@
       "order_id": "cf8fa1f4-cac7-4150-95f0-106e5fb6e328",
       "time": "2026-11-11 14:31:52"
     },
-    "OTIS": {
-      "qty": 3.496326,
-      "cost": 274.74129708,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-12",
-      "order_id": "595ee9ee-a59f-487a-92a8-c6fe0ed75166",
-      "time": "2026-11-12 14:31:41"
-    },
     "ZS": {
       "qty": 25.435195,
       "cost": 4818.69769275,
@@ -39,14 +31,6 @@
       "day": "2026-11-12",
       "order_id": "e1866fc2-0d04-4ea0-b2ec-9c2034710561",
       "time": "2026-11-12 14:32:34"
-    },
-    "SNDK": {
-      "qty": 2.213777,
-      "cost": 1961.4110089459439,
-      "sleeve": "momentum_stocks",
-      "day": "2026-11-12",
-      "order_id": "37b30018-6544-4b90-8dac-33575c546319",
-      "time": "2026-11-12 14:33:11"
     },
     "ABT": {
       "qty": 45.94731,
@@ -64,22 +48,6 @@
       "order_id": "f4f3c963-2ff9-4e20-a4e2-a4a9d55ec677",
       "time": "2026-11-13 14:32:26"
     },
-    "XLF": {
-      "qty": 84.686735,
-      "cost": 4961.8889590584995,
-      "sleeve": "ibs_etfs",
-      "day": "2026-11-13",
-      "order_id": "b044d473-1720-4842-9745-a6817fb13b75",
-      "time": "2026-11-13 14:33:02"
-    },
-    "XLV": {
-      "qty": 26.240579,
-      "cost": 4942.767486150553,
-      "sleeve": "ibs_etfs",
-      "day": "2026-11-13",
-      "order_id": "9b143b92-493f-4a72-8ba3-03d9790deea8",
-      "time": "2026-11-13 14:33:06"
-    },
     "DIA": {
       "qty": 9.385984,
       "cost": 4922.637012103169,
@@ -87,6 +55,22 @@
       "day": "2026-11-13",
       "order_id": "d573b92f-e118-48bc-b902-f3dcf833ae70",
       "time": "2026-11-13 14:33:33"
+    },
+    "VRTX": {
+      "qty": 9.1089,
+      "cost": 4984.754436,
+      "sleeve": "rsi2_stocks",
+      "day": "2026-11-16",
+      "order_id": "b3f3d0b1-26c7-41e0-bca7-3bdd21c6782c",
+      "time": "2026-11-16 14:32:12"
+    },
+    "UAL": {
+      "qty": 44.377021,
+      "cost": 4932.875855374077,
+      "sleeve": "rsi2_stocks",
+      "day": "2026-11-16",
+      "order_id": "fbc4f796-301c-4e47-8dbf-98dd66b5437b",
+      "time": "2026-11-16 14:36:02"
     }
   },
   "seen": [
@@ -154,7 +138,13 @@
     "b044d473-1720-4842-9745-a6817fb13b75",
     "9b143b92-493f-4a72-8ba3-03d9790deea8",
     "d573b92f-e118-48bc-b902-f3dcf833ae70",
-    "7b24f287-59a6-46c1-adde-3a0f28b3cf53"
+    "7b24f287-59a6-46c1-adde-3a0f28b3cf53",
+    "210f9af0-7458-42bc-9d75-c716982fab19",
+    "b3f3d0b1-26c7-41e0-bca7-3bdd21c6782c",
+    "1cfb792b-2c17-4fbe-9103-c1ee67d5cf02",
+    "2cc68714-74de-48e2-9888-a2bd9707a5b1",
+    "b1c8f2ac-c5e3-45dc-9cbb-8f2b17277a35",
+    "fbc4f796-301c-4e47-8dbf-98dd66b5437b"
   ],
   "trades": [
     {
@@ -612,6 +602,74 @@
       "entry_time": "2026-11-12 14:31:05",
       "exit_time": "2026-11-13 14:34:48",
       "exit_order": "7b24f287-59a6-46c1-adde-3a0f28b3cf53"
+    },
+    {
+      "symbol": "XLV",
+      "sleeve": "ibs_etfs",
+      "entry_day": "2026-11-13",
+      "exit_day": "2026-11-16",
+      "days": 3,
+      "qty": 26.240579,
+      "entry": 188.3635,
+      "exit": 190.47,
+      "pnl": 55.28,
+      "ret": 0.01118,
+      "stop": false,
+      "entry_order": "9b143b92-493f-4a72-8ba3-03d9790deea8",
+      "entry_time": "2026-11-13 14:33:06",
+      "exit_time": "2026-11-16 14:30:24",
+      "exit_order": "210f9af0-7458-42bc-9d75-c716982fab19"
+    },
+    {
+      "symbol": "SNDK",
+      "sleeve": "momentum_stocks",
+      "entry_day": "2026-11-12",
+      "exit_day": "2026-11-16",
+      "days": 4,
+      "qty": 2.213777,
+      "entry": 886.0021,
+      "exit": 815.8603,
+      "pnl": -155.28,
+      "ret": -0.07917,
+      "stop": true,
+      "entry_order": "37b30018-6544-4b90-8dac-33575c546319",
+      "entry_time": "2026-11-12 14:33:11",
+      "exit_time": "2026-11-16 14:33:32",
+      "exit_order": "1cfb792b-2c17-4fbe-9103-c1ee67d5cf02"
+    },
+    {
+      "symbol": "XLF",
+      "sleeve": "ibs_etfs",
+      "entry_day": "2026-11-13",
+      "exit_day": "2026-11-16",
+      "days": 3,
+      "qty": 84.686735,
+      "entry": 58.5911,
+      "exit": 58.7478,
+      "pnl": 13.27,
+      "ret": 0.00267,
+      "stop": false,
+      "entry_order": "b044d473-1720-4842-9745-a6817fb13b75",
+      "entry_time": "2026-11-13 14:33:02",
+      "exit_time": "2026-11-16 14:34:13",
+      "exit_order": "2cc68714-74de-48e2-9888-a2bd9707a5b1"
+    },
+    {
+      "symbol": "OTIS",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-12",
+      "exit_day": "2026-11-16",
+      "days": 4,
+      "qty": 3.496326,
+      "entry": 78.58,
+      "exit": 78.0028,
+      "pnl": -2.02,
+      "ret": -0.00735,
+      "stop": false,
+      "entry_order": "595ee9ee-a59f-487a-92a8-c6fe0ed75166",
+      "entry_time": "2026-11-12 14:31:41",
+      "exit_time": "2026-11-16 14:34:46",
+      "exit_order": "b1c8f2ac-c5e3-45dc-9cbb-8f2b17277a35"
     }
   ]
 }
