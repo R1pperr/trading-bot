@@ -71,6 +71,38 @@
       "day": "2026-11-16",
       "order_id": "fbc4f796-301c-4e47-8dbf-98dd66b5437b",
       "time": "2026-11-16 14:36:02"
+    },
+    "XLI": {
+      "qty": 0.863175,
+      "cost": 142.81230374999998,
+      "sleeve": "ibs_etfs",
+      "day": "2026-11-17",
+      "order_id": "27100f9b-dba9-420e-bde7-4f3d34c944d5",
+      "time": "2026-11-17 14:30:00"
+    },
+    "AMZN": {
+      "qty": 0.135597,
+      "cost": 34.936567049999994,
+      "sleeve": "rsi2_stocks",
+      "day": "2026-11-17",
+      "order_id": "9c33215c-e986-40f2-941a-c980dd39c2df",
+      "time": "2026-11-17 14:30:00"
+    },
+    "XLV": {
+      "qty": 26.167931,
+      "cost": 4870.323557552481,
+      "sleeve": "ibs_etfs",
+      "day": "2026-11-17",
+      "order_id": "94cddcd6-ecf2-4c17-86f7-8b898db35a03",
+      "time": "2026-11-17 14:32:52"
+    },
+    "XLE": {
+      "qty": 76.400831,
+      "cost": 4899.447082926721,
+      "sleeve": "ibs_etfs",
+      "day": "2026-11-17",
+      "order_id": "69a6abf9-cacf-4b48-adaf-25533dc47f6b",
+      "time": "2026-11-17 14:33:37"
     }
   },
   "seen": [
@@ -144,7 +176,11 @@
     "1cfb792b-2c17-4fbe-9103-c1ee67d5cf02",
     "2cc68714-74de-48e2-9888-a2bd9707a5b1",
     "b1c8f2ac-c5e3-45dc-9cbb-8f2b17277a35",
-    "fbc4f796-301c-4e47-8dbf-98dd66b5437b"
+    "fbc4f796-301c-4e47-8dbf-98dd66b5437b",
+    "27100f9b-dba9-420e-bde7-4f3d34c944d5",
+    "9c33215c-e986-40f2-941a-c980dd39c2df",
+    "94cddcd6-ecf2-4c17-86f7-8b898db35a03",
+    "69a6abf9-cacf-4b48-adaf-25533dc47f6b"
   ],
   "trades": [
     {
