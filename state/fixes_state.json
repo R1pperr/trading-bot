@@ -11,7 +11,8 @@
   "rotation": {},
   "momentum_stocks": {
    "trend_below": "2027-02-03",
-   "gap_filter": "2027-02-05"
+   "gap_filter": "2027-02-05",
+   "vol_filter": "2027-02-08"
   },
   "realtime": {}
  },
