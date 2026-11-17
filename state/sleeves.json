@@ -6,7 +6,7 @@
   },
   "days": {
     "crypto": "2026-11-02",
-    "stock": "2026-11-16"
+    "stock": "2026-11-17"
   },
   "entries": {
     "11ee5671-d61d-4874-a4bd-a435f711dbd8": {
@@ -56,6 +56,18 @@
       "sleeve": "rotation",
       "spread": "wide",
       "symbol": "EFA"
+    },
+    "27100f9b-dba9-420e-bde7-4f3d34c944d5": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Prices have chopped in a fairly narrow range with no extreme latest-day collapse; the recent dip looks like ordinary pullback, so the signal isn't clearly unreliable.",
+      "day": "2026-11-17",
+      "equity": 97349.94,
+      "placed_utc": "2026-11-17T14:19:30Z",
+      "pre_open": true,
+      "qty": 0.863175,
+      "sleeve": "ibs_etfs",
+      "spread": "wide",
+      "symbol": "XLI"
     },
     "2aab6f80-a394-4f3e-bbdf-aad3af9e4bc5": {
       "ai_decision": "APPROVE",
@@ -141,6 +153,18 @@
       "spread": "wide",
       "symbol": "OTIS"
     },
+    "69a6abf9-cacf-4b48-adaf-25533dc47f6b": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Recent prices show a sharp pullback followed by a steady partial recovery, with no extreme one-day move or choppiness; the latest dip looks like an ordinary pullback.",
+      "day": "2026-11-17",
+      "equity": 97349.94,
+      "placed_utc": "2026-11-17T14:19:16Z",
+      "pre_open": true,
+      "qty": 76.400831,
+      "sleeve": "ibs_etfs",
+      "spread": null,
+      "symbol": "XLE"
+    },
     "8d5a3d24-84a2-49b1-9b7a-2385993086c2": {
       "ai_decision": "APPROVE",
       "ai_reason": "The prices show a steady uptrend followed by a sharp multi-day pullback, which fits a short-term oversold setup; nothing looks choppy or like a single extreme reversal-prone spike.",
@@ -164,6 +188,18 @@
       "sleeve": "rsi2_stocks",
       "spread": "wide",
       "symbol": "PLTR"
+    },
+    "94cddcd6-ecf2-4c17-86f7-8b898db35a03": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Prices show a steady, fairly smooth uptrend with no extreme one-day spike or reversal in the latest session, so the dip-buy signal looks reasonably reliable.",
+      "day": "2026-11-17",
+      "equity": 97349.94,
+      "placed_utc": "2026-11-17T14:19:22Z",
+      "pre_open": true,
+      "qty": 26.167931,
+      "sleeve": "ibs_etfs",
+      "spread": "wide",
+      "symbol": "XLV"
     },
     "94d8e6ec-7b78-4e9d-b206-eb19882d2bf2": {
       "ai_decision": "APPROVE",
@@ -200,6 +236,18 @@
       "sleeve": "ibs_etfs",
       "spread": "wide",
       "symbol": "XLV"
+    },
+    "9c33215c-e986-40f2-941a-c980dd39c2df": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "The latest drop is sizable but not extreme, and prices remain in a broad upward drift from recent lows, so the oversold dip-buy signal looks reasonably reliable.",
+      "day": "2026-11-17",
+      "equity": 97349.94,
+      "placed_utc": "2026-11-17T14:19:37Z",
+      "pre_open": true,
+      "qty": 0.135597,
+      "sleeve": "rsi2_stocks",
+      "spread": "wide",
+      "symbol": "AMZN"
     },
     "9eac0df4-542f-4805-b834-e507bb47189f": {
       "ai_decision": "APPROVE",
@@ -408,6 +456,11 @@
       "sleeve": "rsi2_stocks",
       "stop": 99.7611
     },
+    "AMZN": {
+      "entry_date": "2026-11-17",
+      "sleeve": "rsi2_stocks",
+      "stop": 241.056
+    },
     "DBC": {
       "entry_date": "2026-11-11",
       "sleeve": "rotation",
@@ -442,6 +495,21 @@
       "entry_date": "2026-11-16",
       "sleeve": "rsi2_stocks",
       "stop": 500.84685
+    },
+    "XLE": {
+      "entry_date": "2026-11-17",
+      "sleeve": "ibs_etfs",
+      "stop": 59.2503
+    },
+    "XLI": {
+      "entry_date": "2026-11-17",
+      "sleeve": "ibs_etfs",
+      "stop": 154.0638
+    },
+    "XLV": {
+      "entry_date": "2026-11-17",
+      "sleeve": "ibs_etfs",
+      "stop": 172.9893
     },
     "ZS": {
       "entry_date": "2026-11-12",
