@@ -4,8 +4,8 @@
   "realtime": "enforce"
  },
  "ai_record": {
-  "main": "of your last 50 calls, 23 have results; 10 approvals averaged -1.31% a trade (50% won); the 13 trades you vetoed would have averaged -9.46% after costs (so your vetoes helped).",
-  "realtime": "of your last 8 calls, 1 have results; the 1 trades you vetoed would have averaged +1.22% after costs (so your vetoes cost money)."
+  "main": "of your last 50 calls, 22 have results; 8 approvals averaged -2.22% a trade (38% won); the 14 trades you vetoed would have averaged -8.55% after costs (so your vetoes helped).",
+  "realtime": "of your last 9 calls, 1 have results; the 1 trades you vetoed would have averaged +1.22% after costs (so your vetoes cost money)."
  },
  "allocations": {
   "ibs_etfs": 0.2,
@@ -106,5 +106,5 @@
   },
   "turn_of_month": null
  },
- "updated_utc": "2026-11-17T04:08:43Z"
+ "updated_utc": "2026-11-18T03:06:49Z"
 }
