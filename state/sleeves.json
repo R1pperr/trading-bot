@@ -527,6 +527,10 @@
       "sleeve": "rsi2_stocks",
       "stop": 682.8711
     },
+    "UAL": {
+      "entry_date": "2026-11-16",
+      "sleeve": "rsi2_stocks"
+    },
     "VNQ": {
       "entry_date": "2026-11-04",
       "sleeve": "rotation",

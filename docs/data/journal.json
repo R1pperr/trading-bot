@@ -103,6 +103,22 @@
       "day": "2026-11-17",
       "order_id": "69a6abf9-cacf-4b48-adaf-25533dc47f6b",
       "time": "2026-11-17 14:33:37"
+    },
+    "MSFT": {
+      "qty": 0.060908,
+      "cost": 30.801784679999997,
+      "sleeve": "rsi2_stocks",
+      "day": "2026-11-18",
+      "order_id": "5a507a56-3780-419b-b94b-4f70f1abbb14",
+      "time": "2026-11-18 14:30:00"
+    },
+    "XLF": {
+      "qty": 1.065209,
+      "cost": 60.54647956000001,
+      "sleeve": "ibs_etfs",
+      "day": "2026-11-18",
+      "order_id": "438bd6f1-f35e-4203-aa57-5ffd2d6a6909",
+      "time": "2026-11-18 14:30:50"
     }
   },
   "seen": [
@@ -180,7 +196,9 @@
     "27100f9b-dba9-420e-bde7-4f3d34c944d5",
     "9c33215c-e986-40f2-941a-c980dd39c2df",
     "94cddcd6-ecf2-4c17-86f7-8b898db35a03",
-    "69a6abf9-cacf-4b48-adaf-25533dc47f6b"
+    "69a6abf9-cacf-4b48-adaf-25533dc47f6b",
+    "5a507a56-3780-419b-b94b-4f70f1abbb14",
+    "438bd6f1-f35e-4203-aa57-5ffd2d6a6909"
   ],
   "trades": [
     {
