@@ -2,11 +2,11 @@
   "closed_pl": {
     "ibs_etfs": -280.08,
     "momentum_stocks": -453.79,
-    "rsi2_stocks": -1001.82
+    "rsi2_stocks": -1191.68
   },
   "days": {
     "crypto": "2026-11-02",
-    "stock": "2026-11-17"
+    "stock": "2026-11-18"
   },
   "entries": {
     "11ee5671-d61d-4874-a4bd-a435f711dbd8": {
@@ -141,6 +141,18 @@
       "spread": "normal",
       "symbol": "IBIT"
     },
+    "438bd6f1-f35e-4203-aa57-5ffd2d6a6909": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "The fund is in a steady uptrend with ordinary daily moves; the latest drop is a modest pullback, not an extreme move or choppy, trendless action.",
+      "day": "2026-11-18",
+      "equity": 96680.79,
+      "placed_utc": "2026-11-18T14:15:30Z",
+      "pre_open": true,
+      "qty": 1.065209,
+      "sleeve": "ibs_etfs",
+      "spread": null,
+      "symbol": "XLF"
+    },
     "595ee9ee-a59f-487a-92a8-c6fe0ed75166": {
       "ai_decision": "APPROVE",
       "ai_reason": "Prices show a steady uptrend with only mild recent pullback, no extreme one-day move or choppiness, so the dip-buy signal looks reasonably reliable.",
@@ -152,6 +164,18 @@
       "sleeve": "rsi2_stocks",
       "spread": "wide",
       "symbol": "OTIS"
+    },
+    "5a507a56-3780-419b-b94b-4f70f1abbb14": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "The recent drop is a steady multi-day slide with no single extreme one-day move, and the oversold dip fits the strategy's setup, so the signal looks reasonably reliable.",
+      "day": "2026-11-18",
+      "equity": 96680.79,
+      "placed_utc": "2026-11-18T14:15:44Z",
+      "pre_open": true,
+      "qty": 0.060908,
+      "sleeve": "rsi2_stocks",
+      "spread": "wide",
+      "symbol": "MSFT"
     },
     "69a6abf9-cacf-4b48-adaf-25533dc47f6b": {
       "ai_decision": "APPROVE",
@@ -176,6 +200,18 @@
       "sleeve": "rsi2_stocks",
       "spread": "wide",
       "symbol": "XLE"
+    },
+    "8f200565-1803-4d32-ae09-6a4d4b2ba652": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Prices have drifted lower in a choppy but orderly way, with a steady pullback into the latest close; this fits an oversold dip signal and shows no clear unreliability.",
+      "day": "2026-11-18",
+      "equity": 96680.79,
+      "placed_utc": "2026-11-18T14:15:37Z",
+      "pre_open": true,
+      "qty": 6.583463,
+      "sleeve": "rsi2_stocks",
+      "spread": "normal",
+      "symbol": "SPY"
     },
     "9494b5cb-8baf-4455-8be1-dc77c60cb943": {
       "ai_decision": "APPROVE",
@@ -481,10 +517,15 @@
       "sleeve": "ibs_etfs",
       "stop": 259.9071
     },
-    "UAL": {
-      "entry_date": "2026-11-16",
+    "MSFT": {
+      "entry_date": "2026-11-18",
       "sleeve": "rsi2_stocks",
-      "stop": 101.5839
+      "stop": 468.813
+    },
+    "SPY": {
+      "entry_date": "2026-11-18",
+      "sleeve": "rsi2_stocks",
+      "stop": 682.8711
     },
     "VNQ": {
       "entry_date": "2026-11-04",
@@ -500,6 +541,11 @@
       "entry_date": "2026-11-17",
       "sleeve": "ibs_etfs",
       "stop": 59.2503
+    },
+    "XLF": {
+      "entry_date": "2026-11-18",
+      "sleeve": "ibs_etfs",
+      "stop": 53.0844
     },
     "XLI": {
       "entry_date": "2026-11-17",
