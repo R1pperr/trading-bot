@@ -24,8 +24,8 @@
       "allocation": 0.2,
       "enabled": true,
       "positions": 6,
-      "value": 19110.32,
-      "open_pl": -707.52,
+      "value": 19094.63,
+      "open_pl": -723.2,
       "closed_pl": -280.08
     },
     {
@@ -35,8 +35,8 @@
       "allocation": 0.2,
       "enabled": true,
       "positions": 6,
-      "value": 19683.98,
-      "open_pl": 8.25,
+      "value": 19648.8,
+      "open_pl": -26.93,
       "closed_pl": -1191.68
     },
     {
@@ -46,8 +46,8 @@
       "allocation": 0.2,
       "enabled": true,
       "positions": 3,
-      "value": 14341.56,
-      "open_pl": -557.35,
+      "value": 14339.66,
+      "open_pl": -559.25,
       "closed_pl": 0.0
     },
     {
