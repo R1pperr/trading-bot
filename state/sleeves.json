@@ -2,11 +2,11 @@
   "closed_pl": {
     "ibs_etfs": -280.08,
     "momentum_stocks": -453.79,
-    "rsi2_stocks": -1191.68
+    "rsi2_stocks": -808.71
   },
   "days": {
     "crypto": "2026-11-02",
-    "stock": "2026-11-18"
+    "stock": "2026-11-19"
   },
   "entries": {
     "11ee5671-d61d-4874-a4bd-a435f711dbd8": {
@@ -333,6 +333,18 @@
       "spread": null,
       "symbol": "VRTX"
     },
+    "ccad54a1-56b1-439f-a2f8-1b1e28983cdc": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Recent decline is a steady pullback with a sharp but already partly recovered drop earlier; no clear sign the oversold signal is unreliable for this mean-reversion entry.",
+      "day": "2026-11-19",
+      "equity": 96815.5,
+      "placed_utc": "2026-11-19T14:12:52Z",
+      "pre_open": true,
+      "qty": 7.17781,
+      "sleeve": "rsi2_stocks",
+      "spread": "normal",
+      "symbol": "VOO"
+    },
     "cf8fa1f4-cac7-4150-95f0-106e5fb6e328": {
       "ai_decision": "APPROVE",
       "ai_reason": "Prices rose steadily, then pulled back sharply in recent days; the drop is gradual rather than one extreme reversal-prone move, so the signal isn't clearly unreliable.",
@@ -492,11 +504,6 @@
       "sleeve": "rsi2_stocks",
       "stop": 99.7611
     },
-    "AMZN": {
-      "entry_date": "2026-11-17",
-      "sleeve": "rsi2_stocks",
-      "stop": 241.056
-    },
     "DBC": {
       "entry_date": "2026-11-11",
       "sleeve": "rotation",
@@ -532,6 +539,11 @@
       "sleeve": "rotation",
       "stop": 90.61455
     },
+    "VOO": {
+      "entry_date": "2026-11-19",
+      "sleeve": "rsi2_stocks",
+      "stop": 624.2718
+    },
     "VRTX": {
       "entry_date": "2026-11-16",
       "sleeve": "rsi2_stocks",
@@ -556,11 +568,6 @@
       "entry_date": "2026-11-17",
       "sleeve": "ibs_etfs",
       "stop": 172.9893
-    },
-    "ZS": {
-      "entry_date": "2026-11-12",
-      "sleeve": "rsi2_stocks",
-      "stop": 180.2247
     }
   },
   "rotation": {
