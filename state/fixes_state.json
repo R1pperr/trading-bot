@@ -33,7 +33,10 @@
   "stage": "idle"
  },
  "realtime": {
-  "stage": "idle"
+  "stage": "shadow",
+  "fix": "trend_below",
+  "since": "2026-11-18",
+  "problem": "Loses when SPY is above its 200-day average"
  },
  "ai": {
   "main": {

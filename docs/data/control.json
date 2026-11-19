@@ -4,8 +4,8 @@
   "realtime": "enforce"
  },
  "ai_record": {
-  "main": "of your last 50 calls, 22 have results; 8 approvals averaged -2.22% a trade (38% won); the 14 trades you vetoed would have averaged -8.55% after costs (so your vetoes helped).",
-  "realtime": "of your last 9 calls, 1 have results; the 1 trades you vetoed would have averaged +1.22% after costs (so your vetoes cost money)."
+  "main": "of your last 50 calls, 23 have results; 9 approvals averaged -2.44% a trade (33% won); the 14 trades you vetoed would have averaged -8.56% after costs (so your vetoes helped).",
+  "realtime": "of your last 10 calls, 1 have results; the 1 trades you vetoed would have averaged +1.22% after costs (so your vetoes cost money)."
  },
  "allocations": {
   "ibs_etfs": 0.2,
@@ -90,7 +90,18 @@
  "shadow": {
   "ibs_etfs": null,
   "momentum_stocks": null,
-  "realtime": null,
+  "realtime": {
+   "confirmation": false,
+   "gap_filter": false,
+   "liquidity_filter": false,
+   "tight_stop": false,
+   "time_exit": false,
+   "time_filter": 0,
+   "trailing_stop": false,
+   "trend_filter": "below",
+   "vol_filter": false,
+   "vol_sizing": false
+  },
   "rotation": null,
   "rsi2_stocks": {
    "confirmation": false,
@@ -106,5 +117,5 @@
   },
   "turn_of_month": null
  },
- "updated_utc": "2026-11-18T03:06:49Z"
+ "updated_utc": "2026-11-19T02:45:27Z"
 }
