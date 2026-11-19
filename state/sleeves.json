@@ -504,6 +504,10 @@
       "sleeve": "rsi2_stocks",
       "stop": 99.7611
     },
+    "AMZN": {
+      "entry_date": "2026-11-17",
+      "sleeve": "rsi2_stocks"
+    },
     "DBC": {
       "entry_date": "2026-11-11",
       "sleeve": "rotation",
@@ -568,6 +572,10 @@
       "entry_date": "2026-11-17",
       "sleeve": "ibs_etfs",
       "stop": 172.9893
+    },
+    "ZS": {
+      "entry_date": "2026-11-12",
+      "sleeve": "rsi2_stocks"
     }
   },
   "rotation": {
