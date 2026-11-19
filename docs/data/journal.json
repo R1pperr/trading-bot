@@ -24,14 +24,6 @@
       "order_id": "cf8fa1f4-cac7-4150-95f0-106e5fb6e328",
       "time": "2026-11-11 14:31:52"
     },
-    "ZS": {
-      "qty": 25.435195,
-      "cost": 4818.69769275,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-12",
-      "order_id": "e1866fc2-0d04-4ea0-b2ec-9c2034710561",
-      "time": "2026-11-12 14:32:34"
-    },
     "ABT": {
       "qty": 45.94731,
       "cost": 4971.498942,
@@ -70,14 +62,6 @@
       "sleeve": "ibs_etfs",
       "day": "2026-11-17",
       "order_id": "27100f9b-dba9-420e-bde7-4f3d34c944d5",
-      "time": "2026-11-17 14:30:00"
-    },
-    "AMZN": {
-      "qty": 0.135597,
-      "cost": 34.936567049999994,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-17",
-      "order_id": "9c33215c-e986-40f2-941a-c980dd39c2df",
       "time": "2026-11-17 14:30:00"
     },
     "XLV": {
@@ -119,6 +103,14 @@
       "day": "2026-11-18",
       "order_id": "8f200565-1803-4d32-ae09-6a4d4b2ba652",
       "time": "2026-11-18 14:33:30"
+    },
+    "VOO": {
+      "qty": 7.17781,
+      "cost": 4870.9336441000005,
+      "sleeve": "rsi2_stocks",
+      "day": "2026-11-19",
+      "order_id": "ccad54a1-56b1-439f-a2f8-1b1e28983cdc",
+      "time": "2026-11-19 14:31:03"
     }
   },
   "seen": [
@@ -200,7 +192,10 @@
     "5a507a56-3780-419b-b94b-4f70f1abbb14",
     "438bd6f1-f35e-4203-aa57-5ffd2d6a6909",
     "58850a98-438b-4332-a9d5-4d8b34c4dd65",
-    "8f200565-1803-4d32-ae09-6a4d4b2ba652"
+    "8f200565-1803-4d32-ae09-6a4d4b2ba652",
+    "dc228ce6-c35f-4c92-8ed8-ef68be9c9064",
+    "ccad54a1-56b1-439f-a2f8-1b1e28983cdc",
+    "240dc925-d96d-4709-96b0-6cbcf8a9e31f"
   ],
   "trades": [
     {
@@ -743,6 +738,40 @@
       "entry_time": "2026-11-16 14:36:02",
       "exit_time": "2026-11-18 14:32:38",
       "exit_order": "58850a98-438b-4332-a9d5-4d8b34c4dd65"
+    },
+    {
+      "symbol": "AMZN",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-17",
+      "exit_day": "2026-11-19",
+      "days": 2,
+      "qty": 0.135597,
+      "entry": 257.65,
+      "exit": 272.51,
+      "pnl": 2.01,
+      "ret": 0.05768,
+      "stop": false,
+      "entry_order": "9c33215c-e986-40f2-941a-c980dd39c2df",
+      "entry_time": "2026-11-17 14:30:00",
+      "exit_time": "2026-11-19 14:30:00",
+      "exit_order": "dc228ce6-c35f-4c92-8ed8-ef68be9c9064"
+    },
+    {
+      "symbol": "ZS",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-12",
+      "exit_day": "2026-11-19",
+      "days": 7,
+      "qty": 25.435195,
+      "entry": 189.45,
+      "exit": 207.1228,
+      "pnl": 449.51,
+      "ret": 0.09328,
+      "stop": false,
+      "entry_order": "e1866fc2-0d04-4ea0-b2ec-9c2034710561",
+      "entry_time": "2026-11-12 14:32:34",
+      "exit_time": "2026-11-19 14:33:13",
+      "exit_order": "240dc925-d96d-4709-96b0-6cbcf8a9e31f"
     }
   ]
 }
