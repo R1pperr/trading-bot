@@ -8,14 +8,6 @@
       "order_id": "11ee5671-d61d-4874-a4bd-a435f711dbd8",
       "time": "2026-11-04 18:21:31"
     },
-    "EFA": {
-      "qty": 47.187472,
-      "cost": 4957.27703971168,
-      "sleeve": "rotation",
-      "day": "2026-11-05",
-      "order_id": "25a41c39-e981-4728-a55f-adf0049b65a6",
-      "time": "2026-11-05 14:36:24"
-    },
     "DBC": {
       "qty": 160.143788,
       "cost": 4943.057253465772,
@@ -212,7 +204,8 @@
     "dc1efdad-6e3d-4182-8b50-07ac8f065293",
     "134c30d8-65cf-4d4f-affd-6c7b8e5cac71",
     "493173a8-f670-4070-bba3-e3134b31cf4b",
-    "f1c68b93-631c-4a1a-ad01-3fdee5719ed2"
+    "f1c68b93-631c-4a1a-ad01-3fdee5719ed2",
+    "77d23019-9501-43bf-ae82-9f023e2b46bc"
   ],
   "trades": [
     {
@@ -857,6 +850,23 @@
       "entry_time": "2026-11-19 14:31:03",
       "exit_time": "2026-11-20 14:34:17",
       "exit_order": "f1c68b93-631c-4a1a-ad01-3fdee5719ed2"
+    },
+    {
+      "symbol": "EFA",
+      "sleeve": "rotation",
+      "entry_day": "2026-11-05",
+      "exit_day": "2026-11-20",
+      "days": 15,
+      "qty": 47.187472,
+      "entry": 105.0549,
+      "exit": 97.69,
+      "pnl": -347.53,
+      "ret": -0.07011,
+      "stop": true,
+      "entry_order": "25a41c39-e981-4728-a55f-adf0049b65a6",
+      "entry_time": "2026-11-05 14:36:24",
+      "exit_time": "2026-11-20 15:19:38",
+      "exit_order": "77d23019-9501-43bf-ae82-9f023e2b46bc"
     }
   ]
 }

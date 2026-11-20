@@ -2,6 +2,7 @@
   "closed_pl": {
     "ibs_etfs": -880.47,
     "momentum_stocks": -453.79,
+    "rotation": -347.48,
     "rsi2_stocks": -1134.69
   },
   "days": {
@@ -574,11 +575,6 @@
       "sleeve": "rotation",
       "stop": 28.5975
     },
-    "EFA": {
-      "entry_date": "2026-11-05",
-      "sleeve": "rotation",
-      "stop": 98.3289
-    },
     "LLY": {
       "entry_date": "2026-11-20",
       "sleeve": "rsi2_stocks",
@@ -637,7 +633,9 @@
   },
   "rotation": {
     "month": "2026-11",
-    "stopped": [],
+    "stopped": [
+      "EFA"
+    ],
     "targets": [
       "DBC",
       "VNQ",
@@ -652,6 +650,7 @@
     "c3c670ea-7860-4bf8-b425-12176598f7c4",
     "79263ed7-d59a-4abe-b5e2-1aad0b46dfc5",
     "7b24f287-59a6-46c1-adde-3a0f28b3cf53",
-    "1cfb792b-2c17-4fbe-9103-c1ee67d5cf02"
+    "1cfb792b-2c17-4fbe-9103-c1ee67d5cf02",
+    "77d23019-9501-43bf-ae82-9f023e2b46bc"
   ]
 }
