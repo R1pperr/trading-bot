@@ -32,22 +32,6 @@
       "order_id": "9816b8ed-bc1c-4bad-a108-24ba2acea5b9",
       "time": "2026-11-13 14:31:10"
     },
-    "IWM": {
-      "qty": 17.636125,
-      "cost": 4922.06612625,
-      "sleeve": "ibs_etfs",
-      "day": "2026-11-13",
-      "order_id": "f4f3c963-2ff9-4e20-a4e2-a4a9d55ec677",
-      "time": "2026-11-13 14:32:26"
-    },
-    "DIA": {
-      "qty": 9.385984,
-      "cost": 4922.637012103169,
-      "sleeve": "ibs_etfs",
-      "day": "2026-11-13",
-      "order_id": "d573b92f-e118-48bc-b902-f3dcf833ae70",
-      "time": "2026-11-13 14:33:33"
-    },
     "VRTX": {
       "qty": 9.1089,
       "cost": 4984.754436,
@@ -96,21 +80,45 @@
       "order_id": "438bd6f1-f35e-4203-aa57-5ffd2d6a6909",
       "time": "2026-11-18 14:30:50"
     },
-    "SPY": {
-      "qty": 6.583463,
-      "cost": 4835.0477397038585,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-18",
-      "order_id": "8f200565-1803-4d32-ae09-6a4d4b2ba652",
-      "time": "2026-11-18 14:33:30"
+    "XLRE": {
+      "qty": 2.357032,
+      "cost": 101.79163484055199,
+      "sleeve": "ibs_etfs",
+      "day": "2026-11-20",
+      "order_id": "6493bfe3-7f76-40f3-b84e-fffd81af80e1",
+      "time": "2026-11-20 14:32:11"
     },
-    "VOO": {
-      "qty": 7.17781,
-      "cost": 4870.9336441000005,
+    "BRK.B": {
+      "qty": 8.270662,
+      "cost": 4753.123357461391,
       "sleeve": "rsi2_stocks",
-      "day": "2026-11-19",
-      "order_id": "ccad54a1-56b1-439f-a2f8-1b1e28983cdc",
-      "time": "2026-11-19 14:31:03"
+      "day": "2026-11-20",
+      "order_id": "982480ae-d2a0-441b-aacb-b0dce591caa6",
+      "time": "2026-11-20 14:32:17"
+    },
+    "LLY": {
+      "qty": 3.547826,
+      "cost": 4834.671010268376,
+      "sleeve": "rsi2_stocks",
+      "day": "2026-11-20",
+      "order_id": "dc1efdad-6e3d-4182-8b50-07ac8f065293",
+      "time": "2026-11-20 14:32:48"
+    },
+    "XLY": {
+      "qty": 41.388148,
+      "cost": 4778.294838506548,
+      "sleeve": "ibs_etfs",
+      "day": "2026-11-20",
+      "order_id": "134c30d8-65cf-4d4f-affd-6c7b8e5cac71",
+      "time": "2026-11-20 14:33:19"
+    },
+    "XLB": {
+      "qty": 96.992353,
+      "cost": 4801.870642434572,
+      "sleeve": "ibs_etfs",
+      "day": "2026-11-20",
+      "order_id": "493173a8-f670-4070-bba3-e3134b31cf4b",
+      "time": "2026-11-20 14:34:01"
     }
   },
   "seen": [
@@ -195,7 +203,16 @@
     "8f200565-1803-4d32-ae09-6a4d4b2ba652",
     "dc228ce6-c35f-4c92-8ed8-ef68be9c9064",
     "ccad54a1-56b1-439f-a2f8-1b1e28983cdc",
-    "240dc925-d96d-4709-96b0-6cbcf8a9e31f"
+    "240dc925-d96d-4709-96b0-6cbcf8a9e31f",
+    "5b33eafb-ca42-4284-b290-c2c1691bc927",
+    "fa24545e-8ff0-4fe2-b245-0c9fa09caa38",
+    "2fc06a6a-6b7b-4fdd-8951-42b494ae4060",
+    "6493bfe3-7f76-40f3-b84e-fffd81af80e1",
+    "982480ae-d2a0-441b-aacb-b0dce591caa6",
+    "dc1efdad-6e3d-4182-8b50-07ac8f065293",
+    "134c30d8-65cf-4d4f-affd-6c7b8e5cac71",
+    "493173a8-f670-4070-bba3-e3134b31cf4b",
+    "f1c68b93-631c-4a1a-ad01-3fdee5719ed2"
   ],
   "trades": [
     {
@@ -772,6 +789,74 @@
       "entry_time": "2026-11-12 14:32:34",
       "exit_time": "2026-11-19 14:33:13",
       "exit_order": "240dc925-d96d-4709-96b0-6cbcf8a9e31f"
+    },
+    {
+      "symbol": "SPY",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-18",
+      "exit_day": "2026-11-20",
+      "days": 2,
+      "qty": 6.583463,
+      "entry": 734.4232,
+      "exit": 712.09,
+      "pnl": -147.03,
+      "ret": -0.03041,
+      "stop": false,
+      "entry_order": "8f200565-1803-4d32-ae09-6a4d4b2ba652",
+      "entry_time": "2026-11-18 14:33:30",
+      "exit_time": "2026-11-20 14:30:23",
+      "exit_order": "5b33eafb-ca42-4284-b290-c2c1691bc927"
+    },
+    {
+      "symbol": "DIA",
+      "sleeve": "ibs_etfs",
+      "entry_day": "2026-11-13",
+      "exit_day": "2026-11-20",
+      "days": 7,
+      "qty": 9.385984,
+      "entry": 524.4668,
+      "exit": 490.19,
+      "pnl": -321.72,
+      "ret": -0.06536,
+      "stop": false,
+      "entry_order": "d573b92f-e118-48bc-b902-f3dcf833ae70",
+      "entry_time": "2026-11-13 14:33:33",
+      "exit_time": "2026-11-20 14:30:52",
+      "exit_order": "fa24545e-8ff0-4fe2-b245-0c9fa09caa38"
+    },
+    {
+      "symbol": "IWM",
+      "sleeve": "ibs_etfs",
+      "entry_day": "2026-11-13",
+      "exit_day": "2026-11-20",
+      "days": 7,
+      "qty": 17.636125,
+      "entry": 279.09,
+      "exit": 263.42,
+      "pnl": -276.36,
+      "ret": -0.05615,
+      "stop": false,
+      "entry_order": "f4f3c963-2ff9-4e20-a4e2-a4a9d55ec677",
+      "entry_time": "2026-11-13 14:32:26",
+      "exit_time": "2026-11-20 14:31:34",
+      "exit_order": "2fc06a6a-6b7b-4fdd-8951-42b494ae4060"
+    },
+    {
+      "symbol": "VOO",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-19",
+      "exit_day": "2026-11-20",
+      "days": 1,
+      "qty": 7.17781,
+      "entry": 678.61,
+      "exit": 654.8402,
+      "pnl": -170.61,
+      "ret": -0.03503,
+      "stop": false,
+      "entry_order": "ccad54a1-56b1-439f-a2f8-1b1e28983cdc",
+      "entry_time": "2026-11-19 14:31:03",
+      "exit_time": "2026-11-20 14:34:17",
+      "exit_order": "f1c68b93-631c-4a1a-ad01-3fdee5719ed2"
     }
   ]
 }

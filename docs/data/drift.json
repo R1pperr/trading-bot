@@ -17,7 +17,7 @@
     },
     {
       "sleeve": "ibs_etfs",
-      "trades": 8,
+      "trades": 10,
       "status": "waiting",
       "expectancy": null,
       "win_rate": null,
@@ -32,9 +32,9 @@
     },
     {
       "sleeve": "rsi2_stocks",
-      "trades": 22,
+      "trades": 24,
       "status": "ok",
-      "expectancy": -0.0028870000000000002,
+      "expectancy": -0.0027215000000000004,
       "win_rate": 0.45,
       "limits": {
         "expectancy_low": -0.02297,

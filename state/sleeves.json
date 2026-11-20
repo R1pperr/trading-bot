@@ -574,18 +574,10 @@
       "sleeve": "rotation",
       "stop": 28.5975
     },
-    "DIA": {
-      "entry_date": "2026-11-13",
-      "sleeve": "ibs_etfs"
-    },
     "EFA": {
       "entry_date": "2026-11-05",
       "sleeve": "rotation",
       "stop": 98.3289
-    },
-    "IWM": {
-      "entry_date": "2026-11-13",
-      "sleeve": "ibs_etfs"
     },
     "LLY": {
       "entry_date": "2026-11-20",
@@ -597,18 +589,10 @@
       "sleeve": "rsi2_stocks",
       "stop": 468.813
     },
-    "SPY": {
-      "entry_date": "2026-11-18",
-      "sleeve": "rsi2_stocks"
-    },
     "VNQ": {
       "entry_date": "2026-11-04",
       "sleeve": "rotation",
       "stop": 90.61455
-    },
-    "VOO": {
-      "entry_date": "2026-11-19",
-      "sleeve": "rsi2_stocks"
     },
     "VRTX": {
       "entry_date": "2026-11-16",
