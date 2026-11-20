@@ -16,6 +16,16 @@
   "ai_errors": 5,
   "latest": [
     {
+      "time_utc": "2026-11-20 14:08:58",
+      "symbol": "XLK",
+      "reason": "The fund has been in a steep, volatile slide with large sharp drops, so a dip-buy signal looks unreliable amid the persistent downtrend and choppy swings."
+    },
+    {
+      "time_utc": "2026-11-20 14:08:51",
+      "symbol": "QQQ",
+      "reason": "Prices have been in a persistent, choppy downtrend with sharp drops, and the latest close sits near the lows, so a bounce signal looks unreliable."
+    },
+    {
       "time_utc": "2026-11-19 14:13:28",
       "symbol": "AAOI",
       "reason": "The stock has fallen sharply for weeks with violent swings, contradicting the long-term strength signal; the trend is a steep collapse, so the entry looks unreliable."
@@ -54,16 +64,6 @@
       "time_utc": "2026-11-18 14:16:06",
       "symbol": "MU",
       "reason": "The stock has fallen sharply over the month, including a huge single-day collapse, with violent swings since; the long-term signal looks unreliable amid this instability."
-    },
-    {
-      "time_utc": "2026-11-18 14:15:59",
-      "symbol": "LITE",
-      "reason": "The price has fallen sharply over the month, with violent swings and a collapse that contradicts a strong-momentum signal, so the entry looks unreliable."
-    },
-    {
-      "time_utc": "2026-11-18 14:15:53",
-      "symbol": "AXTI",
-      "reason": "The stock has fallen sharply for weeks with violent swings and a steep recent drop, so the long-term strength signal looks unreliable right now."
     }
   ]
 }
