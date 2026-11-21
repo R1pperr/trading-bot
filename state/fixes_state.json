@@ -4,7 +4,9 @@
  },
  "cooldown": {
   "turn_of_month": {},
-  "ibs_etfs": {},
+  "ibs_etfs": {
+   "trend_below": "2027-02-12"
+  },
   "rsi2_stocks": {
    "trend_below": "2027-02-03"
   },
