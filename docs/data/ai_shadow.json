@@ -16,6 +16,31 @@
   "ai_errors": 5,
   "latest": [
     {
+      "time_utc": "2026-11-23 14:10:17",
+      "symbol": "XLK",
+      "reason": "The latest day shows a sharp, extreme drop after a steady slide, which is likely to be volatile and unreliable for a simple entry signal."
+    },
+    {
+      "time_utc": "2026-11-23 14:10:11",
+      "symbol": "DIA",
+      "reason": "The fund has fallen sharply for several straight days to a steep multi-week low, so buying into this accelerating slide looks unreliable and risky."
+    },
+    {
+      "time_utc": "2026-11-23 14:10:04",
+      "symbol": "IWM",
+      "reason": "The fund has fallen sharply over several sessions, ending with a steep one-day drop to a new low, so the buy signal looks like catching a falling knife."
+    },
+    {
+      "time_utc": "2026-11-23 14:09:58",
+      "symbol": "QQQ",
+      "reason": "The latest day shows a very sharp drop within a persistent downtrend, an extreme move that could keep falling or snap back unpredictably, making the signal unreliable."
+    },
+    {
+      "time_utc": "2026-11-23 14:09:50",
+      "symbol": "SPY",
+      "reason": "The latest day saw a very sharp drop after a steady slide, an extreme move that could reverse or keep cascading, making this signal unreliable."
+    },
+    {
       "time_utc": "2026-11-20 14:08:58",
       "symbol": "XLK",
       "reason": "The fund has been in a steep, volatile slide with large sharp drops, so a dip-buy signal looks unreliable amid the persistent downtrend and choppy swings."
@@ -39,31 +64,6 @@
       "time_utc": "2026-11-19 14:13:14",
       "symbol": "MU",
       "reason": "The stock has fallen sharply from its recent high, with a huge one-day plunge and erratic swings since, so the long-term signal looks unreliable right now."
-    },
-    {
-      "time_utc": "2026-11-19 14:13:07",
-      "symbol": "LITE",
-      "reason": "The stock has fallen sharply for weeks with wild, violent swings in both directions, so the long-term strength signal looks unreliable and the price action is too choppy."
-    },
-    {
-      "time_utc": "2026-11-19 14:13:00",
-      "symbol": "AXTI",
-      "reason": "The price has fallen sharply to roughly half its recent level with wild, choppy swings and a big one-day drop, so the long-term signal looks unreliable."
-    },
-    {
-      "time_utc": "2026-11-18 14:16:20",
-      "symbol": "AAOI",
-      "reason": "The stock has collapsed by more than half in a month with violent swings, which contradicts the strong-momentum signal and suggests the entry is unreliable."
-    },
-    {
-      "time_utc": "2026-11-18 14:16:13",
-      "symbol": "DELL",
-      "reason": "The stock has fallen sharply for weeks with violent swings and big one-day drops, so the long-term strength signal looks unreliable and the price action is chaotic."
-    },
-    {
-      "time_utc": "2026-11-18 14:16:06",
-      "symbol": "MU",
-      "reason": "The stock has fallen sharply over the month, including a huge single-day collapse, with violent swings since; the long-term signal looks unreliable amid this instability."
     }
   ]
 }

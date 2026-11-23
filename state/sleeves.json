@@ -7,7 +7,7 @@
   },
   "days": {
     "crypto": "2026-11-02",
-    "stock": "2026-11-20"
+    "stock": "2026-11-23"
   },
   "entries": {
     "11ee5671-d61d-4874-a4bd-a435f711dbd8": {
@@ -225,6 +225,18 @@
       "sleeve": "ibs_etfs",
       "spread": null,
       "symbol": "XLE"
+    },
+    "8a4a0254-5476-4f8b-b629-345aa162ed18": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Recent pullback after a gradual uptrend looks like an ordinary dip; no extreme one-day collapse or unusually choppy action undermines the oversold signal.",
+      "day": "2026-11-23",
+      "equity": 95668.22,
+      "placed_utc": "2026-11-23T14:10:31Z",
+      "pre_open": true,
+      "qty": 0.26078,
+      "sleeve": "rsi2_stocks",
+      "spread": null,
+      "symbol": "AAPL"
     },
     "8d5a3d24-84a2-49b1-9b7a-2385993086c2": {
       "ai_decision": "APPROVE",
@@ -490,6 +502,18 @@
       "spread": "wide",
       "symbol": "ZS"
     },
+    "e3382f6f-362f-499b-9071-c824c3242ed6": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Prices show a steady upward trend with modest recent pullback and no extreme one-day move, so the dip-buy signal looks reasonably reliable.",
+      "day": "2026-11-23",
+      "equity": 95668.22,
+      "placed_utc": "2026-11-23T14:10:24Z",
+      "pre_open": true,
+      "qty": 0.23856,
+      "sleeve": "ibs_etfs",
+      "spread": "wide",
+      "symbol": "XLP"
+    },
     "f4f3c963-2ff9-4e20-a4e2-a4a9d55ec677": {
       "ai_decision": "APPROVE",
       "ai_reason": "Recent prices show a modest pullback within a choppy but range-bound pattern; no single extreme move stands out, so the dip-buy signal looks reasonable.",
@@ -560,6 +584,11 @@
     ]
   },
   "positions": {
+    "AAPL": {
+      "entry_date": "2026-11-23",
+      "sleeve": "rsi2_stocks",
+      "stop": 323.6493
+    },
     "ABT": {
       "entry_date": "2026-11-13",
       "sleeve": "rsi2_stocks",
@@ -614,6 +643,11 @@
       "entry_date": "2026-11-17",
       "sleeve": "ibs_etfs",
       "stop": 154.0638
+    },
+    "XLP": {
+      "entry_date": "2026-11-23",
+      "sleeve": "ibs_etfs",
+      "stop": 84.1743
     },
     "XLRE": {
       "entry_date": "2026-11-20",
