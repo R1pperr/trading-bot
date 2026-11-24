@@ -266,3 +266,11 @@ time_utc,event,symbol,signal,signal_date,details,ai_decision,ai_reason,side,qty,
 2026-11-23 14:10:31,AI_DECISION,AAPL,BUY,2026-11-23,sleeve=rsi2_stocks; short-term entry signal,APPROVE,Recent pullback after a gradual uptrend looks like an ordinary dip; no extreme one-day collapse or unusually choppy action undermines the oversold signal.,,0.2608,348.01,,,95668.22
 2026-11-23 14:10:31,ORDER,AAPL,BUY,2026-11-23,sleeve=rsi2_stocks; short-term entry signal,APPROVE,Recent pullback after a gradual uptrend looks like an ordinary dip; no extreme one-day collapse or unusually choppy action undermines the oversold signal.,buy,0.2608,348.01,8a4a0254-5476-4f8b-b629-345aa162ed18,accepted,95668.22
 2026-11-23 21:07:33,DAILY_SUMMARY,,,,,,,,,,,,
+2026-11-24 14:19:42,ORDER,XLB,,,sleeve=ibs_etfs; IBS exit rule,,,sell,96.9924,49.45,f610ab9a-3fe9-4fcf-97d2-46d706f5badb,pending_new,96072.18
+2026-11-24 14:19:42,ORDER,XLE,,,sleeve=ibs_etfs; IBS exit rule,,,sell,76.4008,60.15,688a472c-fdb1-4955-8c1c-1fa4a76fd2cb,pending_new,96072.18
+2026-11-24 14:19:42,ORDER,XLI,,,sleeve=ibs_etfs; IBS exit rule,,,sell,0.8632,161.16,9f0d24a2-ae4c-4175-b1f4-3aa527015eb2,accepted,96072.18
+2026-11-24 14:19:42,ORDER,XLV,,,sleeve=ibs_etfs; IBS exit rule,,,sell,26.1679,180.41,6fc3220f-a57a-4417-b564-876e59d53090,pending_new,96072.18
+2026-11-24 14:19:42,ORDER,AAPL,,,sleeve=rsi2_stocks; RSI(2) exit rule,,,sell,0.2608,347.7,eb9fc587-963c-4215-8503-a99573893958,accepted,96072.18
+2026-11-24 14:19:42,ORDER,VRTX,,,sleeve=rsi2_stocks; RSI(2) exit rule,,,sell,9.1089,546.43,5fff2ccb-454f-4e1f-ba59-e673b431e911,pending_new,96072.18
+2026-11-24 14:19:45,AI_DECISION,VLO,BUY,2026-11-24,sleeve=rsi2_stocks; short-term entry signal,APPROVE,"Prices show a steady downtrend with no single extreme one-day reversal-prone spike recently, so the oversold dip-buy signal looks reasonably consistent rather than unreliable.",,14.5509,329.39,,,96072.18
+2026-11-24 14:19:45,ORDER,VLO,BUY,2026-11-24,sleeve=rsi2_stocks; short-term entry signal,APPROVE,"Prices show a steady downtrend with no single extreme one-day reversal-prone spike recently, so the oversold dip-buy signal looks reasonably consistent rather than unreliable.",buy,14.5509,329.39,b556b57e-0a50-4ada-abe1-5f9ba0f75955,pending_new,96072.18

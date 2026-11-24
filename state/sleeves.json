@@ -1,13 +1,13 @@
 {
   "closed_pl": {
-    "ibs_etfs": -880.47,
+    "ibs_etfs": -1343.08,
     "momentum_stocks": -453.79,
     "rotation": -347.48,
-    "rsi2_stocks": -1134.69
+    "rsi2_stocks": -1142.02
   },
   "days": {
     "crypto": "2026-11-02",
-    "stock": "2026-11-23"
+    "stock": "2026-11-24"
   },
   "entries": {
     "11ee5671-d61d-4874-a4bd-a435f711dbd8": {
@@ -394,6 +394,18 @@
       "spread": null,
       "symbol": "VRTX"
     },
+    "b556b57e-0a50-4ada-abe1-5f9ba0f75955": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Prices show a steady downtrend with no single extreme one-day reversal-prone spike recently, so the oversold dip-buy signal looks reasonably consistent rather than unreliable.",
+      "day": "2026-11-24",
+      "equity": 96072.18,
+      "placed_utc": "2026-11-24T14:19:46Z",
+      "pre_open": true,
+      "qty": 14.550898,
+      "sleeve": "rsi2_stocks",
+      "spread": "wide",
+      "symbol": "VLO"
+    },
     "ccad54a1-56b1-439f-a2f8-1b1e28983cdc": {
       "ai_decision": "APPROVE",
       "ai_reason": "Recent decline is a steady pullback with a sharp but already partly recovered drop earlier; no clear sign the oversold signal is unreliable for this mean-reversion entry.",
@@ -584,11 +596,6 @@
     ]
   },
   "positions": {
-    "AAPL": {
-      "entry_date": "2026-11-23",
-      "sleeve": "rsi2_stocks",
-      "stop": 323.6493
-    },
     "ABT": {
       "entry_date": "2026-11-13",
       "sleeve": "rsi2_stocks",
@@ -614,35 +621,20 @@
       "sleeve": "rsi2_stocks",
       "stop": 468.813
     },
+    "VLO": {
+      "entry_date": "2026-11-24",
+      "sleeve": "rsi2_stocks",
+      "stop": 306.3327
+    },
     "VNQ": {
       "entry_date": "2026-11-04",
       "sleeve": "rotation",
       "stop": 90.61455
     },
-    "VRTX": {
-      "entry_date": "2026-11-16",
-      "sleeve": "rsi2_stocks",
-      "stop": 500.84685
-    },
-    "XLB": {
-      "entry_date": "2026-11-20",
-      "sleeve": "ibs_etfs",
-      "stop": 45.97455
-    },
-    "XLE": {
-      "entry_date": "2026-11-17",
-      "sleeve": "ibs_etfs",
-      "stop": 59.2503
-    },
     "XLF": {
       "entry_date": "2026-11-18",
       "sleeve": "ibs_etfs",
       "stop": 53.0844
-    },
-    "XLI": {
-      "entry_date": "2026-11-17",
-      "sleeve": "ibs_etfs",
-      "stop": 154.0638
     },
     "XLP": {
       "entry_date": "2026-11-23",
@@ -653,11 +645,6 @@
       "entry_date": "2026-11-20",
       "sleeve": "ibs_etfs",
       "stop": 39.8784
-    },
-    "XLV": {
-      "entry_date": "2026-11-17",
-      "sleeve": "ibs_etfs",
-      "stop": 172.9893
     },
     "XLY": {
       "entry_date": "2026-11-20",
