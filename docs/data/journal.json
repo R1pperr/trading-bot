@@ -24,14 +24,6 @@
       "order_id": "9816b8ed-bc1c-4bad-a108-24ba2acea5b9",
       "time": "2026-11-13 14:31:10"
     },
-    "MSFT": {
-      "qty": 0.060908,
-      "cost": 30.801784679999997,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-18",
-      "order_id": "5a507a56-3780-419b-b94b-4f70f1abbb14",
-      "time": "2026-11-18 14:30:00"
-    },
     "XLF": {
       "qty": 1.065209,
       "cost": 60.54647956000001,
@@ -190,7 +182,8 @@
     "6fc3220f-a57a-4417-b564-876e59d53090",
     "f610ab9a-3fe9-4fcf-97d2-46d706f5badb",
     "5fff2ccb-454f-4e1f-ba59-e673b431e911",
-    "b556b57e-0a50-4ada-abe1-5f9ba0f75955"
+    "b556b57e-0a50-4ada-abe1-5f9ba0f75955",
+    "25fc5037-2cda-4e41-b5ef-633e6b632eb9"
   ],
   "trades": [
     {
@@ -954,6 +947,23 @@
       "entry_time": "2026-11-16 14:32:12",
       "exit_time": "2026-11-24 14:34:19",
       "exit_order": "5fff2ccb-454f-4e1f-ba59-e673b431e911"
+    },
+    {
+      "symbol": "MSFT",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-18",
+      "exit_day": "2026-11-25",
+      "days": 7,
+      "qty": 0.060908,
+      "entry": 505.71,
+      "exit": 485.92,
+      "pnl": -1.21,
+      "ret": -0.03913,
+      "stop": false,
+      "entry_order": "5a507a56-3780-419b-b94b-4f70f1abbb14",
+      "entry_time": "2026-11-18 14:30:00",
+      "exit_time": "2026-11-25 14:30:00",
+      "exit_order": "25fc5037-2cda-4e41-b5ef-633e6b632eb9"
     }
   ]
 }

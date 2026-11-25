@@ -32,9 +32,9 @@
     },
     {
       "sleeve": "rsi2_stocks",
-      "trades": 26,
+      "trades": 27,
       "status": "ok",
-      "expectancy": -0.0020745,
+      "expectancy": -0.0005039999999999996,
       "win_rate": 0.45,
       "limits": {
         "expectancy_low": -0.02297,
