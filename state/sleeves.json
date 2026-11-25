@@ -1,13 +1,13 @@
 {
   "closed_pl": {
-    "ibs_etfs": -1343.08,
+    "ibs_etfs": -1333.85,
     "momentum_stocks": -453.79,
     "rotation": -347.48,
-    "rsi2_stocks": -1142.02
+    "rsi2_stocks": -1113.88
   },
   "days": {
     "crypto": "2026-11-02",
-    "stock": "2026-11-24"
+    "stock": "2026-11-25"
   },
   "entries": {
     "11ee5671-d61d-4874-a4bd-a435f711dbd8": {
@@ -238,6 +238,18 @@
       "spread": null,
       "symbol": "AAPL"
     },
+    "8b047e8a-4810-4e89-97ef-1058c44af501": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "The latest sharp one-day drop fits the oversold dip-buying setup, and the prior trend was upward without excessive choppiness, so the signal does not look unreliable.",
+      "day": "2026-11-25",
+      "equity": 96220.19,
+      "placed_utc": "2026-11-25T14:15:01Z",
+      "pre_open": true,
+      "qty": 49.994902,
+      "sleeve": "rsi2_stocks",
+      "spread": "wide",
+      "symbol": "MDT"
+    },
     "8d5a3d24-84a2-49b1-9b7a-2385993086c2": {
       "ai_decision": "APPROVE",
       "ai_reason": "The prices show a steady uptrend followed by a sharp multi-day pullback, which fits a short-term oversold setup; nothing looks choppy or like a single extreme reversal-prone spike.",
@@ -357,6 +369,18 @@
       "sleeve": "rsi2_stocks",
       "spread": "wide",
       "symbol": "PM"
+    },
+    "a329a7b1-8ac6-4b51-9037-1d036b008353": {
+      "ai_decision": "APPROVE",
+      "ai_reason": "Prices show a steady, persistent decline rather than choppiness or a single extreme one-day spike, so the oversold mean-reversion signal looks reasonably reliable.",
+      "day": "2026-11-25",
+      "equity": 96220.19,
+      "placed_utc": "2026-11-25T14:14:54Z",
+      "pre_open": true,
+      "qty": 20.299618,
+      "sleeve": "rsi2_stocks",
+      "spread": "wide",
+      "symbol": "PSX"
     },
     "a794ba71-5e71-42cd-833a-a3b59b9b6463": {
       "ai_decision": "APPROVE",
@@ -596,30 +620,20 @@
     ]
   },
   "positions": {
-    "ABT": {
-      "entry_date": "2026-11-13",
-      "sleeve": "rsi2_stocks",
-      "stop": 99.7611
-    },
-    "BRK.B": {
-      "entry_date": "2026-11-20",
-      "sleeve": "rsi2_stocks",
-      "stop": 532.1553
-    },
     "DBC": {
       "entry_date": "2026-11-11",
       "sleeve": "rotation",
       "stop": 28.5975
     },
-    "LLY": {
-      "entry_date": "2026-11-20",
+    "MDT": {
+      "entry_date": "2026-11-25",
       "sleeve": "rsi2_stocks",
-      "stop": 1256.8764
+      "stop": 89.4939
     },
-    "MSFT": {
-      "entry_date": "2026-11-18",
+    "PSX": {
+      "entry_date": "2026-11-25",
       "sleeve": "rsi2_stocks",
-      "stop": 468.813
+      "stop": 220.41
     },
     "VLO": {
       "entry_date": "2026-11-24",
@@ -631,25 +645,10 @@
       "sleeve": "rotation",
       "stop": 90.61455
     },
-    "XLF": {
-      "entry_date": "2026-11-18",
-      "sleeve": "ibs_etfs",
-      "stop": 53.0844
-    },
     "XLP": {
       "entry_date": "2026-11-23",
       "sleeve": "ibs_etfs",
       "stop": 84.1743
-    },
-    "XLRE": {
-      "entry_date": "2026-11-20",
-      "sleeve": "ibs_etfs",
-      "stop": 39.8784
-    },
-    "XLY": {
-      "entry_date": "2026-11-20",
-      "sleeve": "ibs_etfs",
-      "stop": 107.7405
     }
   },
   "rotation": {

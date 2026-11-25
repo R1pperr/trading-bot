@@ -16,6 +16,11 @@
   "ai_errors": 5,
   "latest": [
     {
+      "time_utc": "2026-11-25 14:14:47",
+      "symbol": "MPC",
+      "reason": "The stock has fallen steeply for weeks with several sharp drops and failed rebounds, so this looks like a sustained slide rather than a reliable short-term dip."
+    },
+    {
       "time_utc": "2026-11-23 14:10:17",
       "symbol": "XLK",
       "reason": "The latest day shows a sharp, extreme drop after a steady slide, which is likely to be volatile and unreliable for a simple entry signal."
@@ -59,11 +64,6 @@
       "time_utc": "2026-11-19 14:13:21",
       "symbol": "DELL",
       "reason": "The stock has fallen sharply, losing roughly half its value in a month with violent swings and big single-day drops, so the long-term signal looks unreliable."
-    },
-    {
-      "time_utc": "2026-11-19 14:13:14",
-      "symbol": "MU",
-      "reason": "The stock has fallen sharply from its recent high, with a huge one-day plunge and erratic swings since, so the long-term signal looks unreliable right now."
     }
   ]
 }
