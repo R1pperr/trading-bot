@@ -620,22 +620,10 @@
     ]
   },
   "positions": {
-    "ABT": {
-      "entry_date": "2026-11-13",
-      "sleeve": "rsi2_stocks"
-    },
-    "BRK.B": {
-      "entry_date": "2026-11-20",
-      "sleeve": "rsi2_stocks"
-    },
     "DBC": {
       "entry_date": "2026-11-11",
       "sleeve": "rotation",
       "stop": 28.5975
-    },
-    "LLY": {
-      "entry_date": "2026-11-20",
-      "sleeve": "rsi2_stocks"
     },
     "MDT": {
       "entry_date": "2026-11-25",
@@ -657,22 +645,10 @@
       "sleeve": "rotation",
       "stop": 90.61455
     },
-    "XLF": {
-      "entry_date": "2026-11-18",
-      "sleeve": "ibs_etfs"
-    },
     "XLP": {
       "entry_date": "2026-11-23",
       "sleeve": "ibs_etfs",
       "stop": 84.1743
-    },
-    "XLRE": {
-      "entry_date": "2026-11-20",
-      "sleeve": "ibs_etfs"
-    },
-    "XLY": {
-      "entry_date": "2026-11-20",
-      "sleeve": "ibs_etfs"
     }
   },
   "rotation": {

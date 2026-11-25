@@ -16,54 +16,6 @@
       "order_id": "cf8fa1f4-cac7-4150-95f0-106e5fb6e328",
       "time": "2026-11-11 14:31:52"
     },
-    "ABT": {
-      "qty": 45.94731,
-      "cost": 4971.498942,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-13",
-      "order_id": "9816b8ed-bc1c-4bad-a108-24ba2acea5b9",
-      "time": "2026-11-13 14:31:10"
-    },
-    "XLF": {
-      "qty": 1.065209,
-      "cost": 60.54647956000001,
-      "sleeve": "ibs_etfs",
-      "day": "2026-11-18",
-      "order_id": "438bd6f1-f35e-4203-aa57-5ffd2d6a6909",
-      "time": "2026-11-18 14:30:50"
-    },
-    "XLRE": {
-      "qty": 2.357032,
-      "cost": 101.79163484055199,
-      "sleeve": "ibs_etfs",
-      "day": "2026-11-20",
-      "order_id": "6493bfe3-7f76-40f3-b84e-fffd81af80e1",
-      "time": "2026-11-20 14:32:11"
-    },
-    "BRK.B": {
-      "qty": 8.270662,
-      "cost": 4753.123357461391,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-20",
-      "order_id": "982480ae-d2a0-441b-aacb-b0dce591caa6",
-      "time": "2026-11-20 14:32:17"
-    },
-    "LLY": {
-      "qty": 3.547826,
-      "cost": 4834.671010268376,
-      "sleeve": "rsi2_stocks",
-      "day": "2026-11-20",
-      "order_id": "dc1efdad-6e3d-4182-8b50-07ac8f065293",
-      "time": "2026-11-20 14:32:48"
-    },
-    "XLY": {
-      "qty": 41.388148,
-      "cost": 4778.294838506548,
-      "sleeve": "ibs_etfs",
-      "day": "2026-11-20",
-      "order_id": "134c30d8-65cf-4d4f-affd-6c7b8e5cac71",
-      "time": "2026-11-20 14:33:19"
-    },
     "XLP": {
       "qty": 0.23856,
       "cost": 21.348734399999998,
@@ -79,6 +31,22 @@
       "day": "2026-11-24",
       "order_id": "b556b57e-0a50-4ada-abe1-5f9ba0f75955",
       "time": "2026-11-24 14:34:29"
+    },
+    "MDT": {
+      "qty": 49.994902,
+      "cost": 4811.3838312810785,
+      "sleeve": "rsi2_stocks",
+      "day": "2026-11-25",
+      "order_id": "8b047e8a-4810-4e89-97ef-1058c44af501",
+      "time": "2026-11-25 14:34:39"
+    },
+    "PSX": {
+      "qty": 20.299618,
+      "cost": 4714.388338924882,
+      "sleeve": "rsi2_stocks",
+      "day": "2026-11-25",
+      "order_id": "a329a7b1-8ac6-4b51-9037-1d036b008353",
+      "time": "2026-11-25 14:35:35"
     }
   },
   "seen": [
@@ -183,7 +151,15 @@
     "f610ab9a-3fe9-4fcf-97d2-46d706f5badb",
     "5fff2ccb-454f-4e1f-ba59-e673b431e911",
     "b556b57e-0a50-4ada-abe1-5f9ba0f75955",
-    "25fc5037-2cda-4e41-b5ef-633e6b632eb9"
+    "25fc5037-2cda-4e41-b5ef-633e6b632eb9",
+    "cf34dad5-df4e-4feb-9ad5-8d5aea3bed27",
+    "aaffcf6b-a5ad-4f5e-9d85-bee364cb5a0a",
+    "42671e15-45b5-4dfb-b36e-39a79eeee56d",
+    "c722ba1f-3a6e-4165-bf32-a49189ffe57a",
+    "ac7b106d-0991-4202-aef6-85bdfbafafcb",
+    "4e22aea9-24ac-4c13-b5c6-00278ddd61e9",
+    "8b047e8a-4810-4e89-97ef-1058c44af501",
+    "a329a7b1-8ac6-4b51-9037-1d036b008353"
   ],
   "trades": [
     {
@@ -964,6 +940,108 @@
       "entry_time": "2026-11-18 14:30:00",
       "exit_time": "2026-11-25 14:30:00",
       "exit_order": "25fc5037-2cda-4e41-b5ef-633e6b632eb9"
+    },
+    {
+      "symbol": "XLF",
+      "sleeve": "ibs_etfs",
+      "entry_day": "2026-11-18",
+      "exit_day": "2026-11-25",
+      "days": 7,
+      "qty": 1.065209,
+      "entry": 56.84,
+      "exit": 55.51,
+      "pnl": -1.42,
+      "ret": -0.0234,
+      "stop": false,
+      "entry_order": "438bd6f1-f35e-4203-aa57-5ffd2d6a6909",
+      "entry_time": "2026-11-18 14:30:50",
+      "exit_time": "2026-11-25 14:31:12",
+      "exit_order": "cf34dad5-df4e-4feb-9ad5-8d5aea3bed27"
+    },
+    {
+      "symbol": "BRK.B",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-20",
+      "exit_day": "2026-11-25",
+      "days": 5,
+      "qty": 8.270662,
+      "entry": 574.6968,
+      "exit": 575.67,
+      "pnl": 8.05,
+      "ret": 0.00169,
+      "stop": false,
+      "entry_order": "982480ae-d2a0-441b-aacb-b0dce591caa6",
+      "entry_time": "2026-11-20 14:32:17",
+      "exit_time": "2026-11-25 14:31:26",
+      "exit_order": "aaffcf6b-a5ad-4f5e-9d85-bee364cb5a0a"
+    },
+    {
+      "symbol": "ABT",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-13",
+      "exit_day": "2026-11-25",
+      "days": 12,
+      "qty": 45.94731,
+      "entry": 108.2,
+      "exit": 105.53,
+      "pnl": -122.68,
+      "ret": -0.02468,
+      "stop": false,
+      "entry_order": "9816b8ed-bc1c-4bad-a108-24ba2acea5b9",
+      "entry_time": "2026-11-13 14:31:10",
+      "exit_time": "2026-11-25 14:31:35",
+      "exit_order": "42671e15-45b5-4dfb-b36e-39a79eeee56d"
+    },
+    {
+      "symbol": "XLRE",
+      "sleeve": "ibs_etfs",
+      "entry_day": "2026-11-20",
+      "exit_day": "2026-11-25",
+      "days": 5,
+      "qty": 2.357032,
+      "entry": 43.1864,
+      "exit": 43.47,
+      "pnl": 0.67,
+      "ret": 0.00657,
+      "stop": false,
+      "entry_order": "6493bfe3-7f76-40f3-b84e-fffd81af80e1",
+      "entry_time": "2026-11-20 14:32:11",
+      "exit_time": "2026-11-25 14:32:04",
+      "exit_order": "c722ba1f-3a6e-4165-bf32-a49189ffe57a"
+    },
+    {
+      "symbol": "LLY",
+      "sleeve": "rsi2_stocks",
+      "entry_day": "2026-11-20",
+      "exit_day": "2026-11-25",
+      "days": 5,
+      "qty": 3.547826,
+      "entry": 1362.7137,
+      "exit": 1399.8593,
+      "pnl": 131.79,
+      "ret": 0.02726,
+      "stop": false,
+      "entry_order": "dc1efdad-6e3d-4182-8b50-07ac8f065293",
+      "entry_time": "2026-11-20 14:32:48",
+      "exit_time": "2026-11-25 14:33:58",
+      "exit_order": "ac7b106d-0991-4202-aef6-85bdfbafafcb"
+    },
+    {
+      "symbol": "XLY",
+      "sleeve": "ibs_etfs",
+      "entry_day": "2026-11-20",
+      "exit_day": "2026-11-25",
+      "days": 5,
+      "qty": 41.388148,
+      "entry": 115.4508,
+      "exit": 115.4789,
+      "pnl": 1.16,
+      "ret": 0.00024,
+      "stop": false,
+      "entry_order": "134c30d8-65cf-4d4f-affd-6c7b8e5cac71",
+      "entry_time": "2026-11-20 14:33:19",
+      "exit_time": "2026-11-25 14:34:36",
+      "exit_order": "4e22aea9-24ac-4c13-b5c6-00278ddd61e9"
     }
   ]
 }
