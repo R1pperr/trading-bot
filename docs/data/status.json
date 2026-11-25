@@ -1,6 +1,6 @@
 {
   "last_run": {
-    "time_utc": "2026-11-25T21:05:31Z",
+    "time_utc": "2026-11-25T21:20:27Z",
     "status": "market_closed",
     "message": "The US market is closed, so there was nothing to do."
   },
@@ -41,7 +41,7 @@
     "kill_switch_pct": 0.03
   },
   "cash": 72487.68,
-  "buying_power": 356900.22,
+  "buying_power": 356900.21,
   "invested": 23910.53,
   "open_pl": -288.94,
   "stock_value": 23910.53,

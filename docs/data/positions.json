@@ -80,13 +80,13 @@
     "sleeve": "ibs_etfs",
     "qty": 0.23856,
     "avg_entry_price": 89.49,
-    "current_price": 92.6,
-    "market_value": 22.090656,
-    "unrealized_pl": 0.741922,
-    "unrealized_pl_pct": 0.03475,
-    "change_today_pct": 0.00784,
+    "current_price": 92.59,
+    "market_value": 22.08827,
+    "unrealized_pl": 0.739536,
+    "unrealized_pl_pct": 0.03464,
+    "change_today_pct": 0.00773,
     "stop_price": 83.23,
     "entry_date": "2026-11-23",
-    "stop_at_alpaca": true
+    "stop_at_alpaca": false
   }
 ]
