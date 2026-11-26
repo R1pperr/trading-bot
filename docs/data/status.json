@@ -1,12 +1,12 @@
 {
   "last_run": {
-    "time_utc": "2026-11-25T21:50:18Z",
+    "time_utc": "2026-11-26T14:17:25Z",
     "status": "market_closed",
     "message": "The US market is closed, so there was nothing to do."
   },
   "market_open": false,
-  "equity": 96400.82,
-  "day_change_pct": 3.529595165607802e-05,
+  "equity": 96397.72,
+  "day_change_pct": -3.54894273968398e-08,
   "kill_switch": {
     "on": false,
     "reason": ""
@@ -29,7 +29,7 @@
       "feed": "crypto"
     }
   },
-  "trades_today": 2,
+  "trades_today": 0,
   "limits": {
     "max_trades_per_day": 5,
     "max_open_positions": {
@@ -40,11 +40,11 @@
     "stop_loss_pct": 0.07,
     "kill_switch_pct": 0.03
   },
-  "cash": 72487.68,
-  "buying_power": 356907.5,
-  "invested": 23913.14,
-  "open_pl": -286.34,
-  "stock_value": 23913.14,
+  "cash": 72487.26,
+  "buying_power": 356898.34,
+  "invested": 23910.46,
+  "open_pl": -289.01,
+  "stock_value": 23910.46,
   "crypto_value": 0,
   "crypto_trades_today": 0
 }
