@@ -7,7 +7,8 @@
   "ibs_etfs": {
    "trend_below": "2027-02-12",
    "vol_sizing": "2027-02-16",
-   "vol_filter": "2027-02-16"
+   "vol_filter": "2027-02-16",
+   "time_exit": "2027-02-17"
   },
   "rsi2_stocks": {
    "trend_below": "2027-02-03"
