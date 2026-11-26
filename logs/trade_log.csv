@@ -288,3 +288,4 @@ time_utc,event,symbol,signal,signal_date,details,ai_decision,ai_reason,side,qty,
 2026-11-25 14:15:01,AI_DECISION,MDT,BUY,2026-11-25,sleeve=rsi2_stocks; short-term entry signal,APPROVE,"The latest sharp one-day drop fits the oversold dip-buying setup, and the prior trend was upward without excessive choppiness, so the signal does not look unreliable.",,49.9949,96.23,,,96220.19
 2026-11-25 14:15:01,ORDER,MDT,BUY,2026-11-25,sleeve=rsi2_stocks; short-term entry signal,APPROVE,"The latest sharp one-day drop fits the oversold dip-buying setup, and the prior trend was upward without excessive choppiness, so the signal does not look unreliable.",buy,49.9949,96.23,8b047e8a-4810-4e89-97ef-1058c44af501,pending_new,96220.19
 2026-11-25 21:05:32,DAILY_SUMMARY,,,,,,,,,,,,
+2026-11-26 21:13:26,DAILY_SUMMARY,,,,,,,,,,,,
