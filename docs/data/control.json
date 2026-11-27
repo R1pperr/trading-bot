@@ -4,7 +4,7 @@
   "realtime": "enforce"
  },
  "ai_record": {
-  "main": "of your last 50 calls, 38 have results; 15 approvals averaged -1.34% a trade (47% won); the 23 trades you vetoed would have averaged -8.20% after costs (so your vetoes helped).",
+  "main": "of your last 50 calls, 40 have results; 15 approvals averaged -1.34% a trade (47% won); the 25 trades you vetoed would have averaged -7.85% after costs (so your vetoes helped).",
   "realtime": "of your last 17 calls, 5 have results; the 5 trades you vetoed would have averaged +0.21% after costs (so your vetoes cost money)."
  },
  "allocations": {
@@ -117,5 +117,5 @@
   },
   "turn_of_month": null
  },
- "updated_utc": "2026-11-26T03:44:02Z"
+ "updated_utc": "2026-11-27T03:45:00Z"
 }
