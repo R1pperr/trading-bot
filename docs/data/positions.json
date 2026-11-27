@@ -5,14 +5,14 @@
     "sleeve": "rotation",
     "qty": 160.143788,
     "avg_entry_price": 30.866369,
-    "current_price": 29.495,
-    "market_value": 4723.441027,
-    "unrealized_pl": -219.616226,
-    "unrealized_pl_pct": -0.04443,
-    "change_today_pct": 0.00769,
+    "current_price": 29.53,
+    "market_value": 4729.04606,
+    "unrealized_pl": -214.011193,
+    "unrealized_pl_pct": -0.0433,
+    "change_today_pct": 0.00888,
     "stop_price": 28.71,
     "entry_date": "2026-11-11",
-    "stop_at_alpaca": true
+    "stop_at_alpaca": false
   },
   {
     "symbol": "MDT",
@@ -20,14 +20,14 @@
     "sleeve": "rsi2_stocks",
     "qty": 49.994902,
     "avg_entry_price": 96.237489,
-    "current_price": 95.43,
-    "market_value": 4771.013498,
-    "unrealized_pl": -40.370333,
-    "unrealized_pl_pct": -0.00839,
-    "change_today_pct": -0.00656,
+    "current_price": 95.02,
+    "market_value": 4750.515588,
+    "unrealized_pl": -60.868243,
+    "unrealized_pl_pct": -0.01265,
+    "change_today_pct": -0.01083,
     "stop_price": 89.5,
     "entry_date": "2026-11-25",
-    "stop_at_alpaca": true
+    "stop_at_alpaca": false
   },
   {
     "symbol": "PSX",
@@ -35,14 +35,14 @@
     "sleeve": "rsi2_stocks",
     "qty": 20.299618,
     "avg_entry_price": 232.240249,
-    "current_price": 242.79,
-    "market_value": 4928.544254,
-    "unrealized_pl": 214.155915,
-    "unrealized_pl_pct": 0.04543,
-    "change_today_pct": 0.02842,
+    "current_price": 242.12,
+    "market_value": 4914.94351,
+    "unrealized_pl": 200.555171,
+    "unrealized_pl_pct": 0.04254,
+    "change_today_pct": 0.02558,
     "stop_price": 215.98,
     "entry_date": "2026-11-25",
-    "stop_at_alpaca": true
+    "stop_at_alpaca": false
   },
   {
     "symbol": "VLO",
@@ -50,14 +50,14 @@
     "sleeve": "rsi2_stocks",
     "qty": 14.550898,
     "avg_entry_price": 323.74144,
-    "current_price": 328.97,
-    "market_value": 4786.808915,
-    "unrealized_pl": 76.080243,
-    "unrealized_pl_pct": 0.01615,
-    "change_today_pct": 0.01848,
+    "current_price": 329.39,
+    "market_value": 4792.920292,
+    "unrealized_pl": 82.19162,
+    "unrealized_pl_pct": 0.01745,
+    "change_today_pct": 0.01978,
     "stop_price": 301.08,
     "entry_date": "2026-11-24",
-    "stop_at_alpaca": true
+    "stop_at_alpaca": false
   },
   {
     "symbol": "VNQ",
@@ -65,14 +65,14 @@
     "sleeve": "rotation",
     "qty": 51.288433,
     "avg_entry_price": 97.46,
-    "current_price": 96.19,
-    "market_value": 4933.43437,
-    "unrealized_pl": -65.13631,
-    "unrealized_pl_pct": -0.01303,
-    "change_today_pct": 0.00554,
+    "current_price": 96.26,
+    "market_value": 4937.024561,
+    "unrealized_pl": -61.546119,
+    "unrealized_pl_pct": -0.01231,
+    "change_today_pct": 0.00627,
     "stop_price": 90.64,
     "entry_date": "2026-11-04",
-    "stop_at_alpaca": true
+    "stop_at_alpaca": false
   },
   {
     "symbol": "XLP",
@@ -80,13 +80,13 @@
     "sleeve": "ibs_etfs",
     "qty": 0.23856,
     "avg_entry_price": 89.49,
-    "current_price": 92.6751,
-    "market_value": 22.108572,
-    "unrealized_pl": 0.759838,
-    "unrealized_pl_pct": 0.03559,
-    "change_today_pct": 0.00406,
+    "current_price": 92.66,
+    "market_value": 22.10497,
+    "unrealized_pl": 0.756236,
+    "unrealized_pl_pct": 0.03542,
+    "change_today_pct": 0.0039,
     "stop_price": 83.23,
     "entry_date": "2026-11-23",
-    "stop_at_alpaca": true
+    "stop_at_alpaca": false
   }
 ]
