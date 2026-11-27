@@ -1,5 +1,19 @@
 [
   {
+    "time_utc": "2026-11-27 14:10:55",
+    "event": "AI_DECISION",
+    "symbol": "MPC",
+    "asset_class": "stock",
+    "sleeve": "rsi2_stocks",
+    "side": "buy",
+    "qty": 13.9451,
+    "price": 346.34,
+    "order_status": "",
+    "reason": "short-term entry signal",
+    "ai_decision": "VETO",
+    "ai_reason": "The stock has fallen steadily and sharply over several weeks, with repeated large drops, so this looks like a persistent downtrend rather than a reliable short-term bounce setup."
+  },
+  {
     "time_utc": "2026-11-25 14:15:01",
     "event": "ORDER",
     "symbol": "MDT",
@@ -1384,19 +1398,5 @@
     "reason": "long-term entry signal",
     "ai_decision": "VETO",
     "ai_reason": "The stock has fallen sharply from its recent peak with several big drops and wild swings, so the long-term strength signal looks unreliable right now."
-  },
-  {
-    "time_utc": "2026-11-11 14:09:06",
-    "event": "AI_DECISION",
-    "symbol": "MU",
-    "asset_class": "stock",
-    "sleeve": "momentum_stocks",
-    "side": "buy",
-    "qty": 2.5481,
-    "price": 773.02,
-    "order_status": "",
-    "reason": "long-term entry signal",
-    "ai_decision": "VETO",
-    "ai_reason": "The stock has fallen steeply over the month, including an extreme one-day plunge, and the rebound is choppy and unproven, so this momentum entry looks unreliable."
   }
 ]

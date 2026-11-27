@@ -6,7 +6,7 @@
     "candidates": []
   },
   "stock": {
-    "day": "2026-11-25",
+    "day": "2026-11-27",
     "scanned": 497,
     "found": 6,
     "candidates": [
@@ -17,39 +17,11 @@
         "action": "BUY",
         "reason": "short-term entry signal",
         "trend": "",
-        "signal_date": "2026-11-25",
+        "signal_date": "2026-11-27",
         "name": "",
         "status": "vetoed",
         "ai_decision": "VETO",
-        "ai_reason": "The stock has fallen steeply for weeks with several sharp drops and failed rebounds, so this looks like a sustained slide rather than a reliable short-term dip.",
-        "note": ""
-      },
-      {
-        "rank": 2,
-        "symbol": "PSX",
-        "sleeve": "rsi2_stocks",
-        "action": "BUY",
-        "reason": "short-term entry signal",
-        "trend": "",
-        "signal_date": "2026-11-25",
-        "name": "",
-        "status": "ordered",
-        "ai_decision": "APPROVE",
-        "ai_reason": "Prices show a steady, persistent decline rather than choppiness or a single extreme one-day spike, so the oversold mean-reversion signal looks reasonably reliable.",
-        "note": ""
-      },
-      {
-        "rank": 3,
-        "symbol": "MDT",
-        "sleeve": "rsi2_stocks",
-        "action": "BUY",
-        "reason": "short-term entry signal",
-        "trend": "",
-        "signal_date": "2026-11-25",
-        "name": "",
-        "status": "ordered",
-        "ai_decision": "APPROVE",
-        "ai_reason": "The latest sharp one-day drop fits the oversold dip-buying setup, and the prior trend was upward without excessive choppiness, so the signal does not look unreliable.",
+        "ai_reason": "The stock has fallen steadily and sharply over several weeks, with repeated large drops, so this looks like a persistent downtrend rather than a reliable short-term bounce setup.",
         "note": ""
       }
     ]
