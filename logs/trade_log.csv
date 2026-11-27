@@ -290,3 +290,4 @@ time_utc,event,symbol,signal,signal_date,details,ai_decision,ai_reason,side,qty,
 2026-11-25 21:05:32,DAILY_SUMMARY,,,,,,,,,,,,
 2026-11-26 21:13:26,DAILY_SUMMARY,,,,,,,,,,,,
 2026-11-27 14:10:55,AI_DECISION,MPC,BUY,2026-11-27,sleeve=rsi2_stocks; short-term entry signal,VETO,"The stock has fallen steadily and sharply over several weeks, with repeated large drops, so this looks like a persistent downtrend rather than a reliable short-term bounce setup.",,13.9451,346.34,,,96595.04
+2026-11-27 21:06:53,DAILY_SUMMARY,,,,,,,,,,,,
